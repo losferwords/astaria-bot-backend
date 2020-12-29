@@ -1,0 +1,69 @@
+{
+    "id": "oracle",
+    "maxEnergy": 12,
+    "maxHealth": 12,
+    "maxMana": 20,
+    "primaryWeapons": [
+        {
+            "name": "book 1",
+            "level": 1,
+            "range": 3,
+            "energyCost": 3,
+            "isUsed": false,
+            "intellect": 1,
+            "magicDamage": 1
+        },
+        {
+            "name": "book 2",
+            "level": 2,
+            "range": 3,
+            "cost": 2,
+            "energyCost": 3,
+            "isUsed": false,
+            "intellect": 2,
+            "will": 1,
+            "mind": 1,
+            "magicDamage": 2
+        },
+        {
+            "name": "book 3",
+            "level": 3,
+            "range": 3,
+            "cost": 2,
+            "energyCost": 3,
+            "isUsed": false,
+            "intellect": 3,
+            "will": 2,
+            "mind": 2,
+            "magicDamage": 3
+        }
+    ],
+    "chestpieces": [
+        {
+            "name": "armor 1",
+            "level": 1,
+            "isUsed": false,
+            "intellect": 1,
+            "armor": 1,
+            "will": 2
+        },
+        {
+            "name": "armor 2",
+            "level": 2,
+            "cost": 1,
+            "isUsed": false,
+            "intellect": 1,
+            "armor": 2,
+            "will": 3
+        },
+        {
+            "name": "armor 3",
+            "level": 3,
+            "cost": 1,
+            "isUsed": false,
+            "intellect": 2,
+            "armor": 3,
+            "will": 3
+        }
+    ]
+}

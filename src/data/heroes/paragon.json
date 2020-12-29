@@ -1,0 +1,91 @@
+{
+    "id": "paragon",
+    "maxEnergy": 12,
+    "maxHealth": 20,
+    "maxMana": 12,
+    "primaryWeapons": [
+        {
+            "name": "spear 1",
+            "level": 1,
+            "range": 2,
+            "energyCost": 3,
+            "isUsed": false,
+            "physDamage": 2
+        },
+        {
+            "name": "spear 2",
+            "level": 2,
+            "range": 2,
+            "cost": 1,
+            "energyCost": 3,
+            "isUsed": false,
+            "strength": 1,
+            "physDamage": 3
+        },
+        {
+            "name": "spear 3",
+            "level": 3,
+            "range": 2,
+            "cost": 1,
+            "energyCost": 3,
+            "isUsed": false,
+            "strength": 2,
+            "physDamage": 4
+        }
+    ],
+    "secondaryWeapons": [
+        {
+            "name": "shield 1",
+            "level": 1,
+            "isUsed": false,
+            "armor": 1
+        },
+        {
+            "name": "shield 2",
+            "level": 2,
+            "cost": 1,
+            "isUsed": false,
+            "armor": 1,
+            "will": 1,
+            "mind": 1
+        },
+        {
+            "name": "shield 3",
+            "level": 3,
+            "cost": 1,
+            "isUsed": false,
+            "strength": 1,
+            "armor": 2,
+            "will": 1,
+            "mind": 1
+        }
+    ],
+    "chestpieces": [
+        {
+            "name": "armor 1",
+            "level": 1,
+            "isUsed": false,
+            "armor": 2,
+            "will": 2
+        },
+        {
+            "name": "armor 2",
+            "level": 2,
+            "cost": 1,
+            "isUsed": false,
+            "strength": 1,
+            "armor": 3,
+            "will": 2
+        },
+        {
+            "name": "armor 3",
+            "level": 3,
+            "cost": 1,
+            "isUsed": false,
+            "strength": 1,
+            "armor": 3,
+            "will": 2,
+            "regeneration": 1
+        }
+    ]
+}
