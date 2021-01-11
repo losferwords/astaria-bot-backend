@@ -1,4 +1,4 @@
-import { Response, Request, NextFunction } from "express";
+import { Response, Request, NextFunction } from 'express';
 import httpError from 'http-errors';
 
 export function httpErrorHandler(req: Request, res: Response, next: NextFunction) {

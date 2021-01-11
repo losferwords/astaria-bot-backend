@@ -1,8 +1,9 @@
-import { IEquip } from "./iEquip";
-import { IHeroState } from "./IHeroState";
+import { IEquip } from './iEquip';
+import { IHeroState } from './IHeroState';
 
 export interface IHero {
     id: string;
+    gender?: string;
 
     maxEnergy: number;
     maxHealth: number;

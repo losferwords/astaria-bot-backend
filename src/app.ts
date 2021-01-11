@@ -1,6 +1,5 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
-import bodyParser from 'body-parser';
 import log4js from 'log4js';
 import { corsRules } from './middleware/cors';
 import { httpErrorHandler } from './middleware/httpError';
@@ -16,8 +15,6 @@ logger.level = 'debug';
 app.use(express.json({limit: '50mb'}));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(bodyParser.json({limit: '50mb'}));
 app.use(corsRules);
 
 Server.ignoreNextMiddlewares(true);

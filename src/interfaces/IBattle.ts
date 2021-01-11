@@ -1,5 +1,5 @@
-import { IMap } from "./IMap";
-import { ITeam } from "./ITeam";
+import { IMap } from './IMap';
+import { ITeam } from './ITeam';
 
 export interface IBattle {
     id: string;
