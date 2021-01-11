@@ -37,7 +37,7 @@ export class BattleService {
     }
 
     private setRandomHeroes(teamSetup) {
-        const availableHeroes = Const.moveOrder.splice(0);
+        const availableHeroes = [...Const.moveOrder];
         const randomHeroes = [];
         for (let i = 0; i < teamSetup.length; i++) {
             for (let j = 0; j < teamSetup[i].length; j++) {

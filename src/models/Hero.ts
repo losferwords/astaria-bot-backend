@@ -4,6 +4,7 @@ import { IHero } from '../interfaces/IHero';
 import { IHeroState } from '../interfaces/IHeroState';
 import { HeroesData } from '../static/heroes-data';
 import { ITeamSetup } from '../interfaces/ITeamSetup';
+import _ from 'lodash';
 
 export class Hero implements IHero {
     id: string;
@@ -17,7 +18,7 @@ export class Hero implements IHero {
     chestpieces: IEquip[];
 
     constructor(teamSetup: ITeamSetup) {
-        const heroData = HeroesData[teamSetup.hero];
+        const heroData = _.cloneDeep(HeroesData[teamSetup.hero]);
         this.id = heroData.id;
         this.maxEnergy = heroData.maxEnergy;
         this.maxHealth = heroData.maxHealth;
