@@ -5,4 +5,5 @@ export interface IBattle {
     id: string;
     map: IMap;
     teams: ITeam[];
+    queue: string[];
 }

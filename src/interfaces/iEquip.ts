@@ -15,4 +15,5 @@ export interface IEquip {
     physDamage?: number;
     magicDamage?: number;
     state?: IEquipState;
+    isPassive: boolean;
 }

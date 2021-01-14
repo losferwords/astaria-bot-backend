@@ -18,7 +18,8 @@ export class HeroesData {
                 armor: 0,
                 will: 0,
                 regeneration: 0,
-                mind: 0
+                mind: 0,
+                isPassive: false
             },
             {
                 name: 'spear 2',
@@ -32,7 +33,8 @@ export class HeroesData {
                 armor: 0,
                 will: 0,
                 regeneration: 0,
-                mind: 0
+                mind: 0,
+                isPassive: false
             },
             {
                 name: 'spear 3',
@@ -46,7 +48,8 @@ export class HeroesData {
                 armor: 0,
                 will: 0,
                 regeneration: 0,
-                mind: 0
+                mind: 0,
+                isPassive: false
             }
         ],
         secondaryWeapons: [
@@ -58,7 +61,8 @@ export class HeroesData {
                 armor: 1,
                 will: 0,
                 regeneration: 0,
-                mind: 0
+                mind: 0,
+                isPassive: true
             },
             {
                 name: 'shield 2',
@@ -69,7 +73,8 @@ export class HeroesData {
                 armor: 1,
                 will: 1,
                 regeneration: 0,
-                mind: 1
+                mind: 1,
+                isPassive: true
             },
             {
                 name: 'shield 3',
@@ -80,7 +85,8 @@ export class HeroesData {
                 armor: 2,
                 will: 1,
                 regeneration: 0,
-                mind: 1
+                mind: 1,
+                isPassive: true
             }
         ],
         chestpieces: [
@@ -92,7 +98,8 @@ export class HeroesData {
                 armor: 2,
                 will: 2,
                 regeneration: 0,
-                mind: 0
+                mind: 0,
+                isPassive: true
             },
             {
                 name: 'armor 2',
@@ -103,7 +110,8 @@ export class HeroesData {
                 armor: 3,
                 will: 2,
                 regeneration: 0,
-                mind: 0
+                mind: 0,
+                isPassive: true
             },
             {
                 name: 'armor 3',
@@ -114,7 +122,8 @@ export class HeroesData {
                 armor: 3,
                 will: 2,
                 regeneration: 1,
-                mind: 0
+                mind: 0,
+                isPassive: true
             }
         ]
     };
@@ -136,7 +145,8 @@ export class HeroesData {
                 armor: 0,
                 will: 0,
                 regeneration: 0,
-                mind: 0
+                mind: 0,
+                isPassive: false
             },
             {
                 name: 'sword 2',
@@ -150,7 +160,8 @@ export class HeroesData {
                 armor: 0,
                 will: 0,
                 regeneration: 0,
-                mind: 1
+                mind: 1,
+                isPassive: false
             },
             {
                 name: 'sword 3',
@@ -164,7 +175,8 @@ export class HeroesData {
                 armor: 0,
                 will: 0,
                 regeneration: 0,
-                mind: 1
+                mind: 1,
+                isPassive: false
             }
         ],
         chestpieces: [
@@ -176,7 +188,8 @@ export class HeroesData {
                 armor: 2,
                 will: 1,
                 regeneration: 0,
-                mind: 0
+                mind: 0,
+                isPassive: true
             },
             {
                 name: 'armor 2',
@@ -187,7 +200,8 @@ export class HeroesData {
                 armor: 3,
                 will: 1,
                 regeneration: 0,
-                mind: 0
+                mind: 0,
+                isPassive: true
             },
             {
                 name: 'armor 3',
@@ -198,7 +212,8 @@ export class HeroesData {
                 armor: 4,
                 will: 2,
                 regeneration: 0,
-                mind: 0
+                mind: 0,
+                isPassive: true
             }
         ]
     };
@@ -220,7 +235,8 @@ export class HeroesData {
                 armor: 0,
                 will: 0,
                 regeneration: 0,
-                mind: 0
+                mind: 0,
+                isPassive: false
             },
             {
                 name: 'staff 2',
@@ -234,7 +250,8 @@ export class HeroesData {
                 armor: 0,
                 will: 1,
                 regeneration: 0,
-                mind: 0
+                mind: 0,
+                isPassive: false
             },
             {
                 name: 'staff 3',
@@ -248,7 +265,8 @@ export class HeroesData {
                 armor: 0,
                 will: 1,
                 regeneration: 1,
-                mind: 0
+                mind: 0,
+                isPassive: false
             }
         ],
         chestpieces: [
@@ -260,7 +278,8 @@ export class HeroesData {
                 armor: 2,
                 will: 1,
                 regeneration: 0,
-                mind: 0
+                mind: 0,
+                isPassive: true
             },
             {
                 name: 'armor 2',
@@ -271,7 +290,8 @@ export class HeroesData {
                 armor: 2,
                 will: 2,
                 regeneration: 0,
-                mind: 1
+                mind: 1,
+                isPassive: true
             },
             {
                 name: 'armor 3',
@@ -282,7 +302,8 @@ export class HeroesData {
                 armor: 3,
                 will: 2,
                 regeneration: 0,
-                mind: 1
+                mind: 1,
+                isPassive: true
             }
         ]
     };
@@ -304,7 +325,8 @@ export class HeroesData {
                 armor: 0,
                 will: 0,
                 regeneration: 0,
-                mind: 0
+                mind: 0,
+                isPassive: false
             },
             {
                 name: 'book 2',
@@ -318,7 +340,8 @@ export class HeroesData {
                 armor: 0,
                 will: 1,
                 regeneration: 0,
-                mind: 1
+                mind: 1,
+                isPassive: false
             },
             {
                 name: 'book 3',
@@ -332,7 +355,8 @@ export class HeroesData {
                 armor: 0,
                 will: 2,
                 regeneration: 0,
-                mind: 2
+                mind: 2,
+                isPassive: false
             }
         ],
         chestpieces: [
@@ -344,7 +368,8 @@ export class HeroesData {
                 armor: 1,
                 will: 2,
                 regeneration: 0,
-                mind: 0
+                mind: 0,
+                isPassive: true
             },
             {
                 name: 'armor 2',
@@ -355,7 +380,8 @@ export class HeroesData {
                 armor: 2,
                 will: 3,
                 regeneration: 0,
-                mind: 0
+                mind: 0,
+                isPassive: true
             },
             {
                 name: 'armor 3',
@@ -366,7 +392,8 @@ export class HeroesData {
                 armor: 3,
                 will: 3,
                 regeneration: 0,
-                mind: 0
+                mind: 0,
+                isPassive: true
             }
         ]
     };

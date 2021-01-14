@@ -5,6 +5,8 @@ import { Team } from '../models/Team';
 import { IBattleSetup } from '../interfaces/IBattleSetup';
 import { Const } from '../static/const';
 import { Helper } from '../static/helper';
+import { ITeam } from '../interfaces/ITeam';
+import _ from 'lodash';
 
 export class BattleService {
 
@@ -27,9 +29,11 @@ export class BattleService {
                     battle = {
                         id: uuid(),
                         map: new ChthonRuins(),
-                        teams: [new Team(battleSetup.teamSetup[0]), new Team(battleSetup.teamSetup[1])]
+                        teams: [new Team(battleSetup.teamSetup[0]), new Team(battleSetup.teamSetup[1])],
+                        queue: []
                     };
                     this.setHeroPositions(battle);
+                    battle.queue = this.getQueue(battle.teams);
                     break;
             }
             resolve(battle);
@@ -64,5 +68,15 @@ export class BattleService {
                 battle.teams[i].heroes[j].state.position.y = battle.map.teamPositions[i][j].y;
             }
         }
+    }
+
+    private getQueue(teams: ITeam[]): string[] {
+        const heroes = [];
+        for (let i = 0; i < teams.length; i++){
+            for (let j = 0; j < teams[i].heroes.length; j++) {
+                heroes.push(teams[i].heroes[j].id);
+            }
+        }
+        return _.intersection(Const.moveOrder, heroes);
     }
 }
