@@ -61,6 +61,7 @@ export class Hero implements IHero {
             buffs: [],
             debuffs: [],
             abilities: [],
+            pets: [],
             strength: 0,
             intellect: 0,
             armor: 0,
