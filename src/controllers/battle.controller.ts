@@ -1,6 +1,7 @@
 import { Path, GET, POST, Return, Context, ServiceContext, QueryParam } from 'typescript-rest';
 import { IBattle } from '../interfaces/IBattle';
 import { IBattleSetup } from '../interfaces/IBattleSetup';
+import { IPosition } from '../interfaces/IPosition';
 import { BattleService } from '../services/battle.service';
 
 const battleService: BattleService = new BattleService();
@@ -19,5 +20,11 @@ export class BattleController {
     @POST
     async startBattle(battleSetup: IBattleSetup): Promise<IBattle> {
         return battleService.startBattle(battleSetup);
+    }
+
+    @Path('/move-points')
+    @GET
+    async movePoints(@QueryParam('battleId') battleId: string): Promise<IPosition[]> {
+        return battleService.getMovePoints(battleId);
     }
 }

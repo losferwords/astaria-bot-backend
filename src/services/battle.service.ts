@@ -7,8 +7,13 @@ import { Const } from '../static/const';
 import { Helper } from '../static/helper';
 import { ITeam } from '../interfaces/ITeam';
 import _ from 'lodash';
+import { Hero } from '../models/Hero';
+import { IHero } from '../interfaces/IHero';
+import { IPosition } from '../interfaces/IPosition';
+import { TileType } from '../enums/tile-type.enum';
 
 export class BattleService {
+    battles: IBattle[] = [];
 
     constructor() {}
 
@@ -36,6 +41,7 @@ export class BattleService {
                     battle.queue = this.getQueue(battle.teams);
                     break;
             }
+            this.battles.push(battle);
             resolve(battle);
         });
     }
@@ -78,5 +84,78 @@ export class BattleService {
             }
         }
         return _.intersection(Const.moveOrder, heroes);
+    }
+
+    private getHeroesInBattle(battle: IBattle): IHero[] {
+        const heroes = [];
+        for (let i = 0; i < battle.teams.length; i++){
+            for (let j = 0; j < battle.teams[i].heroes.length; j++) {
+                heroes.push(battle.teams[i].heroes[j]);
+            }
+        }
+        return heroes;
+    }
+
+    private getBattleById(id: string): IBattle {
+        return this.battles.find((battle: IBattle) => {
+            return battle.id === id;
+        });
+    }
+
+    private getActiveHero(battle: IBattle): IHero {
+        const heroes = this.getHeroesInBattle(battle);
+        return heroes.find((hero: IHero) => {
+            return hero.id === battle.queue[0];
+        });
+    }
+
+    private findNearestPoints(position: IPosition, radius: number): IPosition[] {
+        const points = [];
+        for (let i = -radius; i <= radius; i++) {
+            if (position.x + i >= 0) {
+                for (let j = -radius; j <= radius; j++) {
+                    if (position.y + j >= 0){
+                        points.push({x: position.x + i, y: position.y + j});
+                    }
+                }
+            }
+        }
+        return points;
+    }
+
+    checkTileForObstacle(position: IPosition, battle: IBattle): boolean {
+        const heroes = this.getHeroesInBattle(battle);
+        for (let i = 0; i < heroes.length; i++){
+            for (let j = 0; j < heroes[i].state.pets.length; j++) {
+                if (heroes[i].state.pets[j].state.position.x === position.x &&
+                    heroes[i].state.pets[j].state.position.y === position.y)
+                {
+                    return true;
+                }
+            }
+            if (heroes[i].state.position.x === position.x &&
+                heroes[i].state.position.y === position.y &&
+                !heroes[i].state.isDead &&
+                battle.map.tiles[position.x][position.y] &&
+                battle.map.tiles[position.x][position.y].type === TileType.FLOOR)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    getMovePoints(battleId: string, radius: number = 1): IPosition[] {
+        const battle = this.getBattleById(battleId);
+        const activeHero = this.getActiveHero(battle);
+        const points = this.findNearestPoints(activeHero.state.position, radius);
+
+        const availablePoints = [];
+        for (let i = 0; i < points.length; i++){
+            if (!this.checkTileForObstacle(points[i], battle)){
+                availablePoints.push(points[i]);
+            }
+        }
+        return availablePoints;
     }
 }
