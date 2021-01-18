@@ -8,7 +8,7 @@ export class HeroesData {
         maxMana: 12,
         primaryWeapons: [
             {
-                name: 'spear 1',
+                id: 'spear-1',
                 level: 1,
                 range: 2,
                 energyCost: 3,
@@ -22,7 +22,7 @@ export class HeroesData {
                 isPassive: false
             },
             {
-                name: 'spear 2',
+                id: 'spear-2',
                 level: 2,
                 range: 2,
                 cost: 1,
@@ -37,7 +37,7 @@ export class HeroesData {
                 isPassive: false
             },
             {
-                name: 'spear 3',
+                id: 'spear-3',
                 level: 3,
                 range: 2,
                 cost: 1,
@@ -54,7 +54,7 @@ export class HeroesData {
         ],
         secondaryWeapons: [
             {
-                name: 'shield 1',
+                id: 'shield-1',
                 level: 1,
                 strength: 0,
                 intellect: 0,
@@ -65,7 +65,7 @@ export class HeroesData {
                 isPassive: true
             },
             {
-                name: 'shield 2',
+                id: 'shield-2',
                 level: 2,
                 cost: 1,
                 strength: 0,
@@ -77,7 +77,7 @@ export class HeroesData {
                 isPassive: true
             },
             {
-                name: 'shield 3',
+                id: 'shield-3',
                 level: 3,
                 cost: 1,
                 strength: 1,
@@ -91,7 +91,7 @@ export class HeroesData {
         ],
         chestpieces: [
             {
-                name: 'armor 1',
+                id: 'armor-1',
                 level: 1,
                 strength: 0,
                 intellect: 0,
@@ -102,7 +102,7 @@ export class HeroesData {
                 isPassive: true
             },
             {
-                name: 'armor 2',
+                id: 'armor-2',
                 level: 2,
                 cost: 1,
                 strength: 1,
@@ -114,7 +114,7 @@ export class HeroesData {
                 isPassive: true
             },
             {
-                name: 'armor 3',
+                id: 'armor-3',
                 level: 3,
                 cost: 1,
                 strength: 1,
@@ -135,7 +135,7 @@ export class HeroesData {
         maxMana: 18,
         primaryWeapons: [
             {
-                name: 'sword 1',
+                id: 'sword-1',
                 level: 1,
                 range: 1,
                 energyCost: 4,
@@ -149,7 +149,7 @@ export class HeroesData {
                 isPassive: false
             },
             {
-                name: 'sword 2',
+                id: 'sword-2',
                 level: 2,
                 range: 1,
                 cost: 2,
@@ -164,7 +164,7 @@ export class HeroesData {
                 isPassive: false
             },
             {
-                name: 'sword 3',
+                id: 'sword-3',
                 level: 3,
                 range: 1,
                 cost: 2,
@@ -181,7 +181,7 @@ export class HeroesData {
         ],
         chestpieces: [
             {
-                name: 'armor 1',
+                id: 'armor-1',
                 level: 1,
                 strength: 1,
                 intellect: 0,
@@ -192,7 +192,7 @@ export class HeroesData {
                 isPassive: true
             },
             {
-                name: 'armor 2',
+                id: 'armor-2',
                 level: 2,
                 cost: 1,
                 strength: 2,
@@ -204,7 +204,7 @@ export class HeroesData {
                 isPassive: true
             },
             {
-                name: 'armor 3',
+                id: 'armor-3',
                 level: 3,
                 cost: 1,
                 strength: 2,
@@ -225,7 +225,7 @@ export class HeroesData {
         maxMana: 20,
         primaryWeapons: [
             {
-                name: 'staff 1',
+                id: 'staff-1',
                 level: 1,
                 range: 1,
                 energyCost: 3,
@@ -239,7 +239,7 @@ export class HeroesData {
                 isPassive: false
             },
             {
-                name: 'staff 2',
+                id: 'staff-2',
                 level: 2,
                 range: 1,
                 cost: 2,
@@ -254,7 +254,7 @@ export class HeroesData {
                 isPassive: false
             },
             {
-                name: 'staff 3',
+                id: 'staff-3',
                 level: 3,
                 range: 1,
                 cost: 2,
@@ -271,7 +271,7 @@ export class HeroesData {
         ],
         chestpieces: [
             {
-                name: 'armor 1',
+                id: 'armor-1',
                 level: 1,
                 strength: 0,
                 intellect: 1,
@@ -282,7 +282,7 @@ export class HeroesData {
                 isPassive: true
             },
             {
-                name: 'armor 2',
+                id: 'armor-2',
                 level: 2,
                 cost: 1,
                 strength: 0,
@@ -294,7 +294,7 @@ export class HeroesData {
                 isPassive: true
             },
             {
-                name: 'armor 3',
+                id: 'armor-3',
                 level: 3,
                 cost: 1,
                 strength: 1,
@@ -315,7 +315,7 @@ export class HeroesData {
         maxMana: 20,
         primaryWeapons: [
             {
-                name: 'book 1',
+                id: 'book-1',
                 level: 1,
                 range: 3,
                 energyCost: 3,
@@ -329,7 +329,7 @@ export class HeroesData {
                 isPassive: false
             },
             {
-                name: 'book 2',
+                id: 'book-2',
                 level: 2,
                 range: 3,
                 cost: 2,
@@ -344,7 +344,7 @@ export class HeroesData {
                 isPassive: false
             },
             {
-                name: 'book 3',
+                id: 'book-3',
                 level: 3,
                 range: 3,
                 cost: 2,
@@ -361,7 +361,7 @@ export class HeroesData {
         ],
         chestpieces: [
             {
-                name: 'armor 1',
+                id: 'armor-1',
                 level: 1,
                 strength: 0,
                 intellect: 1,
@@ -372,7 +372,7 @@ export class HeroesData {
                 isPassive: true
             },
             {
-                name: 'armor 2',
+                id: 'armor-2',
                 level: 2,
                 cost: 1,
                 strength: 0,
@@ -384,7 +384,7 @@ export class HeroesData {
                 isPassive: true
             },
             {
-                name: 'armor 3',
+                id: 'armor-3',
                 level: 3,
                 cost: 1,
                 strength: 0,

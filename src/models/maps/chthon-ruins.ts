@@ -5,12 +5,14 @@ import { ITile } from '../../interfaces/ITile';
 
 export class ChthonRuins implements IMap {
     scenarioId: string;
+    tileSize: number;
     tiles: ITile[][];
     teamPositions: [IPosition[], IPosition[]];
     postamentPositions: IPosition[];
 
     constructor() {
         this.scenarioId = '1';
+        this.tileSize = 40;
         this.tiles = [
             [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
             [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],

@@ -1,7 +1,7 @@
 import { IEquipState } from './IEquipState';
 
 export interface IEquip {
-    name: string;
+    id: string;
     level: number;
     strength: number;
     intellect: number;
