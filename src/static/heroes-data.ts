@@ -1,7 +1,7 @@
-import { IHero } from '../interfaces/IHero';
+import { IHeroData } from '../interfaces/IHeroData';
 
 export class HeroesData {
-    public static readonly paragon: IHero = {
+    public static readonly paragon: IHeroData = {
         id: 'paragon',
         maxEnergy: 12,
         maxHealth: 20,
@@ -13,13 +13,15 @@ export class HeroesData {
                 range: 2,
                 energyCost: 3,
                 physDamage: 2,
+                magicDamage: 0,
                 strength: 0,
                 intellect: 0,
                 armor: 0,
                 will: 0,
                 regeneration: 0,
                 mind: 0,
-                isPassive: false
+                isPassive: false,
+                isUsed: false
             },
             {
                 id: 'spear-2',
@@ -28,13 +30,15 @@ export class HeroesData {
                 cost: 1,
                 energyCost: 3,
                 physDamage: 3,
+                magicDamage: 0,
                 strength: 1,
                 intellect: 0,
                 armor: 0,
                 will: 0,
                 regeneration: 0,
                 mind: 0,
-                isPassive: false
+                isPassive: false,
+                isUsed: false
             },
             {
                 id: 'spear-3',
@@ -43,13 +47,15 @@ export class HeroesData {
                 cost: 1,
                 energyCost: 3,
                 physDamage: 4,
+                magicDamage: 0,
                 strength: 2,
                 intellect: 0,
                 armor: 0,
                 will: 0,
                 regeneration: 0,
                 mind: 0,
-                isPassive: false
+                isPassive: false,
+                isUsed: false
             }
         ],
         secondaryWeapons: [
@@ -62,7 +68,8 @@ export class HeroesData {
                 will: 0,
                 regeneration: 0,
                 mind: 0,
-                isPassive: true
+                isPassive: true,
+                isUsed: false
             },
             {
                 id: 'shield-2',
@@ -74,7 +81,8 @@ export class HeroesData {
                 will: 1,
                 regeneration: 0,
                 mind: 1,
-                isPassive: true
+                isPassive: true,
+                isUsed: false
             },
             {
                 id: 'shield-3',
@@ -86,7 +94,8 @@ export class HeroesData {
                 will: 1,
                 regeneration: 0,
                 mind: 1,
-                isPassive: true
+                isPassive: true,
+                isUsed: false
             }
         ],
         chestpieces: [
@@ -99,7 +108,8 @@ export class HeroesData {
                 will: 2,
                 regeneration: 0,
                 mind: 0,
-                isPassive: true
+                isPassive: true,
+                isUsed: false
             },
             {
                 id: 'armor-2',
@@ -111,7 +121,8 @@ export class HeroesData {
                 will: 2,
                 regeneration: 0,
                 mind: 0,
-                isPassive: true
+                isPassive: true,
+                isUsed: false
             },
             {
                 id: 'armor-3',
@@ -123,12 +134,13 @@ export class HeroesData {
                 will: 2,
                 regeneration: 1,
                 mind: 0,
-                isPassive: true
+                isPassive: true,
+                isUsed: false
             }
         ]
     };
 
-    public static readonly highlander: IHero = {
+    public static readonly highlander: IHeroData = {
         id: 'highlander',
         maxEnergy: 10,
         maxHealth: 18,
@@ -140,13 +152,15 @@ export class HeroesData {
                 range: 1,
                 energyCost: 4,
                 physDamage: 4,
+                magicDamage: 0,
                 strength: 0,
                 intellect: 0,
                 armor: 0,
                 will: 0,
                 regeneration: 0,
                 mind: 0,
-                isPassive: false
+                isPassive: false,
+                isUsed: false
             },
             {
                 id: 'sword-2',
@@ -155,13 +169,15 @@ export class HeroesData {
                 cost: 2,
                 energyCost: 4,
                 physDamage: 5,
+                magicDamage: 0,
                 strength: 1,
                 intellect: 1,
                 armor: 0,
                 will: 0,
                 regeneration: 0,
                 mind: 1,
-                isPassive: false
+                isPassive: false,
+                isUsed: false
             },
             {
                 id: 'sword-3',
@@ -170,13 +186,15 @@ export class HeroesData {
                 cost: 2,
                 energyCost: 4,
                 physDamage: 6,
+                magicDamage: 0,
                 strength: 3,
                 intellect: 2,
                 armor: 0,
                 will: 0,
                 regeneration: 0,
                 mind: 1,
-                isPassive: false
+                isPassive: false,
+                isUsed: false
             }
         ],
         chestpieces: [
@@ -189,7 +207,8 @@ export class HeroesData {
                 will: 1,
                 regeneration: 0,
                 mind: 0,
-                isPassive: true
+                isPassive: true,
+                isUsed: false
             },
             {
                 id: 'armor-2',
@@ -201,7 +220,8 @@ export class HeroesData {
                 will: 1,
                 regeneration: 0,
                 mind: 0,
-                isPassive: true
+                isPassive: true,
+                isUsed: false
             },
             {
                 id: 'armor-3',
@@ -213,12 +233,13 @@ export class HeroesData {
                 will: 2,
                 regeneration: 0,
                 mind: 0,
-                isPassive: true
+                isPassive: true,
+                isUsed: false
             }
         ]
     };
 
-    public static readonly druid: IHero = {
+    public static readonly druid: IHeroData = {
         id: 'druid',
         maxEnergy: 10,
         maxHealth: 16,
@@ -230,13 +251,15 @@ export class HeroesData {
                 range: 1,
                 energyCost: 3,
                 physDamage: 2,
+                magicDamage: 0,
                 strength: 1,
                 intellect: 1,
                 armor: 0,
                 will: 0,
                 regeneration: 0,
                 mind: 0,
-                isPassive: false
+                isPassive: false,
+                isUsed: false
             },
             {
                 id: 'staff-2',
@@ -245,13 +268,15 @@ export class HeroesData {
                 cost: 2,
                 energyCost: 3,
                 physDamage: 3,
+                magicDamage: 0,
                 strength: 2,
                 intellect: 2,
                 armor: 0,
                 will: 1,
                 regeneration: 0,
                 mind: 0,
-                isPassive: false
+                isPassive: false,
+                isUsed: false
             },
             {
                 id: 'staff-3',
@@ -260,13 +285,15 @@ export class HeroesData {
                 cost: 2,
                 energyCost: 3,
                 physDamage: 4,
+                magicDamage: 0,
                 strength: 2,
                 intellect: 3,
                 armor: 0,
                 will: 1,
                 regeneration: 1,
                 mind: 0,
-                isPassive: false
+                isPassive: false,
+                isUsed: false
             }
         ],
         chestpieces: [
@@ -279,7 +306,8 @@ export class HeroesData {
                 will: 1,
                 regeneration: 0,
                 mind: 0,
-                isPassive: true
+                isPassive: true,
+                isUsed: false
             },
             {
                 id: 'armor-2',
@@ -291,7 +319,8 @@ export class HeroesData {
                 will: 2,
                 regeneration: 0,
                 mind: 1,
-                isPassive: true
+                isPassive: true,
+                isUsed: false
             },
             {
                 id: 'armor-3',
@@ -303,12 +332,13 @@ export class HeroesData {
                 will: 2,
                 regeneration: 0,
                 mind: 1,
-                isPassive: true
+                isPassive: true,
+                isUsed: false
             }
         ]
     };
 
-    public static readonly oracle: IHero = {
+    public static readonly oracle: IHeroData = {
         id: 'oracle',
         maxEnergy: 12,
         maxHealth: 12,
@@ -319,6 +349,7 @@ export class HeroesData {
                 level: 1,
                 range: 3,
                 energyCost: 3,
+                physDamage: 0,
                 magicDamage: 1,
                 strength: 0,
                 intellect: 1,
@@ -326,7 +357,8 @@ export class HeroesData {
                 will: 0,
                 regeneration: 0,
                 mind: 0,
-                isPassive: false
+                isPassive: false,
+                isUsed: false
             },
             {
                 id: 'book-2',
@@ -334,6 +366,7 @@ export class HeroesData {
                 range: 3,
                 cost: 2,
                 energyCost: 3,
+                physDamage: 0,
                 magicDamage: 2,
                 strength: 0,
                 intellect: 2,
@@ -341,7 +374,8 @@ export class HeroesData {
                 will: 1,
                 regeneration: 0,
                 mind: 1,
-                isPassive: false
+                isPassive: false,
+                isUsed: false
             },
             {
                 id: 'book-3',
@@ -349,6 +383,7 @@ export class HeroesData {
                 range: 3,
                 cost: 2,
                 energyCost: 3,
+                physDamage: 0,
                 magicDamage: 3,
                 strength: 0,
                 intellect: 3,
@@ -356,7 +391,8 @@ export class HeroesData {
                 will: 2,
                 regeneration: 0,
                 mind: 2,
-                isPassive: false
+                isPassive: false,
+                isUsed: false
             }
         ],
         chestpieces: [
@@ -369,7 +405,8 @@ export class HeroesData {
                 will: 2,
                 regeneration: 0,
                 mind: 0,
-                isPassive: true
+                isPassive: true,
+                isUsed: false
             },
             {
                 id: 'armor-2',
@@ -381,7 +418,8 @@ export class HeroesData {
                 will: 3,
                 regeneration: 0,
                 mind: 0,
-                isPassive: true
+                isPassive: true,
+                isUsed: false
             },
             {
                 id: 'armor-3',
@@ -393,7 +431,8 @@ export class HeroesData {
                 will: 3,
                 regeneration: 0,
                 mind: 0,
-                isPassive: true
+                isPassive: true,
+                isUsed: false
             }
         ]
     };

@@ -1,4 +1,4 @@
-import { IHero } from "./IHero";
+import { IHero } from './IHero';
 
 export interface ITeam {
     id: string;

@@ -1,30 +1,49 @@
 import { TileType } from '../../enums/tile-type.enum';
+import { IBattle } from '../../interfaces/IBattle';
 import { IMap } from '../../interfaces/IMap';
-import { IPosition } from '../../interfaces/IPosition';
-import { ITile } from '../../interfaces/ITile';
+import { ITeam } from '../../interfaces/ITeam';
+
+const teamPositions = [[{x: 0, y: 7}, {x: 1, y: 8}], [{x: 7, y: 0}, {x: 8, y: 1}]];
 
 export class ChthonRuins implements IMap {
-    scenarioId: string;
-    tileSize: number;
-    tiles: ITile[][];
-    teamPositions: [IPosition[], IPosition[]];
-    postamentPositions: IPosition[];
+    scenarioId = '1';
+    tileSize = 40;
+    tiles = [
+        [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
+        [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
+        [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.WALL }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.WALL }, { type: TileType.WALL }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
+        [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.WALL }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
+        [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
+        [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.WALL }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
+        [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.WALL }, { type: TileType.WALL }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.WALL }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
+        [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
+        [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }]
+    ];
 
-    constructor() {
-        this.scenarioId = '1';
-        this.tileSize = 40;
-        this.tiles = [
-            [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
-            [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
-            [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.WALL }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.WALL }, { type: TileType.WALL }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
-            [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.WALL }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
-            [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
-            [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.WALL }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
-            [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.WALL }, { type: TileType.WALL }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.WALL }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
-            [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
-            [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }]
-        ];
-        this.teamPositions = [[{x: 0, y: 7}, {x: 1, y: 8}], [{x: 7, y: 0}, {x: 8, y: 1}]];
-        this.postamentPositions = [{x: 1, y: 1}, {x: 5, y: 5}, {x: 7, y: 7}];
+    constructor() {}
+
+    setHeroPositions(teams: ITeam[]) {
+        for (let i = 0; i < teams.length; i++) {
+            for (let j = 0; j < teams[i].heroes.length; j++) {
+                teams[i].heroes[j].position.x = teamPositions[i][j].x;
+                teams[i].heroes[j].position.y = teamPositions[i][j].y;
+            }
+        }
+    }
+
+    beforeTurn() {}
+
+    checkForWin(battle: IBattle): ITeam {
+        for (let i = 0; i < battle.teams.length; i++) {
+            let teamDeathsCount = 0;
+            for (let j = 0; j < battle.teams[i].heroes.length; j++) {
+                if (battle.teams[i].heroes[j].isDead) {
+                    teamDeathsCount++;
+                }
+            }
+            if (teamDeathsCount === 2) {
+                return battle.teams[i];
+            }
+        }
     }
 }

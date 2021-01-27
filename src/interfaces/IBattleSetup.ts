@@ -1,6 +1,6 @@
-import { ITeamSetup } from './ITeamSetup';
+import { IHeroSetup } from './IHeroSetup';
 
 export interface IBattleSetup {
     scenarioId: string;
-    teamSetup: ITeamSetup[][];
+    teamSetup: IHeroSetup[][];
 }

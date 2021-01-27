@@ -1,7 +1,15 @@
-import { IPetState } from './IPetState';
+import { IAbility } from './IAbility';
+import { IChar } from './IChar';
+import { IEffect } from './IEffect';
 
-export interface IPet {
-    id: string;
+export interface IPet extends IChar{
     maxHealth: number;
-    state?: IPetState;
+
+    effects: IEffect[];
+    ability: IAbility;
+
+    health: number;
+
+    isStunned: boolean;
+    isImmobilized: boolean;
 }

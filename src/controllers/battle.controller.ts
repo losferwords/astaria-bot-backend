@@ -27,4 +27,28 @@ export class BattleController {
     async movePoints(@QueryParam('battleId') battleId: string): Promise<IPosition[]> {
         return battleService.getMovePoints(battleId);
     }
+
+    @Path('/move-hero')
+    @POST
+    async moveHero({battleId, position}): Promise<IBattle> {
+        return battleService.moveHero(battleId, position);
+    }
+
+    @Path('/end-turn')
+    @POST
+    async endTurn({battleId}): Promise<IBattle> {
+        return battleService.endTurn(battleId);
+    }
+
+    @Path('/find-enemies')
+    @GET
+    async findEnemies(@QueryParam('battleId') battleId: string, @QueryParam('sourceHeroId') sourceHeroId: string, @QueryParam('radius') radius: number): Promise<string[]> {
+        return battleService.findEnemies(battleId, sourceHeroId, radius);
+    }
+
+    @Path('/use-weapon')
+    @POST
+    async useWeapon({battleId, targetId, weaponId}): Promise<IBattle> {
+        return battleService.useWeapon(battleId, targetId, weaponId);
+    }
 }

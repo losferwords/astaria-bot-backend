@@ -1,5 +1,3 @@
-import { IEquipState } from './IEquipState';
-
 export interface IEquip {
     id: string;
     level: number;
@@ -14,6 +12,6 @@ export interface IEquip {
     energyCost?: number;
     physDamage?: number;
     magicDamage?: number;
-    state?: IEquipState;
     isPassive: boolean;
+    isUsed: boolean;
 }

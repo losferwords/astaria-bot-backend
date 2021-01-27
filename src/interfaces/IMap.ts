@@ -1,10 +1,12 @@
-import { IPosition } from './IPosition';
+import { IBattle } from './IBattle';
+import { ITeam } from './ITeam';
 import { ITile } from './ITile';
 
 export interface IMap {
     scenarioId: string;
     tiles: ITile[][];
     tileSize: number;
-    postamentPositions?: IPosition[];
-    teamPositions: [IPosition[], IPosition[]];
+    setHeroPositions: (teams: ITeam[]) => void;
+    beforeTurn: () => void;
+    checkForWin: (battle: IBattle) => ITeam;
 }

@@ -1,10 +1,12 @@
 import { Const } from '../static/const';
-import { IEquip } from '../interfaces/iEquip';
+import { IEquip } from '../interfaces/IEquip';
 import { IHero } from '../interfaces/IHero';
-import { IHeroState } from '../interfaces/IHeroState';
 import { HeroesData } from '../static/heroes-data';
-import { ITeamSetup } from '../interfaces/ITeamSetup';
+import { IHeroSetup } from '../interfaces/IHeroSetup';
 import _ from 'lodash';
+import { IEffect } from '../interfaces/IEffect';
+import { IAbility } from '../interfaces/IAbility';
+import { IPet } from '../interfaces/IPet';
 
 export class Hero implements IHero {
     id: string;
@@ -12,124 +14,154 @@ export class Hero implements IHero {
     maxEnergy: number;
     maxHealth: number;
     maxMana: number;
-    state: IHeroState;
-    primaryWeapons: IEquip[];
-    secondaryWeapons: IEquip[];
-    chestpieces: IEquip[];
+    effects: IEffect[] = [];
+    abilities: IAbility[] = [];
+    pets: IPet[] = [];
+    primaryWeapon?: IEquip;
+    secondaryWeapon?: IEquip;
+    chestpiece?: IEquip;
 
-    constructor(teamSetup: ITeamSetup) {
-        const heroData = _.cloneDeep(HeroesData[teamSetup.hero]);
+    strength = 0;
+    intellect = 0;
+    armor = 0;
+    will = 0;
+    regeneration = 0;
+    mind = 0;
+
+    energy = 0;
+    health = 0;
+    mana = 0;
+
+    isDead = false;
+    isInvisible = false;
+    isSilenced = false;
+    isDisarmed = false;
+    isStunned = false;
+    isImmobilized = false;
+
+    moveEnergyCost = Const.moveEnergyCost;
+    position = {x: 0, y: 0};
+    crystals = 0;
+
+    constructor(heroSetup: IHeroSetup) {
+        const heroData = _.cloneDeep(HeroesData[heroSetup.hero]);
         this.id = heroData.id;
+        this.gender = heroSetup.gender;
+
         this.maxEnergy = heroData.maxEnergy;
         this.maxHealth = heroData.maxHealth;
         this.maxMana = heroData.maxMana;
-        this.primaryWeapons = heroData.primaryWeapons;
+
+        this.health = this.maxHealth;
+        this.energy = this.maxEnergy;
+        this.mana = this.maxMana;
+
+        this.primaryWeapon = heroData.primaryWeapons[0];
+
         if (heroData.secondaryWeapons) {
-            this.secondaryWeapons = heroData.secondaryWeapons;
-        }
-        this.chestpieces = heroData.chestpieces;
-
-        this.resetState();
-
-        this.gender = teamSetup.gender;
-        this.state.health = this.maxHealth;
-        this.state.energy = this.maxEnergy;
-        this.state.mana = this.maxMana;
-
-        this.state.primaryWeapon = this.primaryWeapons[0];
-        this.state.primaryWeapon.state = {
-            isUsed: false
-        };
-
-        if (this.secondaryWeapons) {
-            this.state.secondaryWeapon = this.secondaryWeapons[0];
-            this.state.secondaryWeapon.state = {
-                isUsed: false
-            };
+            this.secondaryWeapon = heroData.secondaryWeapons[0];
         }
 
-        this.state.chestpiece = this.chestpieces[0];
-        this.state.chestpiece.state = {
-            isUsed: false
-        };
+        this.chestpiece = heroData.chestpieces[0];
 
         this.calcHero();
     }
 
-    resetState(): void {
-        this.state = {
-            buffs: [],
-            debuffs: [],
-            abilities: [],
-            pets: [],
-            strength: 0,
-            intellect: 0,
-            armor: 0,
-            will: 0,
-            regeneration: 0,
-            mind: 0,
-            energy: 0,
-            health: 0,
-            mana: 0,
-            isDead: false,
-            isInvisible: false,
-            isSilenced: false,
-            isDisarmed: false,
-            isStunned: false,
-            isImmobilized: false,
-            moveEnergyCost: Const.moveEnergyCost,
-            position: {x: 0, y: 0},
-            crystals: 0
-        };
+    calcHero() {
+        this.strength = this.primaryWeapon.strength + (this.secondaryWeapon ? this.secondaryWeapon.strength : 0) + this.chestpiece.strength;
+        if (this.strength < 0) {
+            this.strength = 0;
+        }
+        if (this.strength > Const.maxPrimaryAttributes) {
+            this.strength = Const.maxPrimaryAttributes;
+        }
+
+        this.intellect = this.primaryWeapon.intellect + (this.secondaryWeapon ? this.secondaryWeapon.intellect : 0) + this.chestpiece.intellect;
+        if (this.intellect < 0) {
+            this.intellect = 0;
+        }
+        if (this.intellect > Const.maxPrimaryAttributes) {
+            this.intellect = Const.maxPrimaryAttributes;
+        }
+
+        this.armor = this.primaryWeapon.armor + (this.secondaryWeapon ? this.secondaryWeapon.armor : 0) + this.chestpiece.armor;
+        if (this.armor < 0) {
+            this.armor = 0;
+        }
+        if (this.armor > Const.maxPrimaryAttributes) {
+            this.armor = Const.maxPrimaryAttributes;
+        }
+
+        this.will = this.primaryWeapon.will + (this.secondaryWeapon ? this.secondaryWeapon.will : 0) + this.chestpiece.will;
+        if (this.will < 0) {
+            this.will = 0;
+        }
+        if (this.will > Const.maxPrimaryAttributes) {
+            this.will = Const.maxPrimaryAttributes;
+        }
+
+        this.regeneration = this.primaryWeapon.regeneration + (this.secondaryWeapon ? this.secondaryWeapon.regeneration : 0) + this.chestpiece.regeneration;
+        if (this.regeneration < 0) {
+            this.regeneration = 0;
+        }
+        if (this.regeneration > Const.maxSecondaryAttributes) {
+            this.regeneration = Const.maxSecondaryAttributes;
+        }
+
+        this.mind = this.primaryWeapon.mind + (this.secondaryWeapon ? this.secondaryWeapon.mind : 0) + this.chestpiece.mind;
+        if (this.mind < 0) {
+            this.mind = 0;
+        }
+        if (this.mind > Const.maxSecondaryAttributes) {
+            this.mind = Const.maxSecondaryAttributes;
+        }
     }
 
-    calcHero() {
-        this.state.strength = this.state.primaryWeapon.strength + (this.state.secondaryWeapon ? this.state.secondaryWeapon.strength : 0) + this.state.chestpiece.strength;
-        if (this.state.strength < 0) {
-            this.state.strength = 0;
-        }
-        if (this.state.strength > Const.maxPrimaryAttributes) {
-            this.state.strength = Const.maxPrimaryAttributes;
+    private resetState() {
+        this.moveEnergyCost = Const.moveEnergyCost;
+        this.isDead = false;
+        this.isInvisible = false;
+        this.isSilenced = false;
+        this.isDisarmed = false;
+        this.isStunned = false;
+        this.isImmobilized = false;
+    }
+
+    private applyEffects() {
+        // ToDo
+    }
+
+    beforeTurn() {
+        if (this.isDead) {
+            return;
         }
 
-        this.state.intellect = this.state.primaryWeapon.intellect + (this.state.secondaryWeapon ? this.state.secondaryWeapon.intellect : 0) + this.state.chestpiece.intellect;
-        if (this.state.intellect < 0) {
-            this.state.intellect = 0;
-        }
-        if (this.state.intellect > Const.maxPrimaryAttributes) {
-            this.state.intellect = Const.maxPrimaryAttributes;
+        this.resetState();
+        this.applyEffects();
+
+        if (this.isDead) {
+            return; // check again because after DOT hero can die
         }
 
-        this.state.armor = this.state.primaryWeapon.armor + (this.state.secondaryWeapon ? this.state.secondaryWeapon.armor : 0) + this.state.chestpiece.armor;
-        if (this.state.armor < 0) {
-            this.state.armor = 0;
-        }
-        if (this.state.armor > Const.maxPrimaryAttributes) {
-            this.state.armor = Const.maxPrimaryAttributes;
+        this.calcHero();
+
+        this.energy = this.maxEnergy;
+        if (this.health + this.regeneration < this.maxHealth){
+            this.health += this.regeneration;
+        } else {
+            this.health = this.maxHealth;
         }
 
-        this.state.will = this.state.primaryWeapon.will + (this.state.secondaryWeapon ? this.state.secondaryWeapon.will : 0) + this.state.chestpiece.will;
-        if (this.state.will < 0) {
-            this.state.will = 0;
-        }
-        if (this.state.will > Const.maxPrimaryAttributes) {
-            this.state.will = Const.maxPrimaryAttributes;
+        if (this.mana + this.mind < this.maxMana){
+            this.mana += this.mind;
+        } else {
+            this.mana = this.maxMana;
         }
 
-        this.state.regeneration = this.state.primaryWeapon.regeneration + (this.state.secondaryWeapon ? this.state.secondaryWeapon.regeneration : 0) + this.state.chestpiece.regeneration;
-        if (this.state.regeneration < 0) {
-            this.state.regeneration = 0;
-        }
-        if (this.state.regeneration > Const.maxSecondaryAttributes) {
-            this.state.regeneration = Const.maxSecondaryAttributes;
-        }
-
-        this.state.mind = this.state.primaryWeapon.mind + (this.state.secondaryWeapon ? this.state.secondaryWeapon.mind : 0) + this.state.chestpiece.mind;
-        if (this.state.mind < 0) {
-            this.state.mind = 0;
-        }
-        if (this.state.mind > Const.maxSecondaryAttributes) {
-            this.state.mind = Const.maxSecondaryAttributes;
+        for (let i = 0; i < this.abilities.length; i++){
+            if (this.abilities[i].cd > 0){
+                this.abilities[i].cd--;
+            }
         }
     }
 }
