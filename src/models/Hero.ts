@@ -163,5 +163,10 @@ export class Hero implements IHero {
                 this.abilities[i].cd--;
             }
         }
+
+        this.primaryWeapon.isUsed = false;
+        if (this.secondaryWeapon && !this.secondaryWeapon.isPassive) {
+            this.secondaryWeapon.isUsed = false;
+        }
     }
 }

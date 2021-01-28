@@ -42,7 +42,7 @@ export class ChthonRuins implements IMap {
                 }
             }
             if (teamDeathsCount === 2) {
-                return battle.teams[i];
+                return battle.teams[(i + 1 === 2) ? 0 : 1];
             }
         }
     }

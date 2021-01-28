@@ -175,13 +175,7 @@ export class BattleService {
         // this.afterDamageTaken();
 
         if (target.health <= 0){
-            target.health = 0;
-            target.effects = [];
-            target.isDead = true;
-            battle.log.push({
-                type: LogMessageType.DEATH,
-                targetId: target.id
-            });
+            this.heroDeath(battle, target);
         }
 
         return true;
@@ -198,6 +192,25 @@ export class BattleService {
         });
 
         this.battles.splice(battleIndex, 1);
+    }
+
+    private heroDeath(battle: IBattle, hero: IHero) {
+        hero.health = 0;
+        hero.energy = 0;
+        hero.mana = 0;
+        hero.effects = [];
+        hero.isDead = true;
+
+        battle.log.push({
+            type: LogMessageType.DEATH,
+            id: hero.id
+        });
+
+        const queueIndex = battle.queue.findIndex((heroId: string) => {
+            return hero.id === heroId;
+        });
+
+        battle.queue.splice(queueIndex, 1);
     }
 
     getScenarioTeamSize(id: string): number[] {
@@ -288,9 +301,16 @@ export class BattleService {
 
     endTurn(battleId: string): IBattle {
         const battle = this.getBattleById(battleId);
+
+        battle.log.push({
+            type: LogMessageType.TURN_END,
+            id: battle.queue[0]
+        });
+
         battle.queue.push(battle.queue.shift());
         const activeHero = this.getHeroById(battle.queue[0], battle);
         activeHero.beforeTurn();
+
         return battle;
     }
 
@@ -343,7 +363,9 @@ export class BattleService {
             magicDamage = 0;
         }
 
-        this.heroTakesDamage(battle, activeHero, target, physDamage + magicDamage);
+        const totalDamage = physDamage + magicDamage;
+
+        this.heroTakesDamage(battle, activeHero, target, totalDamage);
         activeHero.energy -= weapon.energyCost;
         weapon.isUsed = true;
 
@@ -351,6 +373,7 @@ export class BattleService {
             type: LogMessageType.WEAPON_DAMAGE,
             casterId: activeHero.id,
             targetId: target.id,
+            value: totalDamage + '',
             id: weapon.id
         });
 
