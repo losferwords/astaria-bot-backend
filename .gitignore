@@ -6,3 +6,5 @@ dist/
 
 #VS Code
 .vscode/
+
+reports/

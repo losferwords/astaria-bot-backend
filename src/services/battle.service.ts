@@ -14,8 +14,10 @@ import { ITile } from '../interfaces/ITile';
 import { IChar } from '../interfaces/IChar';
 import { IEquip } from '../interfaces/IEquip';
 import { LogMessageType } from '../enums/log-message-type.enum';
+import { ReportService } from './report.service';
 
 export class BattleService {
+    reportService: ReportService = new ReportService();
     battles: IBattle[] = [];
 
     constructor() {}
@@ -182,9 +184,13 @@ export class BattleService {
     }
 
     private battleEnd(battle: IBattle, winner: ITeam) {
+        let winnerHeroes = '';
+        for (let i = 0; i < winner.heroes.length; i++) {
+            winnerHeroes += winner.heroes[i] + ' ';
+        }
         battle.log.push({
             type: LogMessageType.WIN,
-            id: winner.id
+            id: winnerHeroes
         });
 
         const battleIndex = this.battles.findIndex((b: IBattle) => {
@@ -192,6 +198,7 @@ export class BattleService {
         });
 
         this.battles.splice(battleIndex, 1);
+        this.reportService.saveBattleResults(battle);
     }
 
     private heroDeath(battle: IBattle, hero: IHero) {
