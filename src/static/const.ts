@@ -5,4 +5,5 @@ export class Const {
     public static maxSecondaryAttributes = 4;
     public static rayTracePrecision = 8;
     public static reportsPath = './reports';
+    public static statisticsFilePath = './reports/statistics';
 }

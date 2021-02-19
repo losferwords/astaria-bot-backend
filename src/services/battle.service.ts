@@ -63,12 +63,6 @@ export class BattleService {
         return heroes;
     }
 
-    private getBattleById(id: string): IBattle {
-        return this.battles.find((battle: IBattle) => {
-            return battle.id === id;
-        });
-    }
-
     private findNearestPoints(position: IPosition, tiles: ITile[][], radius: number): IPosition[] {
         const points = [];
         for (let i = -radius; i <= radius; i++) {
@@ -83,15 +77,15 @@ export class BattleService {
         return points;
     }
 
-    private canMove(hero: IHero): boolean {
+    canMove(hero: IHero): boolean {
         return hero.energy - hero.moveEnergyCost >= 0 && !hero.isImmobilized;
     }
 
-    private canUseWeapon(hero: IHero, weapon: IEquip): boolean {
-        return hero.energy - weapon.energyCost >= 0 && !hero.isDisarmed && !weapon.isUsed;
+    canUseWeapon(hero: IHero, weapon: IEquip): boolean {
+        return hero.energy - weapon.energyCost >= 0 && !hero.isDisarmed && !weapon.isUsed && !weapon.isPassive;
     }
 
-    private getHeroById(heroId: string, battle: IBattle) {
+    getHeroById(heroId: string, battle: IBattle) {
         const heroes = this.getHeroesInBattle(battle);
         return heroes.find((hero: IHero) => {
             return hero.id === heroId;
@@ -176,7 +170,7 @@ export class BattleService {
         // this.afterDealingDamage();
         // this.afterDamageTaken();
 
-        if (target.health <= 0){
+        if (target.health <= 0) {
             this.heroDeath(battle, target);
         }
 
@@ -186,7 +180,7 @@ export class BattleService {
     private battleEnd(battle: IBattle, winner: ITeam) {
         let winnerHeroes = '';
         for (let i = 0; i < winner.heroes.length; i++) {
-            winnerHeroes += winner.heroes[i] + ' ';
+            winnerHeroes += winner.heroes[i].id + ' ';
         }
         battle.log.push({
             type: LogMessageType.WIN,
@@ -199,6 +193,7 @@ export class BattleService {
 
         this.battles.splice(battleIndex, 1);
         this.reportService.saveBattleResults(battle);
+        this.reportService.addToStatistics(battle, winner);
     }
 
     private heroDeath(battle: IBattle, hero: IHero) {
@@ -218,6 +213,12 @@ export class BattleService {
         });
 
         battle.queue.splice(queueIndex, 1);
+    }
+
+    getBattleById(id: string): IBattle {
+        return this.battles.find((battle: IBattle) => {
+            return battle.id === id;
+        });
     }
 
     getScenarioTeamSize(id: string): number[] {
@@ -270,8 +271,7 @@ export class BattleService {
         }
     }
 
-    getMovePoints(battleId: string, radius: number = 1): IPosition[] {
-        const battle = this.getBattleById(battleId);
+    getMovePoints(battle: IBattle, radius: number = 1): IPosition[] {
         const activeHero = this.getHeroById(battle.queue[0], battle);
         const points = this.findNearestPoints(activeHero.position, battle.map.tiles, radius);
 
@@ -321,8 +321,7 @@ export class BattleService {
         return battle;
     }
 
-    findEnemies(battleId: string, sourceHeroId: string, radius: number = 1): string[] {
-        const battle = this.getBattleById(battleId);
+    findEnemies(battle: IBattle, sourceHeroId: string, radius: number = 1): string[] {
         const sourceHero = this.getHeroById(sourceHeroId, battle);
         const points = this.findNearestPoints(sourceHero.position, battle.map.tiles, radius);
 

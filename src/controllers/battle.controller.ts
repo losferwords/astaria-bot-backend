@@ -25,7 +25,7 @@ export class BattleController {
     @Path('/move-points')
     @GET
     async movePoints(@QueryParam('battleId') battleId: string): Promise<IPosition[]> {
-        return battleService.getMovePoints(battleId);
+        return battleService.getMovePoints(battleService.getBattleById(battleId));
     }
 
     @Path('/move-hero')
@@ -43,7 +43,7 @@ export class BattleController {
     @Path('/find-enemies')
     @GET
     async findEnemies(@QueryParam('battleId') battleId: string, @QueryParam('sourceHeroId') sourceHeroId: string, @QueryParam('radius') radius: number): Promise<string[]> {
-        return battleService.findEnemies(battleId, sourceHeroId, radius);
+        return battleService.findEnemies(battleService.getBattleById(battleId), sourceHeroId, radius);
     }
 
     @Path('/use-weapon')
