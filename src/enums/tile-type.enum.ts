@@ -1,5 +1,5 @@
 export enum TileType {
-    BLANK,
-    FLOOR,
-    WALL
+  BLANK,
+  FLOOR,
+  WALL,
 }

@@ -1,54 +1,57 @@
-import { Path, GET, POST, Return, Context, ServiceContext, QueryParam } from 'typescript-rest';
-import { IBattle } from '../interfaces/IBattle';
-import { IBattleSetup } from '../interfaces/IBattleSetup';
-import { IPosition } from '../interfaces/IPosition';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { IBattleSetupDto } from 'src/dto/battle-setup.dto';
+import { MoveHeroDto } from 'src/dto/move-hero.dto';
+import { IScenarioSetupDto } from 'src/dto/scenario-setup.dto';
+import { UseWeaponDto } from 'src/dto/use-weapon.dto';
+import { IBattle } from 'src/interfaces/IBattle';
+import { IPosition } from 'src/interfaces/IPosition';
 import { BattleService } from '../services/battle.service';
 
-const battleService: BattleService = new BattleService();
-
+@Controller()
 export class BattleController {
-    @Context
-    context: ServiceContext;
+  constructor(private battleService: BattleService) {}
 
-    @Path('/scenario-team-size')
-    @GET
-    async scenarioTeamSize(@QueryParam('id') id: string): Promise<number[]> {
-        return battleService.getScenarioTeamSize(id);
-    }
+  @Get('/scenarios')
+  async scenarios(): Promise<IScenarioSetupDto[]> {
+    return this.battleService.getScenarios();
+  }
 
-    @Path('/start-battle')
-    @POST
-    async startBattle(battleSetup: IBattleSetup): Promise<IBattle> {
-        return battleService.startBattle(battleSetup);
-    }
+  @Post('/start-battle')
+  async startBattle(@Body() battleSetup: IBattleSetupDto): Promise<IBattle> {
+    return this.battleService.startBattle(battleSetup);
+  }
 
-    @Path('/move-points')
-    @GET
-    async movePoints(@QueryParam('battleId') battleId: string): Promise<IPosition[]> {
-        return battleService.getMovePoints(battleService.getBattleById(battleId));
-    }
+  @Get('/move-points')
+  async movePoints(@Query('battleId') battleId: string): Promise<IPosition[]> {
+    const battle = this.battleService.getBattleById(battleId);
+    return this.battleService.getMovePoints(battle);
+  }
 
-    @Path('/move-hero')
-    @POST
-    async moveHero({battleId, position}): Promise<IBattle> {
-        return battleService.moveHero(battleId, position);
-    }
+  @Post('/move-hero')
+  async moveHero(@Body() moveHeroDto: MoveHeroDto): Promise<IBattle> {
+    const battle = this.battleService.getBattleById(moveHeroDto.battleId);
+    return this.battleService.moveHero(battle, moveHeroDto.position);
+  }
 
-    @Path('/end-turn')
-    @POST
-    async endTurn({battleId}): Promise<IBattle> {
-        return battleService.endTurn(battleId);
-    }
+  @Post('/end-turn')
+  async endTurn(@Body('battleId') battleId: string): Promise<IBattle> {
+    const battle = this.battleService.getBattleById(battleId);
+    return this.battleService.endTurn(battle);
+  }
 
-    @Path('/find-enemies')
-    @GET
-    async findEnemies(@QueryParam('battleId') battleId: string, @QueryParam('sourceHeroId') sourceHeroId: string, @QueryParam('radius') radius: number): Promise<string[]> {
-        return battleService.findEnemies(battleService.getBattleById(battleId), sourceHeroId, radius);
-    }
+  @Get('/find-enemies')
+  async findEnemies(
+    @Query('battleId') battleId: string,
+    @Query('sourceHeroId') sourceHeroId: string,
+    @Query('radius') radius: number
+  ): Promise<string[]> {
+    const battle = this.battleService.getBattleById(battleId);
+    return this.battleService.findEnemies(battle, sourceHeroId, radius);
+  }
 
-    @Path('/use-weapon')
-    @POST
-    async useWeapon({battleId, targetId, weaponId}): Promise<IBattle> {
-        return battleService.useWeapon(battleId, targetId, weaponId);
-    }
+  @Post('/use-weapon')
+  async useWeapon(@Body() useWeaponDto: UseWeaponDto): Promise<IBattle> {
+    const battle = this.battleService.getBattleById(useWeaponDto.battleId);
+    return this.battleService.useWeapon(battle, useWeaponDto.targetId, useWeaponDto.weaponId);
+  }
 }

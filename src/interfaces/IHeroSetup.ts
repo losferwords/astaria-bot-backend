@@ -1,4 +1,4 @@
 export interface IHeroSetup {
-    hero: string;
-    gender: string;
+  hero: string;
+  gender: string;
 }

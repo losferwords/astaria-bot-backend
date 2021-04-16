@@ -1,11 +1,11 @@
 import { ILogMessage } from './ILogMessage';
-import { IMap } from './IMap';
+import { IScenario } from './IScenario';
 import { ITeam } from './ITeam';
 
 export interface IBattle {
-    id: string;
-    map: IMap;
-    teams: ITeam[];
-    queue: string[];
-    log?: ILogMessage[];
+  id: string;
+  scenario: IScenario;
+  teams: ITeam[];
+  queue: string[];
+  log?: ILogMessage[];
 }

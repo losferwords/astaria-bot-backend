@@ -1,13 +1,13 @@
 import { IEquip } from './IEquip';
 
 export interface IHeroData {
-    id: string;
+  id: string;
 
-    maxEnergy: number;
-    maxHealth: number;
-    maxMana: number;
+  maxEnergy: number;
+  maxHealth: number;
+  maxMana: number;
 
-    primaryWeapons: IEquip[];
-    secondaryWeapons?: IEquip[];
-    chestpieces: IEquip[];
+  primaryWeapons: IEquip[];
+  secondaryWeapons?: IEquip[];
+  chestpieces: IEquip[];
 }
