@@ -21,15 +21,105 @@ export class ChthonRuins implements IScenario {
   teamSize;
   tileSize = 40;
   tiles = [
-    [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
-    [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
-    [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.WALL }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.WALL }, { type: TileType.WALL }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
-    [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.WALL }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
-    [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
-    [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.WALL }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
-    [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.WALL }, { type: TileType.WALL }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.WALL }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
-    [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }],
-    [{ type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }, { type: TileType.FLOOR }]
+    [
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR }
+    ],
+    [
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR }
+    ],
+    [
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.WALL },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.WALL },
+      { type: TileType.WALL },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR }
+    ],
+    [
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.WALL },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR }
+    ],
+    [
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR }
+    ],
+    [
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.WALL },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR }
+    ],
+    [
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.WALL },
+      { type: TileType.WALL },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.WALL },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR }
+    ],
+    [
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR }
+    ],
+    [
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR }
+    ]
   ];
 
   constructor() {

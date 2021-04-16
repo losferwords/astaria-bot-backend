@@ -1,4 +1,4 @@
-import { IPosition } from 'src/interfaces/IPosition';
+import { IPosition } from '../interfaces/IPosition';
 
 export interface MoveHeroDto {
   battleId: string;

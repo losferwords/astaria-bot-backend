@@ -68,7 +68,10 @@ export class Hero implements IHero {
   }
 
   calcHero() {
-    this.strength = this.primaryWeapon.strength + (this.secondaryWeapon ? this.secondaryWeapon.strength : 0) + this.chestpiece.strength;
+    this.strength =
+      this.primaryWeapon.strength +
+      (this.secondaryWeapon ? this.secondaryWeapon.strength : 0) +
+      this.chestpiece.strength;
     if (this.strength < 0) {
       this.strength = 0;
     }
@@ -76,7 +79,10 @@ export class Hero implements IHero {
       this.strength = Const.maxPrimaryAttributes;
     }
 
-    this.intellect = this.primaryWeapon.intellect + (this.secondaryWeapon ? this.secondaryWeapon.intellect : 0) + this.chestpiece.intellect;
+    this.intellect =
+      this.primaryWeapon.intellect +
+      (this.secondaryWeapon ? this.secondaryWeapon.intellect : 0) +
+      this.chestpiece.intellect;
     if (this.intellect < 0) {
       this.intellect = 0;
     }
@@ -84,7 +90,8 @@ export class Hero implements IHero {
       this.intellect = Const.maxPrimaryAttributes;
     }
 
-    this.armor = this.primaryWeapon.armor + (this.secondaryWeapon ? this.secondaryWeapon.armor : 0) + this.chestpiece.armor;
+    this.armor =
+      this.primaryWeapon.armor + (this.secondaryWeapon ? this.secondaryWeapon.armor : 0) + this.chestpiece.armor;
     if (this.armor < 0) {
       this.armor = 0;
     }
@@ -100,7 +107,10 @@ export class Hero implements IHero {
       this.will = Const.maxPrimaryAttributes;
     }
 
-    this.regeneration = this.primaryWeapon.regeneration + (this.secondaryWeapon ? this.secondaryWeapon.regeneration : 0) + this.chestpiece.regeneration;
+    this.regeneration =
+      this.primaryWeapon.regeneration +
+      (this.secondaryWeapon ? this.secondaryWeapon.regeneration : 0) +
+      this.chestpiece.regeneration;
     if (this.regeneration < 0) {
       this.regeneration = 0;
     }
