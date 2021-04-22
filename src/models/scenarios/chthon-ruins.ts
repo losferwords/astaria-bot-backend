@@ -150,5 +150,6 @@ export class ChthonRuins implements IScenario {
         return battle.teams[i + 1 === 2 ? 0 : 1];
       }
     }
+    return null;
   }
 }

@@ -152,14 +152,17 @@ export class BattleService {
     return enemies;
   }
 
-  useWeapon(battle: IBattle, targetId: string, weaponId: string): IBattle {
+  useWeapon(battle: IBattle, targetId: string, weaponId: string, isSimulation: boolean): IBattle {
     const heroes = this.getHeroesInBattle(battle);
     const newBattle = this.heroService.useWeapon(battle, heroes, targetId, weaponId);
     const winner = newBattle.scenario.checkForWin(newBattle);
     if (winner) {
       this.battleEnd(newBattle, winner);
-      this.reportService.saveBattleResults(battle);
-      this.reportService.addToStatistics(battle, winner);
+      if(!isSimulation) {
+        this.removeBattle(battle.id);
+        this.reportService.saveBattleResults(battle);
+        this.reportService.addToStatistics(battle, winner);
+      }      
     }
     return newBattle;
   }
@@ -173,9 +176,11 @@ export class BattleService {
       type: LogMessageType.WIN,
       id: winnerHeroes
     });
+  }
 
+  removeBattle(battleId: string) {
     const battleIndex = this.battles.findIndex((b: IBattle) => {
-      return b.id === battle.id;
+      return b.id === battleId;
     });
 
     this.battles.splice(battleIndex, 1);

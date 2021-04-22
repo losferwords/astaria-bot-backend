@@ -52,6 +52,6 @@ export class BattleController {
   @Post('/use-weapon')
   async useWeapon(@Body() useWeaponDto: UseWeaponDto): Promise<IBattle> {
     const battle = this.battleService.getBattleById(useWeaponDto.battleId);
-    return this.battleService.useWeapon(battle, useWeaponDto.targetId, useWeaponDto.weaponId);
+    return this.battleService.useWeapon(battle, useWeaponDto.targetId, useWeaponDto.weaponId, false);
   }
 }

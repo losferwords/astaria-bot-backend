@@ -5,6 +5,7 @@ import { IBattle } from 'src/interfaces/IBattle';
 import { IEquip } from 'src/interfaces/IEquip';
 import { IHero } from 'src/interfaces/IHero';
 import { IPosition } from 'src/interfaces/IPosition';
+import { ITeam } from 'src/interfaces/ITeam';
 import { Const } from 'src/static/const';
 import { Helper } from 'src/static/helper';
 
@@ -80,6 +81,14 @@ export class HeroService {
     return heroes.find((hero: IHero) => {
       return hero.id === heroId;
     });
+  }
+
+  getTeamIdByHeroId(heroId: string, teams: ITeam[]) {
+    return teams.find((team: ITeam) => {
+      return team.heroes.find((hero: IHero) => {
+        return hero.id === heroId;
+      });
+    }).id;
   }
 
   moveHero(battle: IBattle, activeHero: IHero, position: IPosition): IBattle {
