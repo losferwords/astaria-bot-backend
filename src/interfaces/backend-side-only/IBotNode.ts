@@ -8,6 +8,8 @@ export interface IBotNode {
   action?: IAction;
   sims: number;
   wins: number;
+  shortestWin: number;
+  depth: number;
   children: Map<string, IBotTreeBranch>;
   parent?: BotNode;
   getActionHash: (action: IAction) => string;

@@ -147,7 +147,7 @@ export class ChthonRuins implements IScenario {
         }
       }
       if (teamDeathsCount === 2) {
-        return battle.teams[i + 1 === 2 ? 0 : 1];
+        return battle.teams[i === 0 ? 1 : 0];
       }
     }
     return null;

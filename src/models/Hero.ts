@@ -7,6 +7,7 @@ import { IHeroSetup } from '../interfaces/IHeroSetup';
 import { IEffect } from '../interfaces/IEffect';
 import { IAbility } from '../interfaces/IAbility';
 import { IPet } from '../interfaces/IPet';
+import { enumerable } from 'src/decorators/enumerable.decorator';
 
 export class Hero implements IHero {
   id: string;
@@ -67,6 +68,7 @@ export class Hero implements IHero {
     this.calcHero();
   }
 
+  @enumerable(true)
   calcHero() {
     this.strength =
       this.primaryWeapon.strength +
@@ -127,6 +129,7 @@ export class Hero implements IHero {
     }
   }
 
+  @enumerable(true)
   private resetState() {
     this.moveEnergyCost = Const.moveEnergyCost;
     this.isDead = false;
@@ -136,11 +139,13 @@ export class Hero implements IHero {
     this.isStunned = false;
     this.isImmobilized = false;
   }
-
-  private applyEffects() {
+  
+  @enumerable(true)
+  applyEffects() {
     // ToDo
   }
 
+  @enumerable(true)
   beforeTurn() {
     if (this.isDead) {
       return;

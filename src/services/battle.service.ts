@@ -51,19 +51,15 @@ export class BattleService {
 
     for (let i = 0; i < enemyHeroes.length; i++) {
       possibleEnemies.push(enemyHeroes[i]);
-      for (let j = 0; j < enemyHeroes[i].pets.length; j++) {
-        possibleEnemies.push(enemyHeroes[i].pets[j]);
-      }
+      possibleEnemies.push(...enemyHeroes[i].pets);
     }
     return possibleEnemies;
   }
 
   getHeroesInBattle(battle: IBattle): IHero[] {
-    const heroes = [];
-    for (let i = 0; i < battle.teams.length; i++) {
-      for (let j = 0; j < battle.teams[i].heroes.length; j++) {
-        heroes.push(battle.teams[i].heroes[j]);
-      }
+    const heroes = new Array(battle.scenario.teamSize[0] * battle.scenario.teamSize[1]);
+    for (let i = 0; i < heroes.length; i++) {
+      heroes[i] = battle.teams[Math.floor(i / battle.scenario.teamSize[0])].heroes[i % battle.scenario.teamSize[1]];
     }
     return heroes;
   }
@@ -92,6 +88,13 @@ export class BattleService {
         };
         battle.scenario.setHeroPositions(battle.teams);
         battle.queue = this.getQueue(battle.teams);
+        const heroes = this.getHeroesInBattle(battle);
+        const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
+        battle.log.push({          
+          type: LogMessageType.TURN_START,
+          id: activeHero.id,
+          position: activeHero.position
+        });
         break;
     }
     this.battles.push(battle);
@@ -118,11 +121,20 @@ export class BattleService {
   }
 
   endTurn(battle: IBattle): IBattle {
-    const newBattle = this.heroService.endTurn(battle);
-    const heroes = this.getHeroesInBattle(newBattle);
+    battle.log.push({
+      type: LogMessageType.TURN_END,
+      id: battle.queue[0]
+    });
+    battle.queue.push(battle.queue.shift());
+    const heroes = this.getHeroesInBattle(battle);
     const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
+    battle.log.push({
+      type: LogMessageType.TURN_START,
+      id: activeHero.id,
+      position: activeHero.position //initial position at the new turn beginning (for previousMoves)
+    });
     activeHero.beforeTurn();
-    return newBattle;
+    return battle;
   }
 
   findEnemies(battle: IBattle, sourceHeroId: string, radius: number): string[] {
@@ -158,11 +170,11 @@ export class BattleService {
     const winner = newBattle.scenario.checkForWin(newBattle);
     if (winner) {
       this.battleEnd(newBattle, winner);
-      if(!isSimulation) {
+      if (!isSimulation) {
         this.removeBattle(battle.id);
         this.reportService.saveBattleResults(battle);
         this.reportService.addToStatistics(battle, winner);
-      }      
+      }
     }
     return newBattle;
   }
@@ -186,18 +198,10 @@ export class BattleService {
     this.battles.splice(battleIndex, 1);
   }
 
-  getAvailableActions(battle: IBattle): IAction[] {
+  getAvailableActions(battle: IBattle, previousMoves: IPosition[]): IAction[] {
     const heroes = this.getHeroesInBattle(battle);
     const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
     const actions: IAction[] = [];
-    const moves = this.getMovePoints(battle);
-
-    for (let i = 0; i < moves.length; i++) {
-      actions.push({
-        type: ActionType.MOVE,
-        position: moves[i]
-      });
-    }
 
     if (this.heroService.canUseWeapon(activeHero, activeHero.primaryWeapon)) {
       const enemies = this.findEnemies(battle, activeHero.id, activeHero.primaryWeapon.range);
@@ -220,6 +224,17 @@ export class BattleService {
           targetId: enemies[i]
         });
       }
+    }
+
+    const moves = _.shuffle(this.getMovePoints(battle));
+    for (let i = 0; i < moves.length; i++) {
+      if (previousMoves.length && previousMoves.find((move) => move.x === moves[i].x && move.y === moves[i].y)) {
+        continue;
+      }
+      actions.push({
+        type: ActionType.MOVE,
+        position: moves[i]
+      });
     }
     actions.push({ type: ActionType.TURN_END });
     return actions;

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { LogMessageType } from 'src/enums/log-message-type.enum';
 import { IBattle } from 'src/interfaces/IBattle';
 import { IEquip } from 'src/interfaces/IEquip';
@@ -106,15 +106,6 @@ export class HeroService {
     return battle;
   }
 
-  endTurn(battle: IBattle): IBattle {
-    battle.log.push({
-      type: LogMessageType.TURN_END,
-      id: battle.queue[0]
-    });
-    battle.queue.push(battle.queue.shift());
-    return battle;
-  }
-
   useWeapon(battle: IBattle, heroes: IHero[], targetId: string, weaponId: string): IBattle {
     const activeHero = this.getHeroById(battle.queue[0], heroes);
     const target = this.getHeroById(targetId, heroes);
@@ -143,17 +134,17 @@ export class HeroService {
 
     const totalDamage = physDamage + magicDamage;
 
-    this.heroTakesDamage(battle, activeHero, target, totalDamage);
-    activeHero.energy -= weapon.energyCost;
-    weapon.isUsed = true;
-
     battle.log.push({
       type: LogMessageType.WEAPON_DAMAGE,
       casterId: activeHero.id,
       targetId: target.id,
-      value: totalDamage + '',
-      id: weapon.id
+      weaponId: weapon.id,
+      value: totalDamage + ''
     });
+
+    this.heroTakesDamage(battle, activeHero, target, totalDamage);
+    activeHero.energy -= weapon.energyCost;
+    weapon.isUsed = true;
 
     return battle;
   }

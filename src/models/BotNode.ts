@@ -9,6 +9,8 @@ export class BotNode implements IBotNode {
   action: IAction;
   sims: number = 0;
   wins: number = 0;
+  shortestWin: number = 10000;
+  depth: number = 0;
   children: Map<string, IBotTreeBranch>;
   parent: BotNode;
 
@@ -17,9 +19,10 @@ export class BotNode implements IBotNode {
     this.state = state;
 
     this.parent = parent;
+    this.depth = this.parent ? this.parent.depth + 1 : 0;
     this.children = new Map();
-    for (const unexpandedAction of unexpandedActions) {
-      this.children.set(this.getActionHash(unexpandedAction), { action: unexpandedAction, node: null });
+    for(let i = 0; i < unexpandedActions.length; i++) {
+      this.children.set(this.getActionHash(unexpandedActions[i]), { action: unexpandedActions[i], node: null });
     }
   }
 
@@ -56,9 +59,10 @@ export class BotNode implements IBotNode {
     const child = this.children.get(this.getActionHash(action));
     if (child === undefined) {
       throw new Error('No child action!');
-    } else if (child.node === null) {
-      throw new Error('Child node is not expanded!');
-    }
+    } 
+    // else if (child.node === null) {
+    //   throw new Error('Child node is not expanded!');
+    // }
     return child.node;
   }
 

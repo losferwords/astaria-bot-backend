@@ -10,5 +10,5 @@ export class Const {
   public static reportsPath = './reports';
   public static statisticsFilePath = './reports/statistics';
   public static explorationParameter = 2;
-  public static botThinkTime = 10000;
+  public static botThinkTime = 120000;
 }

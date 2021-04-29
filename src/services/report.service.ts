@@ -40,7 +40,7 @@ export class ReportService {
             ',' +
             battle.log[i].casterId +
             ',WEAPON_DAMAGE,,' +
-            battle.log[i].id +
+            battle.log[i].weaponId +
             ',' +
             battle.log[i].targetId +
             ',' +
