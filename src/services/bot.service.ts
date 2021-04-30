@@ -12,12 +12,17 @@ import { ITeam } from 'src/interfaces/ITeam';
 import { HeroService } from './hero.service';
 import { IPosition } from 'src/interfaces/IPosition';
 import { LogMessageType } from 'src/enums/log-message-type.enum';
+import { ReportService } from './report.service';
 
 @Injectable()
 export class BotService {
   nodes: Map<string, BotNode>;
 
-  constructor(private battleService: BattleService, private heroService: HeroService) {}
+  constructor(
+    private battleService: BattleService,
+    private heroService: HeroService,
+    private reportService: ReportService
+  ) {}
   private actionChain = [];
 
   private getStateHash(state: IBattle): string {
@@ -74,11 +79,13 @@ export class BotService {
     state = this.cloneState(state);
     const heroes = this.battleService.getHeroesInBattle(state);
     const activeHero = this.heroService.getHeroById(state.queue[0], heroes);
-    state.log = [{
-      type: LogMessageType.TURN_START,
-      id: activeHero.id,
-      position: activeHero.position
-    }];
+    state.log = [
+      {
+        type: LogMessageType.TURN_START,
+        id: activeHero.id,
+        position: activeHero.position
+      }
+    ];
 
     const stateHash = this.getStateHash(state);
     const unexpandedActions = this.battleService.getAvailableActions(state, []);
@@ -122,6 +129,11 @@ export class BotService {
     console.log('Average Simulation Time: ' + (simulationTimeSum / simulationTime.length).toFixed(0));
     console.log('Min Simulation Time: ' + simulationTimeMin.toFixed(0));
     console.log('Max Simulation Time: ' + simulationTimeMax.toFixed(0));
+
+    // Create mcts diagram
+    if (Const.treeBuild) {
+      this.reportService.saveTreeVisualization(rootNode);
+    }
 
     this.actionChain = this.bestActionChain(nodes, state);
     const actionFromChain = this.actionChain[0];
@@ -198,7 +210,9 @@ export class BotService {
 
   getPreviousMoves(state: IBattle): IPosition[] {
     const previousMoves: IPosition[] = [];
-    const activeHeroId = state.log[state.log.length - 1].id ? state.log[state.log.length - 1].id : state.log[state.log.length - 1].casterId;
+    const activeHeroId = state.log[state.log.length - 1].id
+      ? state.log[state.log.length - 1].id
+      : state.log[state.log.length - 1].casterId;
 
     for (let i = state.log.length - 2; i > -1; i--) {
       if (state.log[i].type === LogMessageType.TURN_START) {
@@ -209,7 +223,7 @@ export class BotService {
         if (state.log[i].type === LogMessageType.MOVE) {
           previousMoves.push(state.log[i].position);
         }
-      } else {        
+      } else {
         break;
       }
     }

@@ -5,6 +5,9 @@ import * as fs from 'fs';
 import { Const } from '../static/const';
 import { ITeam } from '../interfaces/ITeam';
 import { ILogMessage } from '../interfaces/ILogMessage';
+import { BotNode } from 'src/models/BotNode';
+import { IBotTreeBranch } from 'src/interfaces/backend-side-only/IBotTreeBranch';
+import { ActionType } from 'src/enums/action-type.enum';
 
 @Injectable()
 export class ReportService {
@@ -98,5 +101,71 @@ export class ReportService {
     } else {
       fs.appendFileSync(targetFile, statisticsData);
     }
+  }
+
+  saveTreeVisualization(rootNode: BotNode) {
+    const tree = this.expandChildren(rootNode);
+    fs.writeFileSync(
+      Const.mctsTreeReportPath + '/' + rootNode.state.id + '-' + rootNode.state.log.length + '.json',
+      JSON.stringify(tree)
+    );
+  }
+
+  expandChildren(parentNode: BotNode) {
+    const childrenNodeArray = Array.from(parentNode.children.values());
+    const childrenArray = [];
+    for (const child of childrenNodeArray) {
+      if (child.node) {
+        childrenArray.push(this.expandChildren(child.node));
+      } else {
+        childrenArray.push({
+          name: 'unexpanded',
+          children: []
+        });
+      }
+    }
+    let name = '';
+    if (parentNode.action) {
+      switch (parentNode.action.type) {
+        case ActionType.MOVE:
+          name =
+            parentNode.state.log.slice(-2, -1)[0].id +
+            ' move to ' +
+            parentNode.action.position.x +
+            ',' +
+            parentNode.action.position.y;
+          break;
+        case ActionType.WEAPON_DAMAGE:
+          name =
+            parentNode.action.casterId +
+            ' deals ' +
+            parentNode.action.value +
+            ' damage to' +
+            parentNode.action.targetId +
+            ' with ' +
+            parentNode.action.weaponId;
+          break;
+        case ActionType.TURN_END:
+          name = parentNode.state.log.slice(-2, -1)[0].id + ' end turn';
+          break;
+      }
+    } else {
+      name =
+        parentNode.state.log[0].id +
+        ' starts at ' +
+        parentNode.state.log[0].position.x +
+        ',' +
+        parentNode.state.log[0].position.y;
+    }
+
+    return {
+      name: name,
+      hero: parentNode.state.log.length > 1 ? parentNode.state.log.slice(-2, -1)[0].id : parentNode.state.log[0].id,
+      sims: parentNode.sims,
+      wins: parentNode.wins,
+      shortestWin: parentNode.shortestWin,
+      type: parentNode.action ? parentNode.action.type : 0,
+      children: childrenArray
+    };
   }
 }

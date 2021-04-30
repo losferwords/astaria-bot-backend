@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style type="text/css">
+  
+	.node {
+    cursor: pointer;
+  }
+
+  .overlay {
+    background-color:#EEE;
+  }
+   
+  .node circle {
+    fill: #fff;
+    /* stroke: steelblue; */
+    stroke: #333;
+    stroke-width: 1.5px;
+  }
+
+  .node circle.paragon {
+    stroke: #c41e3a;
+  }
+
+  .node circle.highlander {
+    stroke: #0080ff;
+  }
+
+  .node circle.druid {
+    stroke: #25b324;
+  }
+
+  .node circle.oracle {
+    stroke: #4b0082;
+  }
+
+  .node circle.avatar {
+    stroke: #00bd71;
+  }
+
+  .node circle.shadow {
+    stroke: #000000;
+  }
+
+  .node circle.lightbringer {
+    stroke: #ffd700;
+  }
+
+  .node circle.avenger {
+    stroke: #f4a460;
+  }
+   
+  .node text {
+    font-size: 5px;
+    font-family: sans-serif;
+    white-space: pre-line;
+    text-align: center;
+    font-weight: bold;
+  }
+   
+  .link {
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 1.5px;
+  }
+
+  .templink {
+    fill: none;
+    stroke: red;
+    stroke-width: 3px;
+  }
+
+  .ghostCircle.show {
+    display: block;
+  }
+
+  .ghostCircle, .activeDrag .ghostCircle {
+    display: none;
+  }
+
+</style>
+<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<script src="dndTree.js"></script>
+<body>
+    <div id="tree-container"></div>
+</body>
+</html>

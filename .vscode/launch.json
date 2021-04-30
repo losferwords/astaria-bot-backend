@@ -11,7 +11,8 @@
         "-r",
         "ts-node/register",
         "-r",
-        "tsconfig-paths/register"
+        "tsconfig-paths/register",
+        "--max-old-space-size=8192"
       ],
       "sourceMaps": true,
       "envFile": "${workspaceFolder}/.env",
