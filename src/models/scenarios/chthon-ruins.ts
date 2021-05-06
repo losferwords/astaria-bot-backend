@@ -1,3 +1,5 @@
+import { IPosition } from 'src/interfaces/IPosition';
+import { Helper } from 'src/static/helper';
 import { TileType } from '../../enums/tile-type.enum';
 import { IBattle } from '../../interfaces/IBattle';
 import { IScenario } from '../../interfaces/IScenario';
@@ -136,18 +138,61 @@ export class ChthonRuins implements IScenario {
     }
   }
 
-  beforeTurn() {}
+  beforeTurn(state: IBattle) {
+    if (!state.crystalPositions.length) {
+      const possibleSpots: IPosition[] = [
+        {
+          x: 1,
+          y: 1
+        },
+        {
+          x: 4,
+          y: 4
+        },
+        {
+          x: 7,
+          y: 7
+        }
+      ];
+      for (let i = 0; i < state.teams.length; i++) {
+        for (let j = 0; j < state.teams[i].heroes.length; j++) {
+          const spotIndex = possibleSpots.findIndex((spot) => {
+            return spot.x === state.teams[i].heroes[j].position.x && spot.y === state.teams[i].heroes[j].position.y;
+          });
+          if (spotIndex > -1) {
+            possibleSpots.splice(spotIndex, 1);
+          }
+          for (let k = 0; k < state.teams[i].heroes[j].pets.length; k++) {
+            const spotIndex = possibleSpots.findIndex((spot) => {
+              return (
+                spot.x === state.teams[i].heroes[j].pets[k].position.x &&
+                spot.y === state.teams[i].heroes[j].pets[k].position.y
+              );
+            });
+            if (spotIndex > -1) {
+              possibleSpots.splice(spotIndex, 1);
+            }
+          }
+        }
+      }
 
-  checkForWin(battle: IBattle): ITeam {
-    for (let i = 0; i < battle.teams.length; i++) {
+      if (possibleSpots.length) {
+        const randomSpotIndex = Helper.randomInt(0, possibleSpots.length - 1);
+        state.crystalPositions.push(possibleSpots[randomSpotIndex]);
+      }
+    }
+  }
+
+  checkForWin(teams: ITeam[]): ITeam {
+    for (let i = 0; i < teams.length; i++) {
       let teamDeathsCount = 0;
-      for (let j = 0; j < battle.teams[i].heroes.length; j++) {
-        if (battle.teams[i].heroes[j].isDead) {
+      for (let j = 0; j < teams[i].heroes.length; j++) {
+        if (teams[i].heroes[j].isDead) {
           teamDeathsCount++;
         }
       }
       if (teamDeathsCount === 2) {
-        return battle.teams[i === 0 ? 1 : 0];
+        return teams[i === 0 ? 1 : 0];
       }
     }
     return null;

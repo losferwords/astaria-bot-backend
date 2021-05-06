@@ -44,6 +44,7 @@ export class BotService {
     return {
       id: state.id,
       scenario: state.scenario,
+      crystalPositions: state.crystalPositions.slice(0),
       teams: newTeams,
       queue: state.queue.slice(0),
       log: state.log.slice(0)
@@ -102,7 +103,7 @@ export class BotService {
     while (Date.now() < end) {
       const startTime = Date.now();
       let node = this.select(nodes, state);
-      let winner = node.state.scenario.checkForWin(node.state);
+      let winner = node.state.scenario.checkForWin(node.state.teams);
 
       if (node.isLeaf() === false && winner === null) {
         node = this.expand(nodes, node);
@@ -175,7 +176,7 @@ export class BotService {
 
   simulate(node: BotNode, currentTeamId: string): ITeam {
     let state = node.state;
-    let winner = state.scenario.checkForWin(state);
+    let winner = state.scenario.checkForWin(state.teams);
     let chainLength = 0;
 
     while (winner === null) {
@@ -187,7 +188,7 @@ export class BotService {
 
       state = this.cloneState(state);
       this.doAction(state, randomAction, true);
-      winner = state.scenario.checkForWin(state);
+      winner = state.scenario.checkForWin(state.teams);
     }
     if (winner.id === currentTeamId) {
       node.shortestWin = chainLength + node.depth;

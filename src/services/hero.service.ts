@@ -83,12 +83,20 @@ export class HeroService {
     });
   }
 
-  getTeamIdByHeroId(heroId: string, teams: ITeam[]) {
+  getTeamIdByHeroId(heroId: string, teams: ITeam[]): string {
     return teams.find((team: ITeam) => {
       return team.heroes.find((hero: IHero) => {
         return hero.id === heroId;
       });
     }).id;
+  }
+
+  getTeamByHeroId(heroId: string, teams: ITeam[]): ITeam {
+    return teams.find((team: ITeam) => {
+      return team.heroes.find((hero: IHero) => {
+        return hero.id === heroId;
+      });
+    });
   }
 
   moveHero(battle: IBattle, activeHero: IHero, position: IPosition): IBattle {

@@ -83,6 +83,7 @@ export class BattleService {
           id: uuid(),
           scenario: new ChthonRuins(),
           teams: [new Team(battleSetup.teamSetup[0]), new Team(battleSetup.teamSetup[1])],
+          crystalPositions: [],
           queue: [],
           log: []
         };
@@ -90,11 +91,12 @@ export class BattleService {
         battle.queue = this.getQueue(battle.teams);
         const heroes = this.getHeroesInBattle(battle);
         const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
-        battle.log.push({          
+        battle.log.push({
           type: LogMessageType.TURN_START,
           id: activeHero.id,
           position: activeHero.position
         });
+        battle.scenario.beforeTurn(battle);
         break;
     }
     this.battles.push(battle);
@@ -115,7 +117,15 @@ export class BattleService {
     const heroes = this.getHeroesInBattle(battle);
     const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
     if (this.heroService.canMove(activeHero)) {
-      return this.heroService.moveHero(battle, activeHero, targetPosition);
+      this.heroService.moveHero(battle, activeHero, targetPosition);
+      const crystalPositionIndex = battle.crystalPositions.findIndex((cp: IPosition) => {
+        return cp.x === targetPosition.x && cp.y === targetPosition.y;
+      });
+      if (crystalPositionIndex > -1) {
+        const activeTeam = this.heroService.getTeamByHeroId(activeHero.id, battle.teams);
+        activeTeam.crystals += 1;
+        battle.crystalPositions.splice(crystalPositionIndex, 1);
+      }
     }
     return battle;
   }
@@ -134,6 +144,7 @@ export class BattleService {
       position: activeHero.position //initial position at the new turn beginning (for previousMoves)
     });
     activeHero.beforeTurn();
+    battle.scenario.beforeTurn(battle);
     return battle;
   }
 
@@ -167,7 +178,7 @@ export class BattleService {
   useWeapon(battle: IBattle, targetId: string, weaponId: string, isSimulation: boolean): IBattle {
     const heroes = this.getHeroesInBattle(battle);
     const newBattle = this.heroService.useWeapon(battle, heroes, targetId, weaponId);
-    const winner = newBattle.scenario.checkForWin(newBattle);
+    const winner = newBattle.scenario.checkForWin(newBattle.teams);
     if (winner) {
       this.battleEnd(newBattle, winner);
       if (!isSimulation) {

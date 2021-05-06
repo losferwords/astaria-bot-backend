@@ -1,4 +1,5 @@
 import { IBattle } from './IBattle';
+import { IPosition } from './IPosition';
 import { ITeam } from './ITeam';
 import { ITile } from './ITile';
 
@@ -8,6 +9,6 @@ export interface IScenario {
   tiles: ITile[][];
   tileSize: number;
   setHeroPositions: (teams: ITeam[]) => void;
-  beforeTurn: () => void;
-  checkForWin: (battle: IBattle) => ITeam;
+  beforeTurn: (state: IBattle) => void;
+  checkForWin: (teams: ITeam[]) => ITeam;
 }
