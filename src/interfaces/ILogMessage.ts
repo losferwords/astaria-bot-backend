@@ -6,7 +6,7 @@ export interface ILogMessage {
   id?: string;
   casterId?: string;
   targetId?: string;
-  weaponId?: string;
+  equipId?: string;
   value?: string;
   position?: IPosition;
 }

@@ -62,7 +62,9 @@ export class BotService {
       case ActionType.MOVE:
         return this.battleService.moveHero(battle, action.position);
       case ActionType.WEAPON_DAMAGE:
-        return this.battleService.useWeapon(battle, action.targetId, action.weaponId, isSimulation);
+        return this.battleService.useWeapon(battle, action.targetId, action.equipId, isSimulation);
+      case ActionType.UPGRADE_EQUIP:
+        return this.battleService.upgradeEquip(battle, action.equipId);
       case ActionType.TURN_END:
         return this.battleService.endTurn(battle);
     }

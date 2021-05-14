@@ -8,6 +8,7 @@ import { IEffect } from '../interfaces/IEffect';
 import { IAbility } from '../interfaces/IAbility';
 import { IPet } from '../interfaces/IPet';
 import { enumerable } from 'src/decorators/enumerable.decorator';
+import { IHeroData } from 'src/interfaces/IHeroData';
 
 export class Hero implements IHero {
   id: string;
@@ -45,7 +46,7 @@ export class Hero implements IHero {
   crystals = 0;
 
   constructor(heroSetup: IHeroSetup) {
-    const heroData = _.cloneDeep(HeroesData[heroSetup.hero]);
+    const heroData: IHeroData = _.cloneDeep(HeroesData[heroSetup.hero]);
     this.id = heroData.id;
     this.gender = heroSetup.gender;
 
@@ -64,6 +65,8 @@ export class Hero implements IHero {
     }
 
     this.chestpiece = heroData.chestpieces[0];
+
+    this.abilities = heroData.abilities.length > 0 ? [heroData.abilities[0][0]] : [];
 
     this.calcHero();
   }
@@ -132,14 +135,13 @@ export class Hero implements IHero {
   @enumerable(true)
   private resetState() {
     this.moveEnergyCost = Const.moveEnergyCost;
-    this.isDead = false;
     this.isInvisible = false;
     this.isSilenced = false;
     this.isDisarmed = false;
     this.isStunned = false;
     this.isImmobilized = false;
   }
-  
+
   @enumerable(true)
   applyEffects() {
     // ToDo

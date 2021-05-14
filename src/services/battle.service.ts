@@ -124,6 +124,10 @@ export class BattleService {
       if (crystalPositionIndex > -1) {
         const activeTeam = this.heroService.getTeamByHeroId(activeHero.id, battle.teams);
         activeTeam.crystals += 1;
+        battle.log.push({
+          type: LogMessageType.TAKE_CRYSTAL,
+          id: activeHero.id
+        });
         battle.crystalPositions.splice(crystalPositionIndex, 1);
       }
     }
@@ -212,14 +216,50 @@ export class BattleService {
   getAvailableActions(battle: IBattle, previousMoves: IPosition[]): IAction[] {
     const heroes = this.getHeroesInBattle(battle);
     const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
+    const team = this.heroService.getTeamByHeroId(activeHero.id, battle.teams);
     const actions: IAction[] = [];
+
+    if (team.crystals > 0 || activeHero.crystals > 0) {
+      const heroData = this.heroService.getHeroData(activeHero.id);
+      if (
+        activeHero.primaryWeapon.level < 3 &&
+        (team.crystals >= heroData.primaryWeapons[activeHero.primaryWeapon.level].cost ||
+          activeHero.crystals >= heroData.primaryWeapons[activeHero.primaryWeapon.level].cost)
+      ) {
+        actions.push({
+          type: ActionType.UPGRADE_EQUIP,
+          equipId: activeHero.primaryWeapon.id
+        });
+      }
+      if (
+        activeHero.secondaryWeapon &&
+        activeHero.secondaryWeapon.level < 3 &&
+        (team.crystals >= heroData.secondaryWeapons[activeHero.secondaryWeapon.level].cost ||
+          activeHero.crystals >= heroData.secondaryWeapons[activeHero.secondaryWeapon.level].cost)
+      ) {
+        actions.push({
+          type: ActionType.UPGRADE_EQUIP,
+          equipId: activeHero.secondaryWeapon.id
+        });
+      }
+      if (
+        activeHero.chestpiece.level < 3 &&
+        (team.crystals >= heroData.chestpieces[activeHero.chestpiece.level].cost ||
+          activeHero.crystals >= heroData.chestpieces[activeHero.chestpiece.level].cost)
+      ) {
+        actions.push({
+          type: ActionType.UPGRADE_EQUIP,
+          equipId: activeHero.chestpiece.id
+        });
+      }
+    }
 
     if (this.heroService.canUseWeapon(activeHero, activeHero.primaryWeapon)) {
       const enemies = this.findEnemies(battle, activeHero.id, activeHero.primaryWeapon.range);
       for (let i = 0; i < enemies.length; i++) {
         actions.push({
           type: ActionType.WEAPON_DAMAGE,
-          weaponId: activeHero.primaryWeapon.id,
+          equipId: activeHero.primaryWeapon.id,
           casterId: activeHero.id,
           targetId: enemies[i]
         });
@@ -230,7 +270,7 @@ export class BattleService {
       for (let i = 0; i < enemies.length; i++) {
         actions.push({
           type: ActionType.WEAPON_DAMAGE,
-          weaponId: activeHero.secondaryWeapon.id,
+          equipId: activeHero.secondaryWeapon.id,
           casterId: activeHero.id,
           targetId: enemies[i]
         });
@@ -249,5 +289,10 @@ export class BattleService {
     }
     actions.push({ type: ActionType.TURN_END });
     return actions;
+  }
+
+  upgradeEquip(battle: IBattle, equipId: string): IBattle {
+    const heroes = this.getHeroesInBattle(battle);
+    return this.heroService.upgradeEquip(battle, heroes, equipId);
   }
 }

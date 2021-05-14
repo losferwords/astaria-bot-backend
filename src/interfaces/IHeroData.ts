@@ -1,3 +1,4 @@
+import { IAbility } from './IAbility';
 import { IEquip } from './IEquip';
 
 export interface IHeroData {
@@ -10,4 +11,6 @@ export interface IHeroData {
   primaryWeapons: IEquip[];
   secondaryWeapons?: IEquip[];
   chestpieces: IEquip[];
+
+  abilities: IAbility[][];
 }

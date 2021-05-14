@@ -43,12 +43,18 @@ export class ReportService {
             ',' +
             battle.log[i].casterId +
             ',WEAPON_DAMAGE,,' +
-            battle.log[i].weaponId +
+            battle.log[i].equipId +
             ',' +
             battle.log[i].targetId +
             ',' +
             battle.log[i].value +
             '\n';
+          break;
+        case LogMessageType.UPGRADE_EQUIP:
+          battleLogData += i + ',' + turn + ',' + battle.log[i].id + ',UPGRADE_EQUIP,,' + battle.log[i].equipId + '\n';
+          break;
+        case LogMessageType.TAKE_CRYSTAL:
+          battleLogData += i + ',' + turn + ',' + battle.log[i].id + ',TAKE_CRYSTAL\n';
           break;
         case LogMessageType.DEATH:
           battleLogData += i + ',' + turn + ',' + battle.log[i].id + ',DEATH\n';
@@ -143,7 +149,10 @@ export class ReportService {
             ' damage to' +
             parentNode.action.targetId +
             ' with ' +
-            parentNode.action.weaponId;
+            parentNode.action.equipId;
+          break;
+        case ActionType.UPGRADE_EQUIP:
+          name = parentNode.state.log.slice(-2, -1)[0].id + ' upgrade equip: ' + parentNode.action.equipId;
           break;
         case ActionType.TURN_END:
           name = parentNode.state.log.slice(-2, -1)[0].id + ' end turn';

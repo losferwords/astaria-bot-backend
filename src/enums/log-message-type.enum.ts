@@ -6,6 +6,9 @@ export enum LogMessageType {
   ABILITY_DAMAGE,
   ABILITY_HEAL,
   ABILITY_CAST,
+  UPGRADE_EQUIP,
+  LEARN_ABILITY,
+  TAKE_CRYSTAL,
   DEATH,
   WIN
 }

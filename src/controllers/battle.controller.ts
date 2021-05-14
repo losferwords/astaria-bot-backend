@@ -2,14 +2,17 @@ import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { IBattleSetupDto } from 'src/dto/battle-setup.dto';
 import { MoveHeroDto } from 'src/dto/move-hero.dto';
 import { IScenarioSetupDto } from 'src/dto/scenario-setup.dto';
+import { UpgradeEquipDto } from 'src/dto/upgrade-equip.dto';
 import { UseWeaponDto } from 'src/dto/use-weapon.dto';
 import { IBattle } from 'src/interfaces/IBattle';
+import { IHeroData } from 'src/interfaces/IHeroData';
 import { IPosition } from 'src/interfaces/IPosition';
+import { HeroService } from 'src/services/hero.service';
 import { BattleService } from '../services/battle.service';
 
 @Controller()
 export class BattleController {
-  constructor(private battleService: BattleService) {}
+  constructor(private battleService: BattleService, private heroService: HeroService) {}
 
   @Get('/scenarios')
   async scenarios(): Promise<IScenarioSetupDto[]> {
@@ -19,6 +22,11 @@ export class BattleController {
   @Post('/start-battle')
   async startBattle(@Body() battleSetup: IBattleSetupDto): Promise<IBattle> {
     return this.battleService.startBattle(battleSetup);
+  }
+
+  @Get('/hero-data')
+  async heroData(@Query('heroId') heroId: string): Promise<IHeroData> {
+    return this.heroService.getHeroData(heroId);
   }
 
   @Get('/move-points')
@@ -53,5 +61,11 @@ export class BattleController {
   async useWeapon(@Body() useWeaponDto: UseWeaponDto): Promise<IBattle> {
     const battle = this.battleService.getBattleById(useWeaponDto.battleId);
     return this.battleService.useWeapon(battle, useWeaponDto.targetId, useWeaponDto.weaponId, false);
+  }
+
+  @Post('/upgrade-equip')
+  async upgradeEquip(@Body() upgradeEquipDto: UpgradeEquipDto): Promise<IBattle> {
+    const battle = this.battleService.getBattleById(upgradeEquipDto.battleId);
+    return this.battleService.upgradeEquip(battle, upgradeEquipDto.equipId);
   }
 }

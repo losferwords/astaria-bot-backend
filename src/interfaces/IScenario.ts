@@ -1,5 +1,4 @@
 import { IBattle } from './IBattle';
-import { IPosition } from './IPosition';
 import { ITeam } from './ITeam';
 import { ITile } from './ITile';
 

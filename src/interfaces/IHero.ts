@@ -40,4 +40,5 @@ export interface IHero extends IChar {
   crystals: number;
 
   beforeTurn: () => void;
+  calcHero: () => void;
 }

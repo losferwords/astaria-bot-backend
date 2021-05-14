@@ -4,10 +4,12 @@ import { LogMessageType } from 'src/enums/log-message-type.enum';
 import { IBattle } from 'src/interfaces/IBattle';
 import { IEquip } from 'src/interfaces/IEquip';
 import { IHero } from 'src/interfaces/IHero';
+import { IHeroData } from 'src/interfaces/IHeroData';
 import { IPosition } from 'src/interfaces/IPosition';
 import { ITeam } from 'src/interfaces/ITeam';
 import { Const } from 'src/static/const';
 import { Helper } from 'src/static/helper';
+import { HeroesData } from 'src/static/heroes-data';
 
 @Injectable()
 export class HeroService {
@@ -27,6 +29,22 @@ export class HeroService {
     }
 
     return true;
+  }
+
+  spendEnergy(hero: IHero, value: number) {
+    if (hero.energy - value > 0) {
+      hero.energy -= value;
+    } else {
+      hero.energy = 0;
+    }
+  }
+
+  spendMana(hero: IHero, value: number) {
+    if (hero.mana - value > 0) {
+      hero.mana -= value;
+    } else {
+      hero.mana = 0;
+    }
   }
 
   private heroDeath(battle: IBattle, hero: IHero) {
@@ -99,6 +117,10 @@ export class HeroService {
     });
   }
 
+  getHeroData(heroId: string): IHeroData {
+    return HeroesData[heroId];
+  }
+
   moveHero(battle: IBattle, activeHero: IHero, position: IPosition): IBattle {
     activeHero.position.x = position.x;
     activeHero.position.y = position.y;
@@ -146,7 +168,7 @@ export class HeroService {
       type: LogMessageType.WEAPON_DAMAGE,
       casterId: activeHero.id,
       targetId: target.id,
-      weaponId: weapon.id,
+      equipId: weapon.id,
       value: totalDamage + ''
     });
 
@@ -154,6 +176,48 @@ export class HeroService {
     activeHero.energy -= weapon.energyCost;
     weapon.isUsed = true;
 
+    return battle;
+  }
+
+  upgradeEquip(battle: IBattle, heroes: IHero[], equipId: string): IBattle {
+    const activeHero = this.getHeroById(battle.queue[0], heroes);
+    const team = this.getTeamByHeroId(activeHero.id, battle.teams);
+    if (team.crystals > 0 || activeHero.crystals > 0) {
+      const heroData = this.getHeroData(activeHero.id);
+
+      if (activeHero.primaryWeapon.id === equipId && activeHero.primaryWeapon.level < 3) {
+        activeHero.primaryWeapon = heroData.primaryWeapons[activeHero.primaryWeapon.level];
+        battle.log.push({
+          type: LogMessageType.UPGRADE_EQUIP,
+          id: activeHero.id,
+          equipId: activeHero.primaryWeapon.id
+        });
+      } else if (activeHero.secondaryWeapon?.id === equipId && activeHero.secondaryWeapon?.level < 3) {
+        activeHero.secondaryWeapon = heroData.secondaryWeapons[activeHero.secondaryWeapon.level];
+        battle.log.push({
+          type: LogMessageType.UPGRADE_EQUIP,
+          id: activeHero.id,
+          equipId: activeHero.secondaryWeapon.id
+        });
+      } else if (activeHero.chestpiece.id === equipId && activeHero.chestpiece.level < 3) {
+        activeHero.chestpiece = heroData.chestpieces[activeHero.chestpiece.level];
+        battle.log.push({
+          type: LogMessageType.UPGRADE_EQUIP,
+          id: activeHero.id,
+          equipId: activeHero.chestpiece.id
+        });
+      } else {
+        return battle;
+      }
+
+      activeHero.calcHero();
+
+      if (team.crystals > 0) {
+        team.crystals -= 1;
+      } else if (activeHero.crystals > 0) {
+        activeHero.crystals -= 1;
+      }
+    }
     return battle;
   }
 }
