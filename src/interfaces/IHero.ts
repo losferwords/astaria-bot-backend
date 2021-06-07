@@ -35,10 +35,8 @@ export interface IHero extends IChar {
   isDisarmed: boolean;
   isStunned: boolean;
   isImmobilized: boolean;
+  isImmuneToDisarm: boolean;
 
   moveEnergyCost: number;
   crystals: number;
-
-  beforeTurn: () => void;
-  calcHero: () => void;
 }

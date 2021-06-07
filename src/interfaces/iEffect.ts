@@ -1,7 +1,7 @@
 export interface IEffect {
-  name: string;
+  id: string;
   duration: number;
-  left: number;
-  caster?: string;
+  left?: number;
+  casterId?: string;
   isBuff: boolean;
 }

@@ -13,6 +13,7 @@ import { HeroService } from './hero.service';
 import { IPosition } from 'src/interfaces/IPosition';
 import { LogMessageType } from 'src/enums/log-message-type.enum';
 import { ReportService } from './report.service';
+import { AbilityService } from './ability.service';
 
 @Injectable()
 export class BotService {
@@ -21,7 +22,8 @@ export class BotService {
   constructor(
     private battleService: BattleService,
     private heroService: HeroService,
-    private reportService: ReportService
+    private reportService: ReportService,
+    private abilityService: AbilityService
   ) {}
   private actionChain = [];
 
@@ -63,10 +65,22 @@ export class BotService {
         return this.battleService.moveHero(battle, action.position);
       case ActionType.WEAPON_DAMAGE:
         return this.battleService.useWeapon(battle, action.targetId, action.equipId, isSimulation);
+      case ActionType.ABILITY:
+        const heroes = this.battleService.getHeroesInBattle(battle);
+        const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
+        return this.abilityService.castAbility(
+          battle,
+          heroes,
+          action.abilityId,
+          activeHero,
+          action.targetId,
+          action.position,
+          isSimulation
+        );
       case ActionType.UPGRADE_EQUIP:
         return this.battleService.upgradeEquip(battle, action.equipId);
       case ActionType.TURN_END:
-        return this.battleService.endTurn(battle);
+        return this.battleService.endTurn(battle, isSimulation);
     }
   }
 

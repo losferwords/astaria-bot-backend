@@ -15,22 +15,6 @@ import { HeroesData } from 'src/static/heroes-data';
 export class HeroService {
   constructor() {}
 
-  heroTakesDamage(battle: IBattle, caster: IHero, target: IHero, value: number): boolean {
-    if (value === 0) {
-      return false;
-    }
-    target.health -= value;
-
-    // this.afterDealingDamage();
-    // this.afterDamageTaken();
-
-    if (target.health <= 0) {
-      this.heroDeath(battle, target);
-    }
-
-    return true;
-  }
-
   spendEnergy(hero: IHero, value: number) {
     if (hero.energy - value > 0) {
       hero.energy -= value;
@@ -47,7 +31,23 @@ export class HeroService {
     }
   }
 
-  private heroDeath(battle: IBattle, hero: IHero) {
+  takeEnergy(hero: IHero, value: number) {
+    if (hero.energy + value <= hero.maxEnergy) {
+      hero.energy = hero.energy + value;
+    } else {
+      hero.energy = hero.maxEnergy;
+    }
+  }
+
+  takeMana(hero: IHero, value: number) {
+    if (hero.mana + value <= hero.maxMana) {
+      hero.mana = hero.mana + value;
+    } else {
+      hero.mana = hero.maxMana;
+    }
+  }
+
+  heroDeath(battle: IBattle, hero: IHero) {
     hero.health = 0;
     hero.energy = 0;
     hero.mana = 0;
@@ -92,7 +92,12 @@ export class HeroService {
   }
 
   canUseWeapon(hero: IHero, weapon: IEquip): boolean {
-    return hero.energy - weapon.energyCost >= 0 && !hero.isDisarmed && !weapon.isUsed && !weapon.isPassive;
+    return (
+      hero.energy - weapon.energyCost >= 0 &&
+      (!hero.isDisarmed || hero.isImmuneToDisarm) &&
+      !weapon.isUsed &&
+      !weapon.isPassive
+    );
   }
 
   getHeroById(heroId: string, heroes: IHero[]) {
@@ -117,8 +122,92 @@ export class HeroService {
     });
   }
 
+  getHeroAbilityById(hero: IHero, abilityId: string) {
+    for (let i = 0; i < hero.abilities.length; i++) {
+      if (hero.abilities[i].id === abilityId) {
+        return hero.abilities[i];
+      }
+    }
+  }
+
   getHeroData(heroId: string): IHeroData {
     return HeroesData[heroId];
+  }
+
+  calcHero(hero: IHero): IHero {
+    hero.strength =
+      hero.primaryWeapon.strength +
+      (hero.secondaryWeapon ? hero.secondaryWeapon.strength : 0) +
+      hero.chestpiece.strength;
+    if (hero.strength < 0) {
+      hero.strength = 0;
+    }
+    if (hero.strength > Const.maxPrimaryAttributes) {
+      hero.strength = Const.maxPrimaryAttributes;
+    }
+
+    hero.intellect =
+      hero.primaryWeapon.intellect +
+      (hero.secondaryWeapon ? hero.secondaryWeapon.intellect : 0) +
+      hero.chestpiece.intellect;
+    if (hero.intellect < 0) {
+      hero.intellect = 0;
+    }
+    if (hero.intellect > Const.maxPrimaryAttributes) {
+      hero.intellect = Const.maxPrimaryAttributes;
+    }
+
+    hero.armor =
+      hero.primaryWeapon.armor + (hero.secondaryWeapon ? hero.secondaryWeapon.armor : 0) + hero.chestpiece.armor;
+    if (hero.armor < 0) {
+      hero.armor = 0;
+    }
+    if (hero.armor > Const.maxPrimaryAttributes) {
+      hero.armor = Const.maxPrimaryAttributes;
+    }
+
+    hero.will = hero.primaryWeapon.will + (hero.secondaryWeapon ? hero.secondaryWeapon.will : 0) + hero.chestpiece.will;
+    if (hero.will < 0) {
+      hero.will = 0;
+    }
+    if (hero.will > Const.maxPrimaryAttributes) {
+      hero.will = Const.maxPrimaryAttributes;
+    }
+
+    hero.regeneration =
+      hero.primaryWeapon.regeneration +
+      (hero.secondaryWeapon ? hero.secondaryWeapon.regeneration : 0) +
+      hero.chestpiece.regeneration;
+    if (hero.regeneration < 0) {
+      hero.regeneration = 0;
+    }
+    if (hero.regeneration > Const.maxSecondaryAttributes) {
+      hero.regeneration = Const.maxSecondaryAttributes;
+    }
+
+    hero.mind = hero.primaryWeapon.mind + (hero.secondaryWeapon ? hero.secondaryWeapon.mind : 0) + hero.chestpiece.mind;
+    if (hero.mind < 0) {
+      hero.mind = 0;
+    }
+    if (hero.mind > Const.maxSecondaryAttributes) {
+      hero.mind = Const.maxSecondaryAttributes;
+    }
+    return hero;
+  }
+
+  resetHeroState(hero: IHero): IHero {
+    hero.moveEnergyCost = Const.moveEnergyCost;
+    hero.isInvisible = false;
+    hero.isSilenced = false;
+    hero.isDisarmed = false;
+    hero.isStunned = false;
+    hero.isImmobilized = false;
+    if (hero.id === 'avatar') {
+      hero.isImmuneToDisarm = true;
+    } else {
+      hero.isImmuneToDisarm = false;
+    }
+    return hero;
   }
 
   moveHero(battle: IBattle, activeHero: IHero, position: IPosition): IBattle {
@@ -136,51 +225,8 @@ export class HeroService {
     return battle;
   }
 
-  useWeapon(battle: IBattle, heroes: IHero[], targetId: string, weaponId: string): IBattle {
-    const activeHero = this.getHeroById(battle.queue[0], heroes);
-    const target = this.getHeroById(targetId, heroes);
-    let weapon: IEquip;
-
-    if (activeHero.primaryWeapon.id === weaponId) {
-      weapon = activeHero.primaryWeapon;
-    } else if (activeHero.secondaryWeapon.id === weaponId) {
-      weapon = activeHero.secondaryWeapon;
-    } else {
-      return battle;
-    }
-
-    if (!this.canUseWeapon(activeHero, weapon)) {
-      return battle;
-    }
-
-    let physDamage = weapon.physDamage + activeHero.strength - target.armor;
-    if (physDamage < 0) {
-      physDamage = 0;
-    }
-    let magicDamage = weapon.magicDamage + activeHero.intellect - target.will;
-    if (magicDamage < 0) {
-      magicDamage = 0;
-    }
-
-    const totalDamage = physDamage + magicDamage;
-
-    battle.log.push({
-      type: LogMessageType.WEAPON_DAMAGE,
-      casterId: activeHero.id,
-      targetId: target.id,
-      equipId: weapon.id,
-      value: totalDamage + ''
-    });
-
-    this.heroTakesDamage(battle, activeHero, target, totalDamage);
-    activeHero.energy -= weapon.energyCost;
-    weapon.isUsed = true;
-
-    return battle;
-  }
-
   upgradeEquip(battle: IBattle, heroes: IHero[], equipId: string): IBattle {
-    const activeHero = this.getHeroById(battle.queue[0], heroes);
+    let activeHero = this.getHeroById(battle.queue[0], heroes);
     const team = this.getTeamByHeroId(activeHero.id, battle.teams);
     if (team.crystals > 0 || activeHero.crystals > 0) {
       const heroData = this.getHeroData(activeHero.id);
@@ -210,7 +256,7 @@ export class HeroService {
         return battle;
       }
 
-      activeHero.calcHero();
+      activeHero = this.calcHero(activeHero);
 
       if (team.crystals > 0) {
         team.crystals -= 1;

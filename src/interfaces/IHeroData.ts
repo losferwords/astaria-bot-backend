@@ -12,5 +12,5 @@ export interface IHeroData {
   secondaryWeapons?: IEquip[];
   chestpieces: IEquip[];
 
-  abilities: IAbility[][];
+  abilities: IAbility[];
 }

@@ -6,7 +6,6 @@ import { Const } from '../static/const';
 import { ITeam } from '../interfaces/ITeam';
 import { ILogMessage } from '../interfaces/ILogMessage';
 import { BotNode } from 'src/models/BotNode';
-import { IBotTreeBranch } from 'src/interfaces/backend-side-only/IBotTreeBranch';
 import { ActionType } from 'src/enums/action-type.enum';
 
 @Injectable()
@@ -50,11 +49,75 @@ export class ReportService {
             battle.log[i].value +
             '\n';
           break;
+        case LogMessageType.ABILITY_DAMAGE:
+          battleLogData +=
+            i +
+            ',' +
+            turn +
+            ',' +
+            battle.log[i].casterId +
+            ',ABILITY_DAMAGE,,' +
+            battle.log[i].abilityId +
+            ',' +
+            battle.log[i].targetId +
+            ',' +
+            battle.log[i].value +
+            '\n';
+          break;
+        case LogMessageType.EFFECT_DAMAGE:
+          battleLogData +=
+            i +
+            ',' +
+            turn +
+            ',' +
+            battle.log[i].casterId +
+            ',AEFFECT_DAMAGE,,' +
+            battle.log[i].abilityId +
+            ',' +
+            battle.log[i].targetId +
+            ',' +
+            battle.log[i].value +
+            '\n';
+          break;
+        case LogMessageType.ABILITY_HEAL:
+          battleLogData +=
+            i +
+            ',' +
+            turn +
+            ',' +
+            battle.log[i].casterId +
+            ',ABILITY_HEAL,,' +
+            battle.log[i].abilityId +
+            ',' +
+            battle.log[i].targetId +
+            ',' +
+            battle.log[i].value +
+            '\n';
+          break;
+        case LogMessageType.ABILITY_CAST:
+          battleLogData +=
+            i +
+            ',' +
+            turn +
+            ',' +
+            battle.log[i].casterId +
+            ',ABILITY_CAST,,' +
+            battle.log[i].abilityId +
+            ',' +
+            battle.log[i].targetId +
+            '\n';
+          break;
         case LogMessageType.UPGRADE_EQUIP:
           battleLogData += i + ',' + turn + ',' + battle.log[i].id + ',UPGRADE_EQUIP,,' + battle.log[i].equipId + '\n';
           break;
         case LogMessageType.TAKE_CRYSTAL:
           battleLogData += i + ',' + turn + ',' + battle.log[i].id + ',TAKE_CRYSTAL\n';
+          break;
+        case LogMessageType.TAKE_MANA:
+          battleLogData += i + ',' + turn + ',' + battle.log[i].id + ',TAKE_MANA,,,' + battle.log[i].value + '\n';
+          break;
+        case LogMessageType.TAKE_ENERGY:
+          battleLogData += i + ',' + turn + ',' + battle.log[i].id + ',TAKE_ENERGY,,,' + battle.log[i].value + '\n';
           break;
         case LogMessageType.DEATH:
           battleLogData += i + ',' + turn + ',' + battle.log[i].id + ',DEATH\n';
@@ -145,11 +208,22 @@ export class ReportService {
           name =
             parentNode.action.casterId +
             ' deals ' +
-            parentNode.action.value +
+            parentNode.state.log.slice(-2, -1)[0].value +
             ' damage to' +
             parentNode.action.targetId +
             ' with ' +
             parentNode.action.equipId;
+          break;
+        case ActionType.ABILITY:
+          name =
+            parentNode.action.casterId +
+            ' cast ' +
+            parentNode.action.abilityId +
+            ' on ' +
+            (parentNode.action.targetId ? parentNode.action.targetId : '(' + parentNode.action.position.x + ',' + ')') +
+            ' (damage/heal: ' +
+            parentNode.state.log.slice(-2, -1)[0].value +
+            ')';
           break;
         case ActionType.UPGRADE_EQUIP:
           name = parentNode.state.log.slice(-2, -1)[0].id + ' upgrade equip: ' + parentNode.action.equipId;

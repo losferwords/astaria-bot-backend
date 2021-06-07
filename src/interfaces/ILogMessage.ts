@@ -7,6 +7,7 @@ export interface ILogMessage {
   casterId?: string;
   targetId?: string;
   equipId?: string;
+  abilityId?: string;
   value?: string;
   position?: IPosition;
 }

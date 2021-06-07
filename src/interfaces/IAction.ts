@@ -6,6 +6,7 @@ export interface IAction {
   casterId?: string;
   targetId?: string;
   equipId?: string;
+  abilityId?: string;
   value?: string;
   position?: IPosition;
 }

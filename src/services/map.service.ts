@@ -104,4 +104,32 @@ export class MapService {
     }
     return availablePoints;
   }
+
+  knockBack(target: IHero, heroPosition: IPosition, tiles: ITile[][], heroes: IHero[]) {
+    const direction: IPosition = { x: 0, y: 0 };
+
+    if (heroPosition.x < target.position.x) {
+      direction.x = 1;
+    } else if (heroPosition.x > target.position.x) {
+      direction.x = -1;
+    }
+
+    if (heroPosition.y < target.position.y) {
+      direction.y = 1;
+    } else if (heroPosition.y > target.position.y) {
+      direction.y = -1;
+    }
+
+    const newPosition = { x: target.position.x + direction.x, y: target.position.y + direction.y };
+
+    if (
+      !this.checkTileForObstacle(newPosition, tiles, heroes) &&
+      newPosition.x >= 0 &&
+      newPosition.x < tiles[0].length &&
+      newPosition.y >= 0 &&
+      newPosition.y < tiles.length
+    ) {
+      target.position = { x: newPosition.x, y: newPosition.y };
+    }
+  }
 }

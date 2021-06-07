@@ -7,7 +7,6 @@ import { IHeroSetup } from '../interfaces/IHeroSetup';
 import { IEffect } from '../interfaces/IEffect';
 import { IAbility } from '../interfaces/IAbility';
 import { IPet } from '../interfaces/IPet';
-import { enumerable } from 'src/decorators/enumerable.decorator';
 import { IHeroData } from 'src/interfaces/IHeroData';
 
 export class Hero implements IHero {
@@ -40,6 +39,7 @@ export class Hero implements IHero {
   isDisarmed = false;
   isStunned = false;
   isImmobilized = false;
+  isImmuneToDisarm = false;
 
   moveEnergyCost = Const.moveEnergyCost;
   position = { x: 0, y: 0 };
@@ -66,124 +66,6 @@ export class Hero implements IHero {
 
     this.chestpiece = heroData.chestpieces[0];
 
-    this.abilities = heroData.abilities.length > 0 ? [heroData.abilities[0][0]] : [];
-
-    this.calcHero();
-  }
-
-  @enumerable(true)
-  calcHero() {
-    this.strength =
-      this.primaryWeapon.strength +
-      (this.secondaryWeapon ? this.secondaryWeapon.strength : 0) +
-      this.chestpiece.strength;
-    if (this.strength < 0) {
-      this.strength = 0;
-    }
-    if (this.strength > Const.maxPrimaryAttributes) {
-      this.strength = Const.maxPrimaryAttributes;
-    }
-
-    this.intellect =
-      this.primaryWeapon.intellect +
-      (this.secondaryWeapon ? this.secondaryWeapon.intellect : 0) +
-      this.chestpiece.intellect;
-    if (this.intellect < 0) {
-      this.intellect = 0;
-    }
-    if (this.intellect > Const.maxPrimaryAttributes) {
-      this.intellect = Const.maxPrimaryAttributes;
-    }
-
-    this.armor =
-      this.primaryWeapon.armor + (this.secondaryWeapon ? this.secondaryWeapon.armor : 0) + this.chestpiece.armor;
-    if (this.armor < 0) {
-      this.armor = 0;
-    }
-    if (this.armor > Const.maxPrimaryAttributes) {
-      this.armor = Const.maxPrimaryAttributes;
-    }
-
-    this.will = this.primaryWeapon.will + (this.secondaryWeapon ? this.secondaryWeapon.will : 0) + this.chestpiece.will;
-    if (this.will < 0) {
-      this.will = 0;
-    }
-    if (this.will > Const.maxPrimaryAttributes) {
-      this.will = Const.maxPrimaryAttributes;
-    }
-
-    this.regeneration =
-      this.primaryWeapon.regeneration +
-      (this.secondaryWeapon ? this.secondaryWeapon.regeneration : 0) +
-      this.chestpiece.regeneration;
-    if (this.regeneration < 0) {
-      this.regeneration = 0;
-    }
-    if (this.regeneration > Const.maxSecondaryAttributes) {
-      this.regeneration = Const.maxSecondaryAttributes;
-    }
-
-    this.mind = this.primaryWeapon.mind + (this.secondaryWeapon ? this.secondaryWeapon.mind : 0) + this.chestpiece.mind;
-    if (this.mind < 0) {
-      this.mind = 0;
-    }
-    if (this.mind > Const.maxSecondaryAttributes) {
-      this.mind = Const.maxSecondaryAttributes;
-    }
-  }
-
-  @enumerable(true)
-  private resetState() {
-    this.moveEnergyCost = Const.moveEnergyCost;
-    this.isInvisible = false;
-    this.isSilenced = false;
-    this.isDisarmed = false;
-    this.isStunned = false;
-    this.isImmobilized = false;
-  }
-
-  @enumerable(true)
-  applyEffects() {
-    // ToDo
-  }
-
-  @enumerable(true)
-  beforeTurn() {
-    if (this.isDead) {
-      return;
-    }
-
-    this.resetState();
-    this.applyEffects();
-
-    if (this.isDead) {
-      return; // check again because after DOT hero can die
-    }
-
-    this.calcHero();
-
-    this.energy = this.maxEnergy;
-    if (this.health + this.regeneration < this.maxHealth) {
-      this.health += this.regeneration;
-    } else {
-      this.health = this.maxHealth;
-    }
-
-    if (this.mana + this.mind < this.maxMana) {
-      this.mana += this.mind;
-    } else {
-      this.mana = this.maxMana;
-    }
-
-    for (let i = 0; i < this.abilities.length; i++) {
-      if (this.abilities[i].cd > 0) {
-        this.abilities[i].cd--;
-      }
-    }
-
-    this.primaryWeapon.isUsed = false;
-    if (this.secondaryWeapon && !this.secondaryWeapon.isPassive) {
-      this.secondaryWeapon.isUsed = false;
-    }
+    this.abilities = [];
   }
 }

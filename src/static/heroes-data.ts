@@ -21,7 +21,7 @@ export class HeroesData {
     maxMana: 18,
     primaryWeapons: EquipData.highlander.primaryWeapons,
     chestpieces: EquipData.highlander.chestpieces,
-    abilities: []
+    abilities: AbilitiesData.highlander
   };
 
   public static readonly druid: IHeroData = {
@@ -31,7 +31,7 @@ export class HeroesData {
     maxMana: 20,
     primaryWeapons: EquipData.druid.primaryWeapons,
     chestpieces: EquipData.druid.chestpieces,
-    abilities: []
+    abilities: AbilitiesData.druid
   };
 
   public static readonly oracle: IHeroData = {
@@ -41,6 +41,6 @@ export class HeroesData {
     maxMana: 20,
     primaryWeapons: EquipData.oracle.primaryWeapons,
     chestpieces: EquipData.oracle.chestpieces,
-    abilities: []
+    abilities: AbilitiesData.oracle
   };
 }
