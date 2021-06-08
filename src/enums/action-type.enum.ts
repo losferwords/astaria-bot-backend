@@ -3,5 +3,6 @@ export enum ActionType {
   TURN_END,
   WEAPON_DAMAGE,
   ABILITY,
-  UPGRADE_EQUIP
+  UPGRADE_EQUIP,
+  LEARN_ABILITY
 }

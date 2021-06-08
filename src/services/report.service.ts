@@ -110,6 +110,10 @@ export class ReportService {
         case LogMessageType.UPGRADE_EQUIP:
           battleLogData += i + ',' + turn + ',' + battle.log[i].id + ',UPGRADE_EQUIP,,' + battle.log[i].equipId + '\n';
           break;
+        case LogMessageType.LEARN_ABILITY:
+          battleLogData +=
+            i + ',' + turn + ',' + battle.log[i].id + ',LEARN_ABILITY,,' + battle.log[i].abilityId + '\n';
+          break;
         case LogMessageType.TAKE_CRYSTAL:
           battleLogData += i + ',' + turn + ',' + battle.log[i].id + ',TAKE_CRYSTAL\n';
           break;

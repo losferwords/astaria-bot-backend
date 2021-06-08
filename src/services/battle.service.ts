@@ -434,6 +434,11 @@ export class BattleService {
     return this.heroService.upgradeEquip(battle, heroes, equipId);
   }
 
+  learnAbility(battle: IBattle, abilityId: string): IBattle {
+    const heroes = this.getHeroesInBattle(battle);
+    return this.heroService.learnAbility(battle, heroes, abilityId);
+  }
+
   checkAbilityForUse(ability: IAbility, hero: IHero): boolean {
     if (ability.targetType === AbilityTargetType.MOVE && hero.isImmobilized) {
       return false;

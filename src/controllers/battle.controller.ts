@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { IBattleSetupDto } from 'src/dto/battle-setup.dto';
 import { CastAbilityDto } from 'src/dto/cast-ability.dto';
+import { LearnAbilityDto } from 'src/dto/learn-ability.dto';
 import { MoveHeroDto } from 'src/dto/move-hero.dto';
 import { IScenarioSetupDto } from 'src/dto/scenario-setup.dto';
 import { UpgradeEquipDto } from 'src/dto/upgrade-equip.dto';
@@ -99,5 +100,11 @@ export class BattleController {
   async upgradeEquip(@Body() upgradeEquipDto: UpgradeEquipDto): Promise<IBattle> {
     const battle = this.battleService.getBattleById(upgradeEquipDto.battleId);
     return this.battleService.upgradeEquip(battle, upgradeEquipDto.equipId);
+  }
+
+  @Post('/learn-ability')
+  async learnAbility(@Body() learnAbilityDto: LearnAbilityDto): Promise<IBattle> {
+    const battle = this.battleService.getBattleById(learnAbilityDto.battleId);
+    return this.battleService.learnAbility(battle, learnAbilityDto.abilityId);
   }
 }

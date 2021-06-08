@@ -266,4 +266,28 @@ export class HeroService {
     }
     return battle;
   }
+
+  learnAbility(battle: IBattle, heroes: IHero[], abilityId: string): IBattle {
+    let activeHero = this.getHeroById(battle.queue[0], heroes);
+    const team = this.getTeamByHeroId(activeHero.id, battle.teams);
+    if (activeHero.abilities.length === 0 || team.crystals > 0 || activeHero.crystals > 0) {
+      const heroData = this.getHeroData(activeHero.id);
+
+      activeHero.abilities.push(heroData.abilities.find((a) => a.id === abilityId));
+      battle.log.push({
+        type: LogMessageType.LEARN_ABILITY,
+        id: activeHero.id,
+        abilityId: abilityId
+      });
+
+      if (activeHero.abilities.length > 1) {
+        if (team.crystals > 0) {
+          team.crystals -= 1;
+        } else if (activeHero.crystals > 0) {
+          activeHero.crystals -= 1;
+        }
+      }
+    }
+    return battle;
+  }
 }
