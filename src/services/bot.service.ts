@@ -14,6 +14,8 @@ import { IPosition } from 'src/interfaces/IPosition';
 import { LogMessageType } from 'src/enums/log-message-type.enum';
 import { ReportService } from './report.service';
 import { AbilityService } from './ability.service';
+import { IHero } from 'src/interfaces/IHero';
+import { IAbility } from 'src/interfaces/IAbility';
 
 @Injectable()
 export class BotService {
@@ -68,17 +70,31 @@ export class BotService {
       case ActionType.ABILITY:
         const heroes = this.battleService.getHeroesInBattle(battle);
         const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
-        return this.abilityService.castAbility(
+        const target: IHero =
+          activeHero.id === action.targetId ? activeHero : this.heroService.getHeroById(action.targetId, heroes);
+        const ability: IAbility = this.heroService.getHeroAbilityById(activeHero, action.abilityId);
+        const newBattle = this.abilityService.castAbility(
           battle,
           heroes,
-          action.abilityId,
+          ability,
           activeHero,
-          action.targetId,
+          target,
+          action.position,
+          isSimulation
+        );
+        return this.battleService.afterCastAbility(
+          newBattle,
+          activeHero,
+          heroes,
+          ability,
+          target,
           action.position,
           isSimulation
         );
       case ActionType.UPGRADE_EQUIP:
         return this.battleService.upgradeEquip(battle, action.equipId);
+      case ActionType.LEARN_ABILITY:
+        return this.battleService.learnAbility(battle, action.abilityId);
       case ActionType.TURN_END:
         return this.battleService.endTurn(battle, isSimulation);
     }
@@ -356,8 +372,11 @@ export class BotService {
     return bestNode;
   }
 
-  bestActionChain(nodes: Map<string, BotNode>, state: IBattle) {
+  bestActionChain(nodes: Map<string, BotNode>, state: IBattle): IAction[] {
     let bestNode = this.bestNode(nodes, state);
+    if (!bestNode) {
+      return [];
+    }
     const actionChain = [bestNode.action];
     while (bestNode && bestNode.action.type !== ActionType.TURN_END) {
       bestNode = this.bestNode(nodes, bestNode.state);

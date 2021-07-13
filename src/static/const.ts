@@ -12,5 +12,5 @@ export class Const {
   public static mctsTreeReportPath = './tree-observer/mcts-trees';
   public static explorationParameter = 2;
   public static botThinkTime = 300000;
-  public static treeBuild = false;
+  public static treeBuild = true;
 }

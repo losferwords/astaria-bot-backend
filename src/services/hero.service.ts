@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as _ from 'lodash';
+import * as rfdc from 'rfdc';
 import { LogMessageType } from 'src/enums/log-message-type.enum';
 import { IBattle } from 'src/interfaces/IBattle';
 import { IEquip } from 'src/interfaces/IEquip';
@@ -130,8 +131,16 @@ export class HeroService {
     }
   }
 
+  getHeroEffectById(hero: IHero, effectId: string) {
+    for (let i = 0; i < hero.effects.length; i++) {
+      if (hero.effects[i].id === effectId) {
+        return hero.effects[i];
+      }
+    }
+  }
+
   getHeroData(heroId: string): IHeroData {
-    return HeroesData[heroId];
+    return rfdc({ proto: true })(HeroesData[heroId]);
   }
 
   calcHero(hero: IHero): IHero {

@@ -22,6 +22,8 @@ import { IEffect } from 'src/interfaces/IEffect';
 import { IAbility } from 'src/interfaces/IAbility';
 import { AbilityTargetType } from 'src/enums/ability-target-type.enum';
 import { IEquip } from 'src/interfaces/IEquip';
+import { IHeroTakesDamageArgs } from 'src/interfaces/backend-side-only/IHeroTakesDamageArgs';
+import { ILogMessage } from 'src/interfaces/ILogMessage';
 
 @Injectable()
 export class BattleService {
@@ -186,15 +188,19 @@ export class BattleService {
     switch (effect.id) {
       case '12-poison-touch':
         if (isBeforeTurn) {
-          battle.log.push({
-            type: LogMessageType.EFFECT_DAMAGE,
-            casterId: effect.casterId,
-            targetId: hero.id,
-            abilityId: effect.id,
-            value: '1'
+          this.heroTakesDamage({
+            battle,
+            caster: this.heroService.getHeroById(effect.casterId, heroes),
+            heroes,
+            target: hero,
+            directDamage: 1,
+            effectId: effect.id,
+            isSimulation
           });
-          this.heroTakesDamage(battle, this.heroService.getHeroById(effect.casterId, heroes), hero, 1, isSimulation);
         }
+        break;
+      case '23-defender':
+        //No need to apply, just effect existance
         break;
       default:
         this.effectService.apply(effect, hero, isBeforeTurn);
@@ -380,32 +386,37 @@ export class BattleService {
       return battle;
     }
 
-    const totalDamage = this.calculateWeaponDamage(weapon, activeHero, target);
-
-    battle.log.push({
-      type: LogMessageType.WEAPON_DAMAGE,
-      casterId: activeHero.id,
-      targetId: target.id,
-      equipId: weapon.id,
-      value: totalDamage + ''
-    });
+    const { physDamage, magicDamage } = this.calculateWeaponDamage(weapon, activeHero, target);
 
     activeHero.energy -= weapon.energyCost;
     weapon.isUsed = true;
-    this.heroTakesDamage(battle, activeHero, target, totalDamage, isSimulation);
 
+    const healthDamage = this.heroTakesDamage({
+      battle,
+      caster: activeHero,
+      heroes,
+      target,
+      physDamage,
+      magicDamage,
+      weaponId,
+      isSimulation
+    });
+
+    this.checkPassiveAbilityTrigger('22-counterattack', battle, activeHero, heroes, target, healthDamage, isSimulation);
     return battle;
   }
 
-  afterCastAbility(newBattle: IBattle, isSimulation: boolean): IBattle {
-    const winner = newBattle.scenario.checkForWin(newBattle.teams);
-    if (winner) {
-      this.battleEnd(newBattle, winner);
-      if (!isSimulation) {
-        this.removeBattle(newBattle.id);
-        this.reportService.saveBattleResults(newBattle);
-        this.reportService.addToStatistics(newBattle, winner);
-      }
+  afterCastAbility(
+    newBattle: IBattle,
+    activeHero: IHero,
+    heroes: IHero[],
+    ability: IAbility,
+    target: IHero,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    if (!ability.isPassive) {
+      this.checkPassiveAbilityTrigger('22-counterattack', newBattle, activeHero, heroes, target, 0, isSimulation);
     }
     return newBattle;
   }
@@ -440,6 +451,9 @@ export class BattleService {
   }
 
   checkAbilityForUse(ability: IAbility, hero: IHero): boolean {
+    if (ability.isPassive) {
+      return false;
+    }
     if (ability.targetType === AbilityTargetType.MOVE && hero.isImmobilized) {
       return false;
     }
@@ -461,44 +475,81 @@ export class BattleService {
     }
   }
 
-  heroTakesDamage(battle: IBattle, caster: IHero, target: IHero, value: number, isSimulation): boolean {
-    if (value === 0) {
-      return false;
-    }
-    target.health -= value;
+  heroTakesDamage({
+    battle,
+    caster,
+    heroes,
+    target,
+    physDamage,
+    magicDamage,
+    directDamage,
+    weaponId,
+    abilityId,
+    effectId,
+    isSimulation
+  }: IHeroTakesDamageArgs): number {
+    let healthDamage = 0;
 
-    this.afterDamageTaken(battle, caster, target, value, isSimulation);
+    if (this.heroService.getHeroEffectById(target, '23-defender')) {
+      target = this.heroService.getHeroById('paragon', heroes);
+    }
+
+    if (physDamage > 0) {
+      healthDamage += physDamage - target.armor;
+    }
+    if (magicDamage > 0) {
+      healthDamage += magicDamage - target.will;
+    }
+    if (directDamage > 0) {
+      healthDamage += directDamage;
+    }
+
+    if (healthDamage < 0) {
+      healthDamage = 0;
+    }
+
+    const battleLogMessage: ILogMessage = {
+      casterId: caster.id,
+      targetId: target.id,
+      value: healthDamage + '',
+      type: weaponId
+        ? LogMessageType.WEAPON_DAMAGE
+        : abilityId
+        ? LogMessageType.ABILITY_DAMAGE
+        : LogMessageType.EFFECT_DAMAGE
+    };
+
+    if (weaponId) {
+      battleLogMessage.equipId = weaponId;
+    } else if (abilityId || effectId) {
+      battleLogMessage.abilityId = abilityId || effectId;
+    }
+
+    battle.log.push(battleLogMessage);
+
+    if (healthDamage === 0) {
+      return 0;
+    }
+    target.health -= healthDamage;
+
+    this.afterDamageTaken(battle, caster, heroes, target, healthDamage, isSimulation);
 
     if (target.health <= 0) {
       this.heroService.heroDeath(battle, target);
     }
 
-    return true;
+    return healthDamage;
   }
 
-  afterDamageTaken(battle: IBattle, caster: IHero, target: IHero, value: number, isSimulation: boolean) {
-    if (target.id === 'oracle' && this.heroService.getHeroAbilityById(target, '12-reflection')) {
-      this.heroService.takeMana(target, value);
-      battle.log.push({
-        id: target.id,
-        type: LogMessageType.TAKE_MANA,
-        value: value + ''
-      });
-      const enemies = this.findEnemies(battle, target.id, 1);
-      const heroes = this.getHeroesInBattle(battle);
-      for (let i = 0; i < enemies.length; i++) {
-        const enemyHero = this.heroService.getHeroById(enemies[i], heroes);
-        const magicDamage = value + target.intellect - enemyHero.will;
-        battle.log.push({
-          type: LogMessageType.ABILITY_DAMAGE,
-          casterId: target.id,
-          targetId: enemyHero.id,
-          abilityId: '12-reflection',
-          value: magicDamage + ''
-        });
-        this.heroTakesDamage(battle, target, enemyHero, magicDamage, isSimulation);
-      }
-    }
+  afterDamageTaken(
+    battle: IBattle,
+    caster: IHero,
+    heroes: IHero[],
+    target: IHero,
+    value: number,
+    isSimulation: boolean
+  ) {
+    this.checkPassiveAbilityTrigger('12-reflection', battle, caster, heroes, target, value, isSimulation);
 
     const winner = battle.scenario.checkForWin(battle.teams);
     if (winner) {
@@ -511,24 +562,83 @@ export class BattleService {
     }
   }
 
-  calculateWeaponDamage(weapon: IEquip, activeHero: IHero, target: IHero) {
-    let physDamage = weapon.physDamage + activeHero.strength - target.armor;
-    if (physDamage < 0) {
-      physDamage = 0;
-    }
+  calculateWeaponDamage(weapon: IEquip, activeHero: IHero, target: IHero): { physDamage: number; magicDamage: number } {
+    let physDamage = weapon.physDamage || 0;
+    let magicDamage = weapon.magicDamage || 0;
 
-    let weaponMagicDamage = weapon.magicDamage;
+    if (physDamage > 0) {
+      physDamage = weapon.physDamage + activeHero.strength;
+    }
 
     if (activeHero.id === 'highlander' && this.heroService.getHeroAbilityById(activeHero, '13-lightning-rod')) {
-      weaponMagicDamage = 2;
+      magicDamage = magicDamage + 2;
     }
 
-    let magicDamage = weaponMagicDamage + activeHero.intellect - target.will;
-    if (magicDamage < 0) {
-      magicDamage = 0;
+    if (magicDamage > 0) {
+      magicDamage = magicDamage + activeHero.intellect;
     }
 
-    return physDamage + magicDamage;
+    return { physDamage, magicDamage };
+  }
+
+  checkPassiveAbilityTrigger(
+    passiveAbility: string,
+    battle: IBattle,
+    activeHero: IHero,
+    heroes: IHero[],
+    target: IHero,
+    damageValue: number,
+    isSimulation: boolean
+  ) {
+    switch (passiveAbility) {
+      case '22-counterattack':
+        if (activeHero.id !== 'paragon') {
+          const enemies = this.findEnemies(battle, activeHero.id, 2);
+          for (let i = 0; i < enemies.length; i++) {
+            if (enemies[i] === 'paragon') {
+              const paragon = this.heroService.getHeroById(enemies[i], heroes);
+              if (!paragon.isDisarmed && this.heroService.getHeroAbilityById(paragon, passiveAbility)) {
+                let counterDamage = paragon.primaryWeapon.physDamage + paragon.strength + 1;
+                this.heroTakesDamage({
+                  battle,
+                  caster: paragon,
+                  heroes,
+                  target: activeHero,
+                  abilityId: passiveAbility,
+                  physDamage: counterDamage,
+                  isSimulation
+                });
+              }
+              break;
+            }
+          }
+        }
+        break;
+      case '12-reflection':
+        if (target.id === 'oracle' && this.heroService.getHeroAbilityById(target, '12-reflection')) {
+          this.heroService.takeMana(target, damageValue);
+          battle.log.push({
+            id: target.id,
+            type: LogMessageType.TAKE_MANA,
+            value: damageValue + ''
+          });
+          const enemies = this.findEnemies(battle, target.id, 1);
+          for (let i = 0; i < enemies.length; i++) {
+            const enemyHero = this.heroService.getHeroById(enemies[i], heroes);
+            const magicDamage = damageValue + target.intellect;
+            this.heroTakesDamage({
+              battle,
+              caster: target,
+              heroes,
+              target: enemyHero,
+              abilityId: passiveAbility,
+              magicDamage,
+              isSimulation
+            });
+          }
+        }
+        break;
+    }
   }
 
   getAvailableActions(battle: IBattle, previousMoves: IPosition[]): IAction[] {
@@ -536,6 +646,17 @@ export class BattleService {
     const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
     const team = this.heroService.getTeamByHeroId(activeHero.id, battle.teams);
     const actions: IAction[] = [];
+
+    if (activeHero.abilities.length === 0) {
+      const heroData = this.heroService.getHeroData(activeHero.id);
+      for (let i = 0; i < 3; i++) {
+        actions.push({
+          type: ActionType.LEARN_ABILITY,
+          abilityId: heroData.abilities[i].id
+        });
+      }
+      return actions;
+    }
 
     if (team.crystals > 0 || activeHero.crystals > 0) {
       const heroData = this.heroService.getHeroData(activeHero.id);
@@ -660,13 +781,9 @@ export class BattleService {
     if (this.heroService.canUseWeapon(activeHero, activeHero.primaryWeapon)) {
       const enemies = this.findEnemies(battle, activeHero.id, activeHero.primaryWeapon.range);
       for (let i = 0; i < enemies.length; i++) {
-        if (
-          this.calculateWeaponDamage(
-            activeHero.primaryWeapon,
-            activeHero,
-            this.heroService.getHeroById(enemies[i], heroes)
-          ) > 0
-        ) {
+        const target = this.heroService.getHeroById(enemies[i], heroes);
+        const { physDamage, magicDamage } = this.calculateWeaponDamage(activeHero.primaryWeapon, activeHero, target);
+        if (physDamage - target.armor > 0 || magicDamage - target.will > 0) {
           actions.push({
             type: ActionType.WEAPON_DAMAGE,
             equipId: activeHero.primaryWeapon.id,
@@ -679,13 +796,9 @@ export class BattleService {
     if (activeHero.secondaryWeapon && this.heroService.canUseWeapon(activeHero, activeHero.secondaryWeapon)) {
       const enemies = this.findEnemies(battle, activeHero.id, activeHero.secondaryWeapon.range);
       for (let i = 0; i < enemies.length; i++) {
-        if (
-          this.calculateWeaponDamage(
-            activeHero.secondaryWeapon,
-            activeHero,
-            this.heroService.getHeroById(enemies[i], heroes)
-          ) > 0
-        ) {
+        const target = this.heroService.getHeroById(enemies[i], heroes);
+        const { physDamage, magicDamage } = this.calculateWeaponDamage(activeHero.secondaryWeapon, activeHero, target);
+        if (physDamage - target.armor > 0 || magicDamage - target.will > 0) {
           actions.push({
             type: ActionType.WEAPON_DAMAGE,
             equipId: activeHero.secondaryWeapon.id,

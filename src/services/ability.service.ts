@@ -42,15 +42,12 @@ export class AbilityService {
   castAbility(
     battle: IBattle,
     heroes: IHero[],
-    abilityId: string,
+    ability: IAbility,
     caster: IHero,
-    targetId: string,
+    target: IHero,
     position: IPosition,
     isSimulation: boolean
   ): IBattle {
-    const target: IHero = caster.id === targetId ? caster : this.heroService.getHeroById(targetId, heroes);
-    const ability: IAbility = caster.abilities.find((ability: IAbility) => ability.id === abilityId);
-
     return this[ability.id](battle, heroes, ability, caster, target, position, isSimulation);
   }
 
@@ -66,20 +63,16 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(caster, ability);
 
-    let physDamage = caster.primaryWeapon.physDamage + caster.strength + 1 - target.armor;
-    if (physDamage < 0) {
-      physDamage = 0;
-    }
-
-    battle.log.push({
-      type: LogMessageType.ABILITY_DAMAGE,
-      casterId: caster.id,
-      targetId: target.id,
+    this.battleService.heroTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      physDamage: caster.primaryWeapon.physDamage + caster.strength + 1,
       abilityId: ability.id,
-      value: physDamage + ''
+      isSimulation
     });
 
-    this.battleService.heroTakesDamage(battle, caster, target, physDamage, isSimulation);
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
     return battle;
   }
@@ -95,25 +88,68 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(caster, ability);
 
-    let physDamage = caster.primaryWeapon.physDamage + caster.strength + 1 - target.armor;
-    if (physDamage < 0) {
-      physDamage = 0;
-    }
-
-    battle.log.push({
-      type: LogMessageType.ABILITY_DAMAGE,
-      casterId: caster.id,
-      targetId: target.id,
+    this.battleService.heroTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      physDamage: caster.primaryWeapon.physDamage + caster.strength + 1,
       abilityId: ability.id,
-      value: physDamage + ''
+      isSimulation
     });
 
-    this.battleService.heroTakesDamage(battle, caster, target, physDamage, isSimulation);
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
     return battle;
   }
 
   '13-shoulder-to-shoulder'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IHero,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(caster, ability);
+
+    battle.log.push({
+      type: LogMessageType.ABILITY_CAST,
+      casterId: caster.id,
+      targetId: target.id,
+      abilityId: ability.id
+    });
+
+    this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
+    return battle;
+  }
+
+  '21-spear-throw'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IHero,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(caster, ability);
+
+    this.battleService.heroTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      physDamage: caster.primaryWeapon.physDamage + caster.strength + 1,
+      abilityId: ability.id,
+      isSimulation
+    });
+
+    this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
+    return battle;
+  }
+
+  '23-defender'(
     battle: IBattle,
     heroes: IHero[],
     ability: IAbility,
@@ -147,20 +183,16 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(caster, ability);
 
-    let physDamage = caster.primaryWeapon.physDamage + caster.strength - target.armor;
-    if (physDamage < 0) {
-      physDamage = 0;
-    }
-
-    battle.log.push({
-      type: LogMessageType.ABILITY_DAMAGE,
-      casterId: caster.id,
-      targetId: target.id,
+    this.battleService.heroTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      physDamage: caster.primaryWeapon.physDamage + caster.strength,
       abilityId: ability.id,
-      value: physDamage + ''
+      isSimulation
     });
 
-    this.battleService.heroTakesDamage(battle, caster, target, physDamage, isSimulation);
     this.addEffect(battle, heroes, caster, ability.id, caster.id, isSimulation);
     return battle;
   }
@@ -199,20 +231,16 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(caster, ability);
 
-    let magicDamage = 2 + caster.intellect - target.will;
-    if (magicDamage < 0) {
-      magicDamage = 0;
-    }
-
-    battle.log.push({
-      type: LogMessageType.ABILITY_DAMAGE,
-      casterId: caster.id,
-      targetId: target.id,
+    this.battleService.heroTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      magicDamage: 2 + caster.intellect,
       abilityId: ability.id,
-      value: magicDamage + ''
+      isSimulation
     });
 
-    this.battleService.heroTakesDamage(battle, caster, target, magicDamage, isSimulation);
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
     return battle;
   }
@@ -228,20 +256,16 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(caster, ability);
 
-    let physDamage = caster.primaryWeapon.physDamage + 1 + caster.strength - target.armor;
-    if (physDamage < 0) {
-      physDamage = 0;
-    }
-
-    battle.log.push({
-      type: LogMessageType.ABILITY_DAMAGE,
-      casterId: caster.id,
-      targetId: target.id,
+    this.battleService.heroTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      physDamage: caster.primaryWeapon.physDamage + 1 + caster.strength,
       abilityId: ability.id,
-      value: physDamage + ''
+      isSimulation
     });
 
-    this.battleService.heroTakesDamage(battle, caster, target, physDamage, isSimulation);
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
     return battle;
   }
@@ -280,20 +304,16 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(caster, ability);
 
-    let magicDamage = 2 + caster.intellect - target.will;
-    if (magicDamage < 0) {
-      magicDamage = 0;
-    }
-
-    battle.log.push({
-      type: LogMessageType.ABILITY_DAMAGE,
-      casterId: caster.id,
-      targetId: target.id,
+    this.battleService.heroTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      magicDamage: 2 + caster.intellect,
       abilityId: ability.id,
-      value: magicDamage + ''
+      isSimulation
     });
 
-    this.battleService.heroTakesDamage(battle, caster, target, magicDamage, isSimulation);
     this.battleService.knockBack(battle, target, caster.position);
     return battle;
   }
@@ -309,15 +329,15 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(caster, ability);
 
-    battle.log.push({
-      type: LogMessageType.ABILITY_DAMAGE,
-      casterId: caster.id,
-      targetId: target.id,
+    this.battleService.heroTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      directDamage: caster.intellect,
       abilityId: ability.id,
-      value: caster.intellect + ''
+      isSimulation
     });
-
-    this.battleService.heroTakesDamage(battle, caster, target, caster.intellect, isSimulation);
     return battle;
   }
 }

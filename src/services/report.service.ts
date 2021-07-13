@@ -179,7 +179,7 @@ export class ReportService {
   saveTreeVisualization(rootNode: BotNode) {
     const tree = this.expandChildren(rootNode);
     fs.writeFileSync(
-      Const.mctsTreeReportPath + '/' + rootNode.state.id + '-' + rootNode.state.log.length + '.json',
+      Const.mctsTreeReportPath + '/' + rootNode.state.id + '-' + (+new Date()) + '.json',
       JSON.stringify(tree)
     );
   }
@@ -225,12 +225,15 @@ export class ReportService {
             parentNode.action.abilityId +
             ' on ' +
             (parentNode.action.targetId ? parentNode.action.targetId : '(' + parentNode.action.position.x + ',' + ')') +
-            ' (damage/heal: ' +
-            parentNode.state.log.slice(-2, -1)[0].value +
-            ')';
+            (parentNode.state.log.slice(-2, -1)[0].value
+              ? ' (damage/heal: ' + parentNode.state.log.slice(-2, -1)[0].value + ')'
+              : '');
           break;
         case ActionType.UPGRADE_EQUIP:
           name = parentNode.state.log.slice(-2, -1)[0].id + ' upgrade equip: ' + parentNode.action.equipId;
+          break;
+        case ActionType.LEARN_ABILITY:
+          name = parentNode.state.log.slice(-2, -1)[0].id + ' learn ability: ' + parentNode.action.abilityId;
           break;
         case ActionType.TURN_END:
           name = parentNode.state.log.slice(-2, -1)[0].id + ' end turn';

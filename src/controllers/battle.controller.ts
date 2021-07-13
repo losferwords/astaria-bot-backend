@@ -6,7 +6,9 @@ import { MoveHeroDto } from 'src/dto/move-hero.dto';
 import { IScenarioSetupDto } from 'src/dto/scenario-setup.dto';
 import { UpgradeEquipDto } from 'src/dto/upgrade-equip.dto';
 import { UseWeaponDto } from 'src/dto/use-weapon.dto';
+import { IAbility } from 'src/interfaces/IAbility';
 import { IBattle } from 'src/interfaces/IBattle';
+import { IHero } from 'src/interfaces/IHero';
 import { IHeroData } from 'src/interfaces/IHeroData';
 import { IPosition } from 'src/interfaces/IPosition';
 import { AbilityService } from 'src/services/ability.service';
@@ -15,7 +17,11 @@ import { BattleService } from '../services/battle.service';
 
 @Controller()
 export class BattleController {
-  constructor(private battleService: BattleService, private heroService: HeroService, private abilityService: AbilityService) {}
+  constructor(
+    private battleService: BattleService,
+    private heroService: HeroService,
+    private abilityService: AbilityService
+  ) {}
 
   @Get('/scenarios')
   async scenarios(): Promise<IScenarioSetupDto[]> {
@@ -92,8 +98,29 @@ export class BattleController {
     const battle = this.battleService.getBattleById(castAbilityDto.battleId);
     const heroes = this.battleService.getHeroesInBattle(battle);
     const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
-    const newBattle = this.abilityService.castAbility(battle, heroes, castAbilityDto.abilityId, activeHero, castAbilityDto.targetId, castAbilityDto.position, false);
-    return this.battleService.afterCastAbility(newBattle, false);
+    const target: IHero =
+      activeHero.id === castAbilityDto.targetId
+        ? activeHero
+        : this.heroService.getHeroById(castAbilityDto.targetId, heroes);
+    const ability: IAbility = this.heroService.getHeroAbilityById(activeHero, castAbilityDto.abilityId);
+    const newBattle = this.abilityService.castAbility(
+      battle,
+      heroes,
+      ability,
+      activeHero,
+      target,
+      castAbilityDto.position,
+      false
+    );
+    return this.battleService.afterCastAbility(
+      newBattle,
+      activeHero,
+      heroes,
+      ability,
+      target,
+      castAbilityDto.position,
+      false
+    );
   }
 
   @Post('/upgrade-equip')

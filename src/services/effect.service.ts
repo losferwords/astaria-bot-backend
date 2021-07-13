@@ -35,6 +35,10 @@ export class EffectService {
     }
   }
 
+  '21-spear-throw'(effect: IEffect, target: IHero, isBeforeTurn: boolean) {
+    target.moveEnergyCost = target.moveEnergyCost + 1;
+  }
+
   // Highlander
   '11-shoulder-punch'(effect: IEffect, target: IHero, isBeforeTurn: boolean) {
     target.strength = target.strength + 1;

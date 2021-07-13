@@ -4,4 +4,5 @@ export interface IEffect {
   left?: number;
   casterId?: string;
   isBuff: boolean;
+  isRemovable: boolean;
 }
