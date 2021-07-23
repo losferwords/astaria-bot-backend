@@ -11,7 +11,7 @@ export class Team implements ITeam {
 
   constructor(teamSetup: IHeroSetup[]) {
     this.id = uuid();
-    this.crystals = 1;
+    this.crystals = 18;
 
     for (let i = 0; i < teamSetup.length; i++) {
       this.heroes.push(new Hero(teamSetup[i]));

@@ -64,7 +64,7 @@ export class BotService {
   doAction(battle: IBattle, action: IAction, isSimulation: boolean): IBattle {
     switch (action.type) {
       case ActionType.MOVE:
-        return this.battleService.moveHero(battle, action.position);
+        return this.battleService.moveChar(battle, action.position);
       case ActionType.WEAPON_DAMAGE:
         return this.battleService.useWeapon(battle, action.targetId, action.equipId, isSimulation);
       case ActionType.ABILITY:

@@ -12,6 +12,8 @@ export enum LogMessageType {
   TAKE_CRYSTAL,
   TAKE_MANA,
   TAKE_ENERGY,
+  PET_SUMMON,
+  PET_MOVE,
   DEATH,
   WIN
 }

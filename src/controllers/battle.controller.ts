@@ -2,23 +2,26 @@ import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { IBattleSetupDto } from 'src/dto/battle-setup.dto';
 import { CastAbilityDto } from 'src/dto/cast-ability.dto';
 import { LearnAbilityDto } from 'src/dto/learn-ability.dto';
-import { MoveHeroDto } from 'src/dto/move-hero.dto';
+import { MoveCharDto } from 'src/dto/move-char.dto';
 import { IScenarioSetupDto } from 'src/dto/scenario-setup.dto';
 import { UpgradeEquipDto } from 'src/dto/upgrade-equip.dto';
 import { UseWeaponDto } from 'src/dto/use-weapon.dto';
 import { IAbility } from 'src/interfaces/IAbility';
 import { IBattle } from 'src/interfaces/IBattle';
+import { IChar } from 'src/interfaces/IChar';
 import { IHero } from 'src/interfaces/IHero';
 import { IHeroData } from 'src/interfaces/IHeroData';
 import { IPosition } from 'src/interfaces/IPosition';
 import { AbilityService } from 'src/services/ability.service';
 import { HeroService } from 'src/services/hero.service';
+import { MapService } from 'src/services/map.service';
 import { BattleService } from '../services/battle.service';
 
 @Controller()
 export class BattleController {
   constructor(
     private battleService: BattleService,
+    private mapService: MapService,
     private heroService: HeroService,
     private abilityService: AbilityService
   ) {}
@@ -39,15 +42,15 @@ export class BattleController {
   }
 
   @Get('/move-points')
-  async movePoints(@Query('battleId') battleId: string): Promise<IPosition[]> {
+  async movePoints(@Query('battleId') battleId: string, @Query('petId') petId: string): Promise<IPosition[]> {
     const battle = this.battleService.getBattleById(battleId);
-    return this.battleService.getMovePoints(battle);
+    return this.battleService.getMovePoints(battle, petId);
   }
 
-  @Post('/move-hero')
-  async moveHero(@Body() moveHeroDto: MoveHeroDto): Promise<IBattle> {
-    const battle = this.battleService.getBattleById(moveHeroDto.battleId);
-    return this.battleService.moveHero(battle, moveHeroDto.position);
+  @Post('/move-char')
+  async moveHero(@Body() moveCharDto: MoveCharDto): Promise<IBattle> {
+    const battle = this.battleService.getBattleById(moveCharDto.battleId);
+    return this.battleService.moveChar(battle, moveCharDto.position, moveCharDto.petId);
   }
 
   @Post('/end-turn')
@@ -60,10 +63,11 @@ export class BattleController {
   async findEnemies(
     @Query('battleId') battleId: string,
     @Query('sourceHeroId') sourceHeroId: string,
-    @Query('radius') radius: number
+    @Query('radius') radius: number,
+    @Query('petId') petId: string
   ): Promise<string[]> {
     const battle = this.battleService.getBattleById(battleId);
-    return this.battleService.findEnemies(battle, sourceHeroId, radius);
+    return this.battleService.findEnemies(battle, sourceHeroId, radius, petId);
   }
 
   @Get('/find-allies')
@@ -75,6 +79,19 @@ export class BattleController {
   ): Promise<string[]> {
     const battle = this.battleService.getBattleById(battleId);
     return this.battleService.findAllies(battle, sourceHeroId, radius, includeSelf);
+  }
+
+  @Get('/get-map-ability-positions')
+  async getMapAbilityPositions(
+    @Query('battleId') battleId: string,
+    @Query('abilityId') abilityId: string
+  ): Promise<IPosition[]> {
+    const battle = this.battleService.getBattleById(battleId);
+    const heroes = this.battleService.getHeroesInBattle(battle);
+    const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
+    const ability: IAbility = this.heroService.getHeroAbilityById(activeHero, abilityId);
+
+    return this.mapService.getMovePoints(activeHero.position, ability.range, battle.scenario.tiles, heroes);
   }
 
   @Get('/find-heroes')
@@ -97,24 +114,35 @@ export class BattleController {
   async castAbility(@Body() castAbilityDto: CastAbilityDto): Promise<IBattle> {
     const battle = this.battleService.getBattleById(castAbilityDto.battleId);
     const heroes = this.battleService.getHeroesInBattle(battle);
-    const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
-    const target: IHero =
-      activeHero.id === castAbilityDto.targetId
-        ? activeHero
-        : this.heroService.getHeroById(castAbilityDto.targetId, heroes);
-    const ability: IAbility = this.heroService.getHeroAbilityById(activeHero, castAbilityDto.abilityId);
+    const activeHero: IHero = this.heroService.getHeroById(battle.queue[0], heroes);
+    let activeChar: IChar = activeHero;
+    const target: IChar =
+    activeChar.id === castAbilityDto.targetId
+        ? activeChar
+        : this.heroService.getCharById(castAbilityDto.targetId, heroes);
+    let ability: IAbility = this.heroService.getHeroAbilityById(activeHero, castAbilityDto.abilityId);
+
+    //Maybe it is a pet ability
+    if(!ability) {
+      for(let i = 0; i < activeHero.pets.length; i++) {
+        if(activeHero.pets[i].ability.id === castAbilityDto.abilityId) {
+          ability = activeHero.pets[i].ability;
+          activeChar = activeHero.pets[i];
+        }
+      }
+    }
     const newBattle = this.abilityService.castAbility(
       battle,
       heroes,
       ability,
-      activeHero,
+      activeChar,
       target,
       castAbilityDto.position,
       false
     );
     return this.battleService.afterCastAbility(
       newBattle,
-      activeHero,
+      activeChar,
       heroes,
       ability,
       target,

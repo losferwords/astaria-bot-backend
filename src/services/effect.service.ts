@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { IChar } from 'src/interfaces/IChar';
 import { IEffect } from 'src/interfaces/IEffect';
 import { IHero } from 'src/interfaces/IHero';
 import { Const } from 'src/static/const';
@@ -8,64 +9,102 @@ import { HeroService } from './hero.service';
 export class EffectService {
   constructor(private heroService: HeroService) {}
 
-  apply(effect: IEffect, target: IHero, isBeforeTurn: boolean) {
+  apply(effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     return this[effect.id](effect, target, isBeforeTurn);
   }
 
   // Paragon
-  '11-sunder-armor'(effect: IEffect, target: IHero, isBeforeTurn: boolean) {
-    target.armor = target.armor - 1;
-    if (target.armor < 0) {
-      target.armor = 0;
+  '11-sunder-armor'(effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    if (!target.isPet) {
+      (target as IHero).armor = (target as IHero).armor - 1;
+      if ((target as IHero).armor < 0) {
+        (target as IHero).armor = 0;
+      }
     }
   }
 
-  '12-shield-bash'(effect: IEffect, target: IHero, isBeforeTurn: boolean) {
+  '12-shield-bash'(effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    if (!target.isPet) {
+      (target as IHero).will = (target as IHero).will - 1;
+      if ((target as IHero).will < 0) {
+        (target as IHero).will = 0;
+      }
+    }
     target.isSilenced = true;
   }
 
-  '13-shoulder-to-shoulder'(effect: IEffect, target: IHero, isBeforeTurn: boolean) {
-    target.armor = target.armor + 1;
-    if (target.armor > Const.maxPrimaryAttributes) {
-      target.armor = Const.maxPrimaryAttributes;
-    }
-    target.will = target.will + 1;
-    if (target.will > Const.maxPrimaryAttributes) {
-      target.will = Const.maxPrimaryAttributes;
+  '13-shoulder-to-shoulder'(effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    if (!target.isPet) {
+      (target as IHero).armor = (target as IHero).armor + 1;
+      if ((target as IHero).armor > Const.maxPrimaryAttributes) {
+        (target as IHero).armor = Const.maxPrimaryAttributes;
+      }
+      (target as IHero).will = (target as IHero).will + 1;
+      if ((target as IHero).will > Const.maxPrimaryAttributes) {
+        (target as IHero).will = Const.maxPrimaryAttributes;
+      }
     }
   }
 
-  '21-spear-throw'(effect: IEffect, target: IHero, isBeforeTurn: boolean) {
-    target.moveEnergyCost = target.moveEnergyCost + 1;
+  '21-spear-throw'(effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    if (!target.isPet) {
+      (target as IHero).moveEnergyCost = (target as IHero).moveEnergyCost + 1;
+    }
   }
 
   // Highlander
-  '11-shoulder-punch'(effect: IEffect, target: IHero, isBeforeTurn: boolean) {
-    target.strength = target.strength + 1;
-    if (target.strength > Const.maxPrimaryAttributes) {
-      target.strength = Const.maxPrimaryAttributes;
+  '11-shoulder-punch'(effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    if (!target.isPet) {
+      (target as IHero).strength = (target as IHero).strength + 1;
+      if ((target as IHero).strength > Const.maxPrimaryAttributes) {
+        (target as IHero).strength = Const.maxPrimaryAttributes;
+      }
     }
   }
 
-  '12-strong-grip'(effect: IEffect, target: IHero, isBeforeTurn: boolean) {
-    target.strength = target.strength + 2;
-    if (target.strength > Const.maxPrimaryAttributes) {
-      target.strength = Const.maxPrimaryAttributes;
+  '12-strong-grip'(effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    if (!target.isPet) {
+      (target as IHero).strength = (target as IHero).strength + 2;
+      if ((target as IHero).strength > Const.maxPrimaryAttributes) {
+        (target as IHero).strength = Const.maxPrimaryAttributes;
+      }
+      (target as IHero).isImmuneToDisarm = true;
     }
-    target.isImmuneToDisarm = true;
+  }
+
+  '22-freedom-spirit'(effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    if (!target.isPet) {
+      (target as IHero).moveEnergyCost = (target as IHero).moveEnergyCost - 1;
+    }
   }
 
   // Druid
-  '11-crown-of-thorns'(effect: IEffect, target: IHero, isBeforeTurn: boolean) {
-    if (isBeforeTurn) {
-      this.heroService.spendMana(target, 1);
+  '11-crown-of-thorns'(effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    if (isBeforeTurn && !target.isPet) {
+      this.heroService.spendMana(target as IHero, 1);
     }
   }
 
-  '13-healing-wounds'(effect: IEffect, target: IHero, isBeforeTurn: boolean) {
+  '13-healing-wounds'(effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     target.regeneration = target.regeneration + 1;
     if (target.regeneration > Const.maxSecondaryAttributes) {
       target.regeneration = Const.maxSecondaryAttributes;
     }
+  }
+
+  '21-entangling-roots'(effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    if (!target.isPet) {
+      (target as IHero).strength = (target as IHero).strength - 1;
+      if ((target as IHero).strength < 0) {
+        (target as IHero).strength = 0;
+      }
+
+      (target as IHero).intellect = (target as IHero).intellect - 1;
+      if ((target as IHero).intellect < 0) {
+        (target as IHero).intellect = 0;
+      }
+    }
+
+    target.isImmobilized = true;
   }
 }

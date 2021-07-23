@@ -22,8 +22,9 @@ import { IEffect } from 'src/interfaces/IEffect';
 import { IAbility } from 'src/interfaces/IAbility';
 import { AbilityTargetType } from 'src/enums/ability-target-type.enum';
 import { IEquip } from 'src/interfaces/IEquip';
-import { IHeroTakesDamageArgs } from 'src/interfaces/backend-side-only/IHeroTakesDamageArgs';
+import { ICharTakesDamageArgs } from 'src/interfaces/backend-side-only/ICharTakesDamageArgs';
 import { ILogMessage } from 'src/interfaces/ILogMessage';
+import { Pet } from 'src/models/Pet';
 
 @Injectable()
 export class BattleService {
@@ -141,21 +142,41 @@ export class BattleService {
     return battle;
   }
 
-  getMovePoints(battle: IBattle): IPosition[] {
+  getMovePoints(battle: IBattle, petId?: string): IPosition[] {
     const heroes = this.getHeroesInBattle(battle);
+    let char: IChar;
     const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
+    if (petId) {
+      char = activeHero.pets.find((p) => p.id === petId);
+    } else {
+      char = this.heroService.getHeroById(battle.queue[0], heroes);
+    }
+
     let movePoints: IPosition[] = [];
-    if (this.heroService.canMove(activeHero)) {
-      movePoints = this.mapService.getMovePoints(activeHero.position, 1, battle.scenario.tiles, heroes);
+    if (this.heroService.canMove(char, !!petId)) {
+      movePoints = this.mapService.getMovePoints(char.position, 1, battle.scenario.tiles, heroes);
     }
     return movePoints;
   }
 
-  moveHero(battle: IBattle, targetPosition: IPosition): IBattle {
+  moveChar(battle: IBattle, targetPosition: IPosition, petId?: string): IBattle {
     const heroes = this.getHeroesInBattle(battle);
     const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
-    if (this.heroService.canMove(activeHero)) {
-      this.heroService.moveHero(battle, activeHero, targetPosition);
+    let activeChar: IChar = activeHero;
+    if (petId) {
+      activeChar = activeHero.pets.find((p) => p.id === petId);
+    }
+    if (this.heroService.canMove(activeChar, !!petId)) {
+      this.heroService.moveChar(battle, activeChar, targetPosition, !!petId);
+      battle.log.push({
+        type: LogMessageType.MOVE,
+        position: {
+          x: targetPosition.x,
+          y: targetPosition.y
+        },
+        id: activeChar.id
+      });
+
       const crystalPositionIndex = battle.crystalPositions.findIndex((cp: IPosition) => {
         return cp.x === targetPosition.x && cp.y === targetPosition.y;
       });
@@ -164,7 +185,7 @@ export class BattleService {
         activeTeam.crystals += 1;
         battle.log.push({
           type: LogMessageType.TAKE_CRYSTAL,
-          id: activeHero.id
+          id: activeChar.id
         });
         battle.crystalPositions.splice(crystalPositionIndex, 1);
       }
@@ -172,15 +193,20 @@ export class BattleService {
     return battle;
   }
 
-  knockBack(battle: IBattle, target: IHero, heroPosition: IPosition) {
+  knockBack(battle: IBattle, target: IChar, charPosition: IPosition) {
     const heroes = this.getHeroesInBattle(battle);
-    this.mapService.knockBack(target, heroPosition, battle.scenario.tiles, heroes);
+    this.mapService.knockBack(target, charPosition, battle.scenario.tiles, heroes);
+  }
+
+  charge(battle: IBattle, targetPosition: IPosition, char: IChar) {
+    const heroes = this.getHeroesInBattle(battle);
+    this.mapService.charge(targetPosition, char, battle.scenario.tiles, heroes);
   }
 
   applyEffect(
     battle: IBattle,
     heroes: IHero[],
-    hero: IHero,
+    char: IChar,
     effect: IEffect,
     isBeforeTurn: boolean,
     isSimulation: boolean
@@ -188,11 +214,11 @@ export class BattleService {
     switch (effect.id) {
       case '12-poison-touch':
         if (isBeforeTurn) {
-          this.heroTakesDamage({
+          this.charTakesDamage({
             battle,
             caster: this.heroService.getHeroById(effect.casterId, heroes),
             heroes,
-            target: hero,
+            target: char,
             directDamage: 1,
             effectId: effect.id,
             isSimulation
@@ -203,7 +229,7 @@ export class BattleService {
         //No need to apply, just effect existance
         break;
       default:
-        this.effectService.apply(effect, hero, isBeforeTurn);
+        this.effectService.apply(effect, char, isBeforeTurn);
         break;
     }
   }
@@ -214,9 +240,16 @@ export class BattleService {
         this.applyEffect(battle, heroes, hero, hero.effects[i], isBeforeTurn, isSimulation);
       }
     }
+    for (let i = 0; i < hero.pets.length; i++) {
+      for (let j = 0; j < hero.pets[i].effects.length; j++) {
+        if (hero.pets[i].effects[j].left > 0) {
+          this.applyEffect(battle, heroes, hero.pets[i], hero.pets[i].effects[j], isBeforeTurn, isSimulation);
+        }
+      }
+    }
   }
 
-  beforeTurn(battle: IBattle, heroes: IHero[], hero: IHero, isSimulation) {
+  beforeTurn(battle: IBattle, heroes: IHero[], hero: IHero, isSimulation: boolean) {
     if (hero.isDead) {
       return;
     }
@@ -260,6 +293,26 @@ export class BattleService {
     if (hero.secondaryWeapon && !hero.secondaryWeapon.isPassive) {
       hero.secondaryWeapon.isUsed = false;
     }
+
+    for (let i = 0; i < hero.pets.length; i++) {
+      if (hero.pets[i].health + hero.pets[i].regeneration < hero.pets[i].maxHealth) {
+        hero.pets[i].health += hero.pets[i].regeneration;
+      } else {
+        hero.pets[i].health = hero.pets[i].maxHealth;
+      }
+
+      if (hero.pets[i].ability.left > 0) {
+        hero.pets[i].ability.left--;
+      }
+
+      for (let j = hero.pets[i].effects.length - 1; j > -1; j--) {
+        if (hero.pets[i].effects[j].left > 0) {
+          hero.pets[i].effects[j].left--;
+        } else {
+          hero.pets[i].effects.splice(j, 1);
+        }
+      }
+    }
   }
 
   endTurn(battle: IBattle, isSimulation: boolean): IBattle {
@@ -282,10 +335,13 @@ export class BattleService {
     return battle;
   }
 
-  findEnemies(battle: IBattle, sourceHeroId: string, radius: number): string[] {
+  findEnemies(battle: IBattle, sourceHeroId: string, radius: number, petId?: string): string[] {
     const heroes = this.getHeroesInBattle(battle);
-    const sourceHero = this.heroService.getHeroById(sourceHeroId, heroes);
-    const points = this.mapService.findNearestPoints(sourceHero.position, battle.scenario.tiles, radius);
+    let sourceChar: IChar = this.heroService.getHeroById(sourceHeroId, heroes);
+    if (petId) {
+      sourceChar = (sourceChar as IHero).pets.find((pet) => pet.id === petId);
+    }
+    const points = this.mapService.findNearestPoints(sourceChar.position, battle.scenario.tiles, radius);
     const possibleEnemies = this.getPossibleEnemies(battle, sourceHeroId);
 
     const enemies: string[] = [];
@@ -296,7 +352,7 @@ export class BattleService {
           points[i].y === possibleEnemies[j].position.y &&
           !(possibleEnemies[j] as IHero).isDead &&
           !this.mapService.rayTrace(
-            { x: sourceHero.position.x, y: sourceHero.position.y },
+            { x: sourceChar.position.x, y: sourceChar.position.y },
             { x: points[i].x, y: points[i].y },
             battle.scenario.tiles,
             heroes
@@ -371,7 +427,7 @@ export class BattleService {
   useWeapon(battle: IBattle, targetId: string, weaponId: string, isSimulation: boolean): IBattle {
     const heroes = this.getHeroesInBattle(battle);
     const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
-    const target = this.heroService.getHeroById(targetId, heroes);
+    const target = this.heroService.getCharById(targetId, heroes);
     let weapon: IEquip;
 
     if (activeHero.primaryWeapon.id === weaponId) {
@@ -386,12 +442,12 @@ export class BattleService {
       return battle;
     }
 
-    const { physDamage, magicDamage } = this.calculateWeaponDamage(weapon, activeHero, target);
+    const { physDamage, magicDamage } = this.calculateWeaponDamage(weapon, activeHero);
 
     activeHero.energy -= weapon.energyCost;
     weapon.isUsed = true;
 
-    const healthDamage = this.heroTakesDamage({
+    const healthDamage = this.charTakesDamage({
       battle,
       caster: activeHero,
       heroes,
@@ -408,15 +464,15 @@ export class BattleService {
 
   afterCastAbility(
     newBattle: IBattle,
-    activeHero: IHero,
+    activeChar: IChar,
     heroes: IHero[],
     ability: IAbility,
-    target: IHero,
+    target: IChar,
     position: IPosition,
     isSimulation: boolean
   ): IBattle {
     if (!ability.isPassive) {
-      this.checkPassiveAbilityTrigger('22-counterattack', newBattle, activeHero, heroes, target, 0, isSimulation);
+      this.checkPassiveAbilityTrigger('22-counterattack', newBattle, activeChar, heroes, target, 0, isSimulation);
     }
     return newBattle;
   }
@@ -475,7 +531,7 @@ export class BattleService {
     }
   }
 
-  heroTakesDamage({
+  charTakesDamage({
     battle,
     caster,
     heroes,
@@ -487,21 +543,25 @@ export class BattleService {
     abilityId,
     effectId,
     isSimulation
-  }: IHeroTakesDamageArgs): number {
+  }: ICharTakesDamageArgs): number {
     let healthDamage = 0;
 
-    if (this.heroService.getHeroEffectById(target, '23-defender')) {
+    if (this.heroService.getCharEffectById(target, '23-defender')) {
       target = this.heroService.getHeroById('paragon', heroes);
     }
 
-    if (physDamage > 0) {
-      healthDamage += physDamage - target.armor;
-    }
-    if (magicDamage > 0) {
-      healthDamage += magicDamage - target.will;
-    }
-    if (directDamage > 0) {
-      healthDamage += directDamage;
+    if (target.isPet) {
+      healthDamage = (physDamage || 0) + (magicDamage || 0) + (directDamage || 0);
+    } else {
+      if (physDamage > 0) {
+        healthDamage += physDamage - (target as IHero).armor;
+      }
+      if (magicDamage > 0) {
+        healthDamage += magicDamage - (target as IHero).will;
+      }
+      if (directDamage > 0) {
+        healthDamage += directDamage;
+      }
     }
 
     if (healthDamage < 0) {
@@ -535,17 +595,57 @@ export class BattleService {
     this.afterDamageTaken(battle, caster, heroes, target, healthDamage, isSimulation);
 
     if (target.health <= 0) {
-      this.heroService.heroDeath(battle, target);
+      if (target.isPet) {
+        for (let i = 0; i < heroes.length; i++) {
+          for (let j = heroes[i].pets.length - 1; j >= 0; j--) {
+            if (heroes[i].pets[j].id === target.id) {
+              battle.log.push({
+                type: LogMessageType.DEATH,
+                id: heroes[i].pets[j].id
+              });
+              heroes[i].pets[j] = undefined;
+              target = undefined;
+              heroes[i].pets.splice(j, 1);
+            }
+          }
+        }
+      } else {
+        this.heroDeath(battle, target as IHero, isSimulation);
+      }
     }
 
     return healthDamage;
   }
 
+  heroDeath(battle: IBattle, hero: IHero, isSimulation: boolean) {
+    hero.health = 0;
+    hero.energy = 0;
+    hero.mana = 0;
+    hero.effects = [];
+    hero.isDead = true;
+
+    battle.log.push({
+      type: LogMessageType.DEATH,
+      id: hero.id
+    });
+
+    const queueIndex = battle.queue.findIndex((heroId: string) => {
+      return hero.id === heroId;
+    });
+
+    if (queueIndex === 0) {
+      this.endTurn(battle, isSimulation);
+      battle.queue.splice(battle.queue.length - 1, 1);
+    } else {
+      battle.queue.splice(queueIndex, 1);
+    }
+  }
+
   afterDamageTaken(
     battle: IBattle,
-    caster: IHero,
+    caster: IChar,
     heroes: IHero[],
-    target: IHero,
+    target: IChar,
     value: number,
     isSimulation: boolean
   ) {
@@ -562,7 +662,7 @@ export class BattleService {
     }
   }
 
-  calculateWeaponDamage(weapon: IEquip, activeHero: IHero, target: IHero): { physDamage: number; magicDamage: number } {
+  calculateWeaponDamage(weapon: IEquip, activeHero: IHero): { physDamage: number; magicDamage: number } {
     let physDamage = weapon.physDamage || 0;
     let magicDamage = weapon.magicDamage || 0;
 
@@ -584,26 +684,30 @@ export class BattleService {
   checkPassiveAbilityTrigger(
     passiveAbility: string,
     battle: IBattle,
-    activeHero: IHero,
+    activeChar: IChar,
     heroes: IHero[],
-    target: IHero,
+    target: IChar,
     damageValue: number,
     isSimulation: boolean
   ) {
     switch (passiveAbility) {
       case '22-counterattack':
-        if (activeHero.id !== 'paragon') {
-          const enemies = this.findEnemies(battle, activeHero.id, 2);
+        if (activeChar && activeChar.id !== 'paragon' && activeChar.health > 0) {
+          let activeHero: IHero = activeChar as IHero;
+          if (activeChar.isPet) {
+            activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
+          }
+          const enemies = this.findEnemies(battle, activeHero.id, 2, activeChar.isPet ? activeChar.id : undefined);
           for (let i = 0; i < enemies.length; i++) {
             if (enemies[i] === 'paragon') {
               const paragon = this.heroService.getHeroById(enemies[i], heroes);
               if (!paragon.isDisarmed && this.heroService.getHeroAbilityById(paragon, passiveAbility)) {
                 let counterDamage = paragon.primaryWeapon.physDamage + paragon.strength + 1;
-                this.heroTakesDamage({
+                this.charTakesDamage({
                   battle,
                   caster: paragon,
                   heroes,
-                  target: activeHero,
+                  target: activeChar,
                   abilityId: passiveAbility,
                   physDamage: counterDamage,
                   isSimulation
@@ -615,8 +719,8 @@ export class BattleService {
         }
         break;
       case '12-reflection':
-        if (target.id === 'oracle' && this.heroService.getHeroAbilityById(target, '12-reflection')) {
-          this.heroService.takeMana(target, damageValue);
+        if (target.id === 'oracle' && this.heroService.getHeroAbilityById(target as IHero, '12-reflection')) {
+          this.heroService.takeMana(target as IHero, damageValue);
           battle.log.push({
             id: target.id,
             type: LogMessageType.TAKE_MANA,
@@ -624,13 +728,13 @@ export class BattleService {
           });
           const enemies = this.findEnemies(battle, target.id, 1);
           for (let i = 0; i < enemies.length; i++) {
-            const enemyHero = this.heroService.getHeroById(enemies[i], heroes);
-            const magicDamage = damageValue + target.intellect;
-            this.heroTakesDamage({
+            const enemyChar = this.heroService.getCharById(enemies[i], heroes);
+            const magicDamage = damageValue + (target as IHero).intellect;
+            this.charTakesDamage({
               battle,
               caster: target,
               heroes,
-              target: enemyHero,
+              target: enemyChar,
               abilityId: passiveAbility,
               magicDamage,
               isSimulation
@@ -781,9 +885,9 @@ export class BattleService {
     if (this.heroService.canUseWeapon(activeHero, activeHero.primaryWeapon)) {
       const enemies = this.findEnemies(battle, activeHero.id, activeHero.primaryWeapon.range);
       for (let i = 0; i < enemies.length; i++) {
-        const target = this.heroService.getHeroById(enemies[i], heroes);
-        const { physDamage, magicDamage } = this.calculateWeaponDamage(activeHero.primaryWeapon, activeHero, target);
-        if (physDamage - target.armor > 0 || magicDamage - target.will > 0) {
+        const target = this.heroService.getCharById(enemies[i], heroes);
+        const { physDamage, magicDamage } = this.calculateWeaponDamage(activeHero.primaryWeapon, activeHero);
+        if (target.isPet || physDamage - (target as IHero).armor > 0 || magicDamage - (target as IHero).will > 0) {
           actions.push({
             type: ActionType.WEAPON_DAMAGE,
             equipId: activeHero.primaryWeapon.id,
@@ -796,9 +900,9 @@ export class BattleService {
     if (activeHero.secondaryWeapon && this.heroService.canUseWeapon(activeHero, activeHero.secondaryWeapon)) {
       const enemies = this.findEnemies(battle, activeHero.id, activeHero.secondaryWeapon.range);
       for (let i = 0; i < enemies.length; i++) {
-        const target = this.heroService.getHeroById(enemies[i], heroes);
-        const { physDamage, magicDamage } = this.calculateWeaponDamage(activeHero.secondaryWeapon, activeHero, target);
-        if (physDamage - target.armor > 0 || magicDamage - target.will > 0) {
+        const target = this.heroService.getCharById(enemies[i], heroes);
+        const { physDamage, magicDamage } = this.calculateWeaponDamage(activeHero.secondaryWeapon, activeHero);
+        if (target.isPet || physDamage - (target as IHero).armor > 0 || magicDamage - (target as IHero).will > 0) {
           actions.push({
             type: ActionType.WEAPON_DAMAGE,
             equipId: activeHero.secondaryWeapon.id,

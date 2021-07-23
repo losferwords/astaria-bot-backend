@@ -9,6 +9,9 @@ import { LogMessageType } from 'src/enums/log-message-type.enum';
 import { IEffect } from 'src/interfaces/IEffect';
 import { EffectsData } from 'src/static/effects-data';
 import { BattleService } from './battle.service';
+import { Pet } from 'src/models/Pet';
+import { IChar } from 'src/interfaces/IChar';
+import { IPet } from 'src/interfaces/IPet';
 
 @Injectable()
 export class AbilityService {
@@ -17,12 +20,12 @@ export class AbilityService {
   addEffect(
     battle: IBattle,
     heroes: IHero[],
-    target: IHero,
+    target: IChar,
     effectId: string,
     casterId: string,
     isSimulation: boolean
   ) {
-    if (target.isDead) {
+    if ((target as IHero).isDead) {
       return;
     }
     const effect: IEffect = { ...EffectsData[effectId] };
@@ -43,8 +46,8 @@ export class AbilityService {
     battle: IBattle,
     heroes: IHero[],
     ability: IAbility,
-    caster: IHero,
-    target: IHero,
+    caster: IChar,
+    target: IChar,
     position: IPosition,
     isSimulation: boolean
   ): IBattle {
@@ -57,13 +60,13 @@ export class AbilityService {
     heroes: IHero[],
     ability: IAbility,
     caster: IHero,
-    target: IHero,
+    target: IChar,
     position: IPosition,
     isSimulation: boolean
   ): IBattle {
     this.spendResouces(caster, ability);
 
-    this.battleService.heroTakesDamage({
+    this.battleService.charTakesDamage({
       battle,
       caster,
       heroes,
@@ -82,18 +85,18 @@ export class AbilityService {
     heroes: IHero[],
     ability: IAbility,
     caster: IHero,
-    target: IHero,
+    target: IChar,
     position: IPosition,
     isSimulation: boolean
   ): IBattle {
     this.spendResouces(caster, ability);
 
-    this.battleService.heroTakesDamage({
+    this.battleService.charTakesDamage({
       battle,
       caster,
       heroes,
       target,
-      physDamage: caster.primaryWeapon.physDamage + caster.strength + 1,
+      physDamage: caster.secondaryWeapon.level + 1 + caster.strength,
       abilityId: ability.id,
       isSimulation
     });
@@ -107,7 +110,7 @@ export class AbilityService {
     heroes: IHero[],
     ability: IAbility,
     caster: IHero,
-    target: IHero,
+    target: IChar,
     position: IPosition,
     isSimulation: boolean
   ): IBattle {
@@ -129,13 +132,13 @@ export class AbilityService {
     heroes: IHero[],
     ability: IAbility,
     caster: IHero,
-    target: IHero,
+    target: IChar,
     position: IPosition,
     isSimulation: boolean
   ): IBattle {
     this.spendResouces(caster, ability);
 
-    this.battleService.heroTakesDamage({
+    this.battleService.charTakesDamage({
       battle,
       caster,
       heroes,
@@ -154,7 +157,7 @@ export class AbilityService {
     heroes: IHero[],
     ability: IAbility,
     caster: IHero,
-    target: IHero,
+    target: IChar,
     position: IPosition,
     isSimulation: boolean
   ): IBattle {
@@ -177,13 +180,13 @@ export class AbilityService {
     heroes: IHero[],
     ability: IAbility,
     caster: IHero,
-    target: IHero,
+    target: IChar,
     position: IPosition,
     isSimulation: boolean
   ): IBattle {
     this.spendResouces(caster, ability);
 
-    this.battleService.heroTakesDamage({
+    this.battleService.charTakesDamage({
       battle,
       caster,
       heroes,
@@ -202,7 +205,7 @@ export class AbilityService {
     heroes: IHero[],
     ability: IAbility,
     caster: IHero,
-    target: IHero,
+    target: IChar,
     position: IPosition,
     isSimulation: boolean
   ): IBattle {
@@ -219,19 +222,100 @@ export class AbilityService {
     return battle;
   }
 
+  '21-sweeping-strike'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(caster, ability);
+
+    const enemies = this.battleService.findEnemies(battle, caster.id, 2);
+    for (let i = 0; i < enemies.length; i++) {
+      const enemyHero = this.heroService.getCharById(enemies[i], heroes);
+      this.battleService.charTakesDamage({
+        battle,
+        caster,
+        heroes,
+        target: enemyHero,
+        abilityId: ability.id,
+        physDamage: caster.primaryWeapon.physDamage + caster.strength + 1,
+        isSimulation
+      });
+    }
+
+    return battle;
+  }
+
+  '22-freedom-spirit'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(caster, ability);
+
+    battle.log.push({
+      type: LogMessageType.ABILITY_CAST,
+      casterId: caster.id,
+      targetId: target.id,
+      abilityId: ability.id
+    });
+
+    for (let i = target.effects.length - 1; i > -1; i--) {
+      if (!target.effects[i].isBuff) {
+        target.effects.splice(i, 1);
+      }
+    }
+
+    this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
+    return battle;
+  }
+
+  '23-static-attraction'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(caster, ability);
+
+    this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      magicDamage: 3 + caster.intellect,
+      abilityId: ability.id,
+      isSimulation
+    });
+
+    this.battleService.charge(battle, caster.position, target);
+    return battle;
+  }
+
   // Druid
   '11-crown-of-thorns'(
     battle: IBattle,
     heroes: IHero[],
     ability: IAbility,
     caster: IHero,
-    target: IHero,
+    target: IChar,
     position: IPosition,
     isSimulation: boolean
   ): IBattle {
     this.spendResouces(caster, ability);
 
-    this.battleService.heroTakesDamage({
+    this.battleService.charTakesDamage({
       battle,
       caster,
       heroes,
@@ -250,13 +334,13 @@ export class AbilityService {
     heroes: IHero[],
     ability: IAbility,
     caster: IHero,
-    target: IHero,
+    target: IChar,
     position: IPosition,
     isSimulation: boolean
   ): IBattle {
     this.spendResouces(caster, ability);
 
-    this.battleService.heroTakesDamage({
+    this.battleService.charTakesDamage({
       battle,
       caster,
       heroes,
@@ -275,7 +359,7 @@ export class AbilityService {
     heroes: IHero[],
     ability: IAbility,
     caster: IHero,
-    target: IHero,
+    target: IChar,
     position: IPosition,
     isSimulation: boolean
   ): IBattle {
@@ -292,19 +376,88 @@ export class AbilityService {
     return battle;
   }
 
+  '21-entangling-roots'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(caster, ability);
+
+    this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      physDamage: caster.primaryWeapon.physDamage + 2 + caster.strength,
+      abilityId: ability.id,
+      isSimulation
+    });
+
+    this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
+    return battle;
+  }
+
+  '22-wolf'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(caster, ability);
+
+    battle.log.push({
+      type: LogMessageType.PET_SUMMON,
+      casterId: caster.id,
+      abilityId: 'wolf'
+    });
+
+    caster.pets.push(new Pet('wolf', position));
+    return battle;
+  }
+
+  '22-wolf-bite'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IPet,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    ability.left = ability.cd;
+
+    this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      physDamage: 4,
+      abilityId: ability.id,
+      isSimulation
+    });
+    return battle;
+  }
+
   // Oracle
   '11-kinetic-impact'(
     battle: IBattle,
     heroes: IHero[],
     ability: IAbility,
     caster: IHero,
-    target: IHero,
+    target: IChar,
     position: IPosition,
     isSimulation: boolean
   ): IBattle {
     this.spendResouces(caster, ability);
 
-    this.battleService.heroTakesDamage({
+    this.battleService.charTakesDamage({
       battle,
       caster,
       heroes,
@@ -323,13 +476,13 @@ export class AbilityService {
     heroes: IHero[],
     ability: IAbility,
     caster: IHero,
-    target: IHero,
+    target: IChar,
     position: IPosition,
     isSimulation: boolean
   ): IBattle {
     this.spendResouces(caster, ability);
 
-    this.battleService.heroTakesDamage({
+    this.battleService.charTakesDamage({
       battle,
       caster,
       heroes,

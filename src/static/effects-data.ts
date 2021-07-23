@@ -11,7 +11,7 @@ export class EffectsData {
 
   public static readonly '12-shield-bash': IEffect = {
     id: '12-shield-bash',
-    duration: 1,
+    duration: 2,
     isBuff: false,
     isRemovable: true
   };
@@ -52,6 +52,13 @@ export class EffectsData {
     isRemovable: true
   };
 
+  public static readonly '22-freedom-spirit': IEffect = {
+    id: '22-freedom-spirit',
+    duration: 2,
+    isBuff: true,
+    isRemovable: true
+  };
+
   // Druid
   public static readonly '11-crown-of-thorns': IEffect = {
     id: '11-crown-of-thorns',
@@ -71,6 +78,13 @@ export class EffectsData {
     id: '13-healing-wounds',
     duration: 3,
     isBuff: true,
+    isRemovable: true
+  };
+
+  public static readonly '21-entangling-roots': IEffect = {
+    id: '21-entangling-roots',
+    duration: 1,
+    isBuff: false,
     isRemovable: true
   };
 }

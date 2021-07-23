@@ -20,7 +20,7 @@ export class AbilitiesData {
       id: '12-shield-bash',
       level: 1,
       range: 1,
-      cd: 2,
+      cd: 3,
       energyCost: 4,
       manaCost: 0,
       isPassive: false,
@@ -122,6 +122,45 @@ export class AbilitiesData {
       isSpell: false,
       left: 0,
       targetType: AbilityTargetType.SELF
+    },
+    {
+      id: '21-sweeping-strike',
+      level: 2,
+      range: 0,
+      cd: 2,
+      energyCost: 5,
+      manaCost: 0,
+      isPassive: false,
+      needWeapon: true,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.SELF
+    },
+    {
+      id: '22-freedom-spirit',
+      level: 2,
+      range: 0,
+      cd: 3,
+      energyCost: 3,
+      manaCost: 0,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.SELF
+    },
+    {
+      id: '23-static-attraction',
+      level: 2,
+      range: 3,
+      cd: 3,
+      energyCost: 2,
+      manaCost: 5,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: true,
+      left: 0,
+      targetType: AbilityTargetType.ENEMY
     }
   ];
 
@@ -164,6 +203,32 @@ export class AbilitiesData {
       isSpell: true,
       left: 0,
       targetType: AbilityTargetType.ALLY
+    },
+    {
+      id: '21-entangling-roots',
+      level: 2,
+      range: 2,
+      cd: 2,
+      energyCost: 4,
+      manaCost: 2,
+      isPassive: false,
+      needWeapon: true,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.ENEMY
+    },
+    {
+      id: '22-wolf',
+      level: 2,
+      range: 1,
+      cd: 0,
+      energyCost: 4,
+      manaCost: 3,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: true,
+      left: 0,
+      targetType: AbilityTargetType.MAP
     }
   ];
 

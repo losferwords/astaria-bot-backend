@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { TileType } from 'src/enums/tile-type.enum';
+import { IChar } from 'src/interfaces/IChar';
 import { IHero } from 'src/interfaces/IHero';
 import { IPosition } from 'src/interfaces/IPosition';
 import { ITile } from 'src/interfaces/ITile';
@@ -105,18 +106,18 @@ export class MapService {
     return availablePoints;
   }
 
-  knockBack(target: IHero, heroPosition: IPosition, tiles: ITile[][], heroes: IHero[]) {
+  knockBack(target: IChar, charPosition: IPosition, tiles: ITile[][], heroes: IHero[]) {
     const direction: IPosition = { x: 0, y: 0 };
 
-    if (heroPosition.x < target.position.x) {
+    if (charPosition.x < target.position.x) {
       direction.x = 1;
-    } else if (heroPosition.x > target.position.x) {
+    } else if (charPosition.x > target.position.x) {
       direction.x = -1;
     }
 
-    if (heroPosition.y < target.position.y) {
+    if (charPosition.y < target.position.y) {
       direction.y = 1;
-    } else if (heroPosition.y > target.position.y) {
+    } else if (charPosition.y > target.position.y) {
       direction.y = -1;
     }
 
@@ -130,6 +131,28 @@ export class MapService {
       newPosition.y < tiles.length
     ) {
       target.position = { x: newPosition.x, y: newPosition.y };
+    }
+  }
+
+  charge(targetPosition: IPosition, char: IChar, tiles: ITile[][], heroes: IHero[]) {
+    const direction: IPosition = { x: 0, y: 0 };
+
+    if (char.position.x < targetPosition.x) {
+      direction.x = 1;
+    } else if (char.position.x > targetPosition.x) {
+      direction.x = -1;
+    }
+
+    if (char.position.y < targetPosition.y) {
+      direction.y = 1;
+    } else if (char.position.y > targetPosition.y) {
+      direction.y = -1;
+    }
+
+    const newPosition = { x: targetPosition.x - direction.x, y: targetPosition.y - direction.y };
+
+    if (!this.checkTileForObstacle(newPosition, tiles, heroes)) {
+      char.position = { x: newPosition.x, y: newPosition.y };
     }
   }
 }

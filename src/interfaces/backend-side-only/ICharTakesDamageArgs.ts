@@ -1,11 +1,12 @@
 import { IBattle } from '../IBattle';
+import { IChar } from '../IChar';
 import { IHero } from '../IHero';
 
-export interface IHeroTakesDamageArgs {
+export interface ICharTakesDamageArgs {
   battle: IBattle;
-  caster: IHero;
+  caster: IChar;
   heroes: IHero[];
-  target: IHero;
+  target: IChar;
   physDamage?: number;
   magicDamage?: number;
   directDamage?: number;

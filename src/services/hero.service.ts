@@ -3,9 +3,11 @@ import * as _ from 'lodash';
 import * as rfdc from 'rfdc';
 import { LogMessageType } from 'src/enums/log-message-type.enum';
 import { IBattle } from 'src/interfaces/IBattle';
+import { IChar } from 'src/interfaces/IChar';
 import { IEquip } from 'src/interfaces/IEquip';
 import { IHero } from 'src/interfaces/IHero';
 import { IHeroData } from 'src/interfaces/IHeroData';
+import { IPet } from 'src/interfaces/IPet';
 import { IPosition } from 'src/interfaces/IPosition';
 import { ITeam } from 'src/interfaces/ITeam';
 import { Const } from 'src/static/const';
@@ -48,25 +50,6 @@ export class HeroService {
     }
   }
 
-  heroDeath(battle: IBattle, hero: IHero) {
-    hero.health = 0;
-    hero.energy = 0;
-    hero.mana = 0;
-    hero.effects = [];
-    hero.isDead = true;
-
-    battle.log.push({
-      type: LogMessageType.DEATH,
-      id: hero.id
-    });
-
-    const queueIndex = battle.queue.findIndex((heroId: string) => {
-      return hero.id === heroId;
-    });
-
-    battle.queue.splice(queueIndex, 1);
-  }
-
   setRandomHeroes(teamSetup) {
     const availableHeroes = [...Const.moveOrder];
     const randomHeroes = [];
@@ -88,8 +71,12 @@ export class HeroService {
     }
   }
 
-  canMove(hero: IHero): boolean {
-    return hero.energy - hero.moveEnergyCost >= 0 && !hero.isImmobilized;
+  canMove(char: IChar, isPet?: boolean): boolean {
+    if (isPet) {
+      return !(char as IPet).isMoved && !char.isImmobilized;
+    } else {
+      return (char as IHero).energy - (char as IHero).moveEnergyCost >= 0 && !char.isImmobilized;
+    }
   }
 
   canUseWeapon(hero: IHero, weapon: IEquip): boolean {
@@ -101,10 +88,24 @@ export class HeroService {
     );
   }
 
-  getHeroById(heroId: string, heroes: IHero[]) {
+  getHeroById(heroId: string, heroes: IHero[]): IHero {
     return heroes.find((hero: IHero) => {
       return hero.id === heroId;
     });
+  }
+
+  getCharById(charId: string, heroes: IHero[]): IChar {
+    for (let i = 0; i < heroes.length; i++) {
+      if (heroes[i].id === charId) {
+        return heroes[i];
+      }
+      for (let j = 0; j < heroes[i].pets.length; j++) {
+        if (heroes[i].pets[j].id === charId) {
+          return heroes[i].pets[j];
+        }
+      }
+    }
+    return undefined;
   }
 
   getTeamIdByHeroId(heroId: string, teams: ITeam[]): string {
@@ -131,10 +132,10 @@ export class HeroService {
     }
   }
 
-  getHeroEffectById(hero: IHero, effectId: string) {
-    for (let i = 0; i < hero.effects.length; i++) {
-      if (hero.effects[i].id === effectId) {
-        return hero.effects[i];
+  getCharEffectById(char: IChar, effectId: string) {
+    for (let i = 0; i < char.effects.length; i++) {
+      if (char.effects[i].id === effectId) {
+        return char.effects[i];
       }
     }
   }
@@ -201,6 +202,11 @@ export class HeroService {
     if (hero.mind > Const.maxSecondaryAttributes) {
       hero.mind = Const.maxSecondaryAttributes;
     }
+
+    for (let i = 0; i < hero.pets.length; i++) {
+      hero.pets[i].regeneration = 0;
+    }
+
     return hero;
   }
 
@@ -216,21 +222,23 @@ export class HeroService {
     } else {
       hero.isImmuneToDisarm = false;
     }
+
+    for (let i = 0; i < hero.pets.length; i++) {
+      hero.pets[i].isMoved = false;
+      hero.pets[i].isStunned = false;
+    }
+
     return hero;
   }
 
-  moveHero(battle: IBattle, activeHero: IHero, position: IPosition): IBattle {
-    activeHero.position.x = position.x;
-    activeHero.position.y = position.y;
-    activeHero.energy -= activeHero.moveEnergyCost;
-    battle.log.push({
-      type: LogMessageType.MOVE,
-      position: {
-        x: position.x,
-        y: position.y
-      },
-      id: activeHero.id
-    });
+  moveChar(battle: IBattle, activeChar: IChar, position: IPosition, isPet: boolean): IBattle {
+    activeChar.position.x = position.x;
+    activeChar.position.y = position.y;
+    if (!isPet) {
+      (activeChar as IHero).energy -= (activeChar as IHero).moveEnergyCost;
+    } else {
+      (activeChar as IPet).isMoved = true;
+    }
     return battle;
   }
 
