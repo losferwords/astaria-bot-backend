@@ -16,6 +16,7 @@ import { ReportService } from './report.service';
 import { AbilityService } from './ability.service';
 import { IHero } from 'src/interfaces/IHero';
 import { IAbility } from 'src/interfaces/IAbility';
+import { IChar } from 'src/interfaces/IChar';
 
 @Injectable()
 export class BotService {
@@ -64,27 +65,42 @@ export class BotService {
   doAction(battle: IBattle, action: IAction, isSimulation: boolean): IBattle {
     switch (action.type) {
       case ActionType.MOVE:
-        return this.battleService.moveChar(battle, action.position);
+      case ActionType.PET_MOVE:
+        // action.casterId means that this is a PET_MOVE
+        return this.battleService.moveChar(battle, action.position, action.casterId ? action.casterId : undefined);
       case ActionType.WEAPON_DAMAGE:
         return this.battleService.useWeapon(battle, action.targetId, action.equipId, isSimulation);
       case ActionType.ABILITY:
+      case ActionType.PET_ABILITY:
         const heroes = this.battleService.getHeroesInBattle(battle);
-        const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
-        const target: IHero =
-          activeHero.id === action.targetId ? activeHero : this.heroService.getHeroById(action.targetId, heroes);
-        const ability: IAbility = this.heroService.getHeroAbilityById(activeHero, action.abilityId);
+        const activeHero: IHero = this.heroService.getHeroById(battle.queue[0], heroes);
+        let activeChar: IChar = activeHero;
+        const target: IChar =
+          activeChar.id === action.targetId ? activeChar : this.heroService.getCharById(action.targetId, heroes);
+        let ability: IAbility = this.heroService.getHeroAbilityById(activeHero, action.abilityId);
+
+        //Maybe it is a pet ability
+        if (!ability) {
+          for (let i = 0; i < activeHero.pets.length; i++) {
+            if (activeHero.pets[i].ability.id === action.abilityId) {
+              ability = activeHero.pets[i].ability;
+              activeChar = activeHero.pets[i];
+            }
+          }
+        }
+
         const newBattle = this.abilityService.castAbility(
           battle,
           heroes,
           ability,
-          activeHero,
+          activeChar,
           target,
           action.position,
           isSimulation
         );
         return this.battleService.afterCastAbility(
           newBattle,
-          activeHero,
+          activeChar,
           heroes,
           ability,
           target,
@@ -210,6 +226,7 @@ export class BotService {
     let state = node.state;
     let winner = state.scenario.checkForWin(state.teams);
     let chainLength = 0;
+    let startTime = new Date();
 
     while (winner === null) {
       chainLength += 1;
@@ -221,6 +238,33 @@ export class BotService {
       state = this.cloneState(state);
       this.doAction(state, randomAction, true);
       winner = state.scenario.checkForWin(state.teams);
+
+      //If actionChain is too long, let's assume, that this is a lose
+      if(winner) {
+        console.log(
+          'chainLength: ' +
+            chainLength +
+            ', logLength: ' +
+            state.log.length +
+            ', time: ' +
+            (+new Date() - +startTime) +
+            'ms'
+        );
+      }
+      if (chainLength >= Const.maxChainLength) {
+        console.log(
+          'chainLength: ' +
+            chainLength +
+            ', logLength: ' +
+            state.log.length +
+            ', time: ' +
+            (+new Date() - +startTime) +
+            'ms <- MAX'
+        );
+        winner = state.teams.find((team: ITeam) => {
+          return team.id !== currentTeamId;
+        });
+      }      
     }
     if (winner.id === currentTeamId) {
       node.shortestWin = chainLength + node.depth;

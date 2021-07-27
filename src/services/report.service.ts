@@ -179,7 +179,7 @@ export class ReportService {
   saveTreeVisualization(rootNode: BotNode) {
     const tree = this.expandChildren(rootNode);
     fs.writeFileSync(
-      Const.mctsTreeReportPath + '/' + rootNode.state.id + '-' + (+new Date()) + '.json',
+      Const.mctsTreeReportPath + '/' + rootNode.state.id + '-' + +new Date() + '.json',
       JSON.stringify(tree)
     );
   }
@@ -201,6 +201,7 @@ export class ReportService {
     if (parentNode.action) {
       switch (parentNode.action.type) {
         case ActionType.MOVE:
+        case ActionType.PET_MOVE:
           name =
             parentNode.state.log.slice(-2, -1)[0].id +
             ' move to ' +
@@ -219,6 +220,7 @@ export class ReportService {
             parentNode.action.equipId;
           break;
         case ActionType.ABILITY:
+        case ActionType.PET_ABILITY:
           name =
             parentNode.action.casterId +
             ' cast ' +
