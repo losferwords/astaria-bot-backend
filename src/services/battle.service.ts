@@ -505,31 +505,44 @@ export class BattleService {
     return this.heroService.learnAbility(battle, heroes, abilityId);
   }
 
-  checkAbilityForUse(ability: IAbility, hero: IHero): boolean {
+  checkAbilityForUse(ability: IAbility, char: IChar): boolean {
+    if (char.isStunned) {
+      return false;
+    }
+
     if (ability.isPassive) {
       return false;
     }
-    if (ability.targetType === AbilityTargetType.MOVE && hero.isImmobilized) {
+
+    if (ability.needWeapon && char.isDisarmed) {
       return false;
     }
-    if (ability.needWeapon && hero.isDisarmed) {
+
+    if (ability.isSpell && char.isSilenced) {
       return false;
     }
-    if (ability.isSpell && hero.isSilenced) {
+
+    if (ability.targetType === AbilityTargetType.MOVE && char.isImmobilized) {
       return false;
     }
-    if (ability.left === 0 && hero.energy - ability.energyCost >= 0 && hero.mana - ability.manaCost >= 0) {
-      switch (ability.id) {
-        case '13-dangerous-knowledge':
-          return hero.intellect > 0;
-        case '22-wolf':
-          return hero.pets.findIndex((p) => p.id === 'wolf') < 0;
-        default:
-          return true;
-      }
+
+    if (char.isPet) {
+      return ability.left === 0;
     } else {
-      return false;
+      const hero: IHero = char as IHero;
+
+      if (ability.left === 0 && hero.energy - ability.energyCost >= 0 && hero.mana - ability.manaCost >= 0) {
+        switch (ability.id) {
+          case '13-dangerous-knowledge':
+            return hero.intellect > 0;
+          case '22-wolf':
+            return hero.pets.findIndex((p) => p.id === 'wolf') < 0;
+          default:
+            return true;
+        }
+      }
     }
+    return false;
   }
 
   charTakesDamage({
@@ -916,7 +929,7 @@ export class BattleService {
     }
 
     for (let i = 0; i < activeHero.pets.length; i++) {
-      if (activeHero.pets[i].ability.left === 0) {
+      if (this.checkAbilityForUse(activeHero.pets[i].ability, activeHero.pets[i])) {
         switch (activeHero.pets[i].ability.targetType) {
           case AbilityTargetType.ENEMY:
             const enemies = this.findEnemies(

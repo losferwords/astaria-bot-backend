@@ -187,6 +187,14 @@ export class BotService {
     this.actionChain = this.bestActionChain(nodes, state);
     const actionFromChain = this.actionChain[0];
     this.actionChain.shift();
+
+    console.log('----------------------------------------');
+    const used = process.memoryUsage();
+    for (let key in used) {
+      if (key === 'rss' || key === 'heapTotal' || key === 'heapUsed') {
+        console.log(`Memory: ${key} ${Math.round((used[key] / 1024 / 1024) * 100) / 100} MB`);
+      }
+    }
     return actionFromChain;
   }
 
@@ -240,17 +248,6 @@ export class BotService {
       winner = state.scenario.checkForWin(state.teams);
 
       //If actionChain is too long, let's assume, that this is a lose
-      if(winner) {
-        console.log(
-          'chainLength: ' +
-            chainLength +
-            ', logLength: ' +
-            state.log.length +
-            ', time: ' +
-            (+new Date() - +startTime) +
-            'ms'
-        );
-      }
       if (chainLength >= Const.maxChainLength) {
         console.log(
           'chainLength: ' +
@@ -264,7 +261,7 @@ export class BotService {
         winner = state.teams.find((team: ITeam) => {
           return team.id !== currentTeamId;
         });
-      }      
+      }
     }
     if (winner.id === currentTeamId) {
       node.shortestWin = chainLength + node.depth;

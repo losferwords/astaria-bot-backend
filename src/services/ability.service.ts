@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import { Injectable } from '@nestjs/common';
 import { HeroService } from './hero.service';
 import { IAbility } from 'src/interfaces/IAbility';

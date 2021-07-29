@@ -48,7 +48,7 @@ export class BattleController {
   }
 
   @Post('/move-char')
-  async moveHero(@Body() moveCharDto: MoveCharDto): Promise<IBattle> {
+  async moveChar(@Body() moveCharDto: MoveCharDto): Promise<IBattle> {
     const battle = this.battleService.getBattleById(moveCharDto.battleId);
     return this.battleService.moveChar(battle, moveCharDto.position, moveCharDto.petId);
   }

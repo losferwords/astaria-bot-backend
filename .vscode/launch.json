@@ -8,6 +8,7 @@
       "args": ["${workspaceFolder}/src/main.ts"],
       "runtimeArgs": [
         "--inspect",
+        "--expose-gc",
         "--nolazy",
         "-r",
         "ts-node/register",

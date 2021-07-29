@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import * as _ from 'lodash';
 import * as rfdc from 'rfdc';
 import { LogMessageType } from 'src/enums/log-message-type.enum';
 import { IBattle } from 'src/interfaces/IBattle';
