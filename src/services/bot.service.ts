@@ -162,7 +162,7 @@ export class BotService {
     }
 
     const stats = this.getStats(nodes, state);
-    console.log(util.inspect(stats, { showHidden: false, depth: null }));
+    //console.log(util.inspect(stats, { showHidden: false, depth: null }));
     let simulationTimeSum = 0;
     let simulationTimeMin = Infinity;
     let simulationTimeMax = 0;
@@ -175,9 +175,13 @@ export class BotService {
         simulationTimeMax = simulationTime[i];
       }
     }
-    console.log('Average Simulation Time: ' + (simulationTimeSum / simulationTime.length).toFixed(0));
-    console.log('Min Simulation Time: ' + simulationTimeMin.toFixed(0));
-    console.log('Max Simulation Time: ' + simulationTimeMax.toFixed(0));
+    console.log('----------------------------------------');
+    console.log('Sims: ' + stats.sims + ', Wins: ' + stats.wins);
+    console.log(
+      `Simulation Time: Avg: ${(simulationTimeSum / simulationTime.length).toFixed(
+        0
+      )}, Min: ${simulationTimeMin.toFixed(0)}, Max: ${simulationTimeMax.toFixed(0)}`
+    );
 
     // Create mcts diagram
     if (Const.treeBuild) {
@@ -188,13 +192,19 @@ export class BotService {
     const actionFromChain = this.actionChain[0];
     this.actionChain.shift();
 
-    console.log('----------------------------------------');
+    global.gc();
+
     const used = process.memoryUsage();
-    for (let key in used) {
-      if (key === 'rss' || key === 'heapTotal' || key === 'heapUsed') {
-        console.log(`Memory: ${key} ${Math.round((used[key] / 1024 / 1024) * 100) / 100} MB`);
-      }
-    }
+    console.log(
+      `Memory: rss: ${Math.round((used.rss / 1024 / 1024) * 100) / 100} MB, heapTotal: ${
+        Math.round((used.heapTotal / 1024 / 1024) * 100) / 100
+      } MB, heapUsed: ${Math.round((used.heapUsed / 1024 / 1024) * 100) / 100} MB`
+    );
+    // for (let key in used) {
+    //   if (key === 'rss' || key === 'heapTotal' || key === 'heapUsed') {
+    //     console.log(`Memory: ${key} ${Math.round((used[key] / 1024 / 1024) * 100) / 100} MB`);
+    //   }
+    // }
     return actionFromChain;
   }
 
@@ -234,7 +244,6 @@ export class BotService {
     let state = node.state;
     let winner = state.scenario.checkForWin(state.teams);
     let chainLength = 0;
-    let startTime = new Date();
 
     while (winner === null) {
       chainLength += 1;
@@ -249,15 +258,7 @@ export class BotService {
 
       //If actionChain is too long, let's assume, that this is a lose
       if (chainLength >= Const.maxChainLength) {
-        console.log(
-          'chainLength: ' +
-            chainLength +
-            ', logLength: ' +
-            state.log.length +
-            ', time: ' +
-            (+new Date() - +startTime) +
-            'ms <- MAX'
-        );
+        console.log('chainLength: ' + chainLength + ', logLength: ' + state.log.length + '<- MAX');
         winner = state.teams.find((team: ITeam) => {
           return team.id !== currentTeamId;
         });
