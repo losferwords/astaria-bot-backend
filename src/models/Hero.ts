@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import * as rfdc from 'rfdc';
 import { Const } from '../static/const';
 import { IEquip } from '../interfaces/IEquip';
 import { IHero } from '../interfaces/IHero';
@@ -47,7 +47,7 @@ export class Hero implements IHero {
   crystals = 0;
 
   constructor(heroSetup: IHeroSetup) {
-    const heroData: IHeroData = _.cloneDeep(HeroesData[heroSetup.hero]);
+    const heroData: IHeroData = rfdc({ proto: true })(HeroesData[heroSetup.hero]);
     this.id = heroData.id;
     this.gender = heroSetup.gender;
 

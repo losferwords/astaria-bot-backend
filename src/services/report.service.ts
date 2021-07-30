@@ -7,6 +7,7 @@ import { ITeam } from '../interfaces/ITeam';
 import { ILogMessage } from '../interfaces/ILogMessage';
 import { BotNode } from 'src/models/BotNode';
 import { ActionType } from 'src/enums/action-type.enum';
+import { IAction } from 'src/interfaces/IAction';
 
 @Injectable()
 export class ReportService {
@@ -25,9 +26,9 @@ export class ReportService {
             ',' +
             battle.log[i].id +
             ',MOVE,' +
-            battle.log[i].position.x +
+            battle.log[i].positionX +
             ' ' +
-            battle.log[i].position.y +
+            battle.log[i].positionY +
             '\n';
           break;
         case LogMessageType.TURN_END:
@@ -205,9 +206,9 @@ export class ReportService {
           name =
             parentNode.state.log.slice(-2, -1)[0].id +
             ' move to ' +
-            parentNode.action.position.x +
+            parentNode.action.positionX +
             ',' +
-            parentNode.action.position.y;
+            parentNode.action.positionY;
           break;
         case ActionType.WEAPON_DAMAGE:
           name =
@@ -226,7 +227,9 @@ export class ReportService {
             ' cast ' +
             parentNode.action.abilityId +
             ' on ' +
-            (parentNode.action.targetId ? parentNode.action.targetId : '(' + parentNode.action.position.x + ',' + ')') +
+            (parentNode.action.targetId
+              ? parentNode.action.targetId
+              : '(' + parentNode.action.positionX + ',' + parentNode.action.positionY + ')') +
             (parentNode.state.log.slice(-2, -1)[0].value
               ? ' (damage/heal: ' + parentNode.state.log.slice(-2, -1)[0].value + ')'
               : '');
@@ -245,9 +248,9 @@ export class ReportService {
       name =
         parentNode.state.log[0].id +
         ' starts at ' +
-        parentNode.state.log[0].position.x +
+        parentNode.state.log[0].positionX +
         ',' +
-        parentNode.state.log[0].position.y;
+        parentNode.state.log[0].positionY;
     }
 
     return {

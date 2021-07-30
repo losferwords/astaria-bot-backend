@@ -129,7 +129,8 @@ export class BattleService {
         battle.log.push({
           type: LogMessageType.TURN_START,
           id: activeHero.id,
-          position: activeHero.position
+          positionX: activeHero.position.x,
+          positionY: activeHero.position.y
         });
         for (let i = 0; i < heroes.length; i++) {
           this.beforeTurn(battle, heroes, heroes[i], false);
@@ -169,10 +170,8 @@ export class BattleService {
       this.heroService.moveChar(battle, activeChar, targetPosition, !!petId);
       battle.log.push({
         type: LogMessageType.MOVE,
-        position: {
-          x: targetPosition.x,
-          y: targetPosition.y
-        },
+        positionX: targetPosition.x,
+        positionY: targetPosition.y,
         id: activeChar.id
       });
 
@@ -325,7 +324,8 @@ export class BattleService {
     battle.log.push({
       type: LogMessageType.TURN_START,
       id: activeHero.id,
-      position: activeHero.position //initial position at the new turn beginning (for previousMoves)
+      positionX: activeHero.position.x, //initial position at the new turn beginning (for previousMoves)
+      positionY: activeHero.position.y
     });
 
     this.beforeTurn(battle, heroes, activeHero, isSimulation);
@@ -904,7 +904,8 @@ export class BattleService {
                 type: ActionType.ABILITY,
                 abilityId: ability.id,
                 casterId: activeHero.id,
-                position: movePoints[j]
+                positionX: movePoints[j].x,
+                positionY: movePoints[j].y
               });
             }
             break;
@@ -920,7 +921,8 @@ export class BattleService {
                 type: ActionType.ABILITY,
                 abilityId: ability.id,
                 casterId: activeHero.id,
-                position: mapPoints[j]
+                positionX: mapPoints[j].x,
+                positionY: mapPoints[j].y
               });
             }
             break;
@@ -960,7 +962,8 @@ export class BattleService {
           actions.push({
             type: ActionType.PET_MOVE,
             casterId: activeHero.pets[i].id,
-            position: petMovePoints[j]
+            positionX: petMovePoints[j].x,
+            positionY: petMovePoints[j].y
           });
         }
       }
@@ -1004,7 +1007,8 @@ export class BattleService {
       }
       actions.push({
         type: ActionType.MOVE,
-        position: moves[i]
+        positionX: moves[i].x,
+        positionY: moves[i].y
       });
     }
     actions.push({ type: ActionType.TURN_END });

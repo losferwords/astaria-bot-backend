@@ -1,5 +1,4 @@
 import { LogMessageType } from '../enums/log-message-type.enum';
-import { IPosition } from './IPosition';
 
 export interface ILogMessage {
   type: LogMessageType;
@@ -9,5 +8,6 @@ export interface ILogMessage {
   equipId?: string;
   abilityId?: string;
   value?: string;
-  position?: IPosition;
+  positionX?: number;
+  positionY?: number;
 }

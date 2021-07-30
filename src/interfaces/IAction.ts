@@ -1,5 +1,4 @@
 import { ActionType } from '../enums/action-type.enum';
-import { IPosition } from './IPosition';
 
 export interface IAction {
   type: ActionType;
@@ -8,5 +7,6 @@ export interface IAction {
   equipId?: string;
   abilityId?: string;
   value?: string;
-  position?: IPosition;
+  positionX?: number;
+  positionY?: number;
 }
