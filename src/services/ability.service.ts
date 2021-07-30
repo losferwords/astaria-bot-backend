@@ -174,7 +174,7 @@ export class AbilityService {
   }
 
   // Highlander
-  '11-shoulder-punch'(
+  '11-heavy-strike'(
     battle: IBattle,
     heroes: IHero[],
     ability: IAbility,
@@ -273,6 +273,10 @@ export class AbilityService {
       }
     }
 
+    target = this.heroService.resetHeroState(target as IHero);
+    target = this.heroService.calcHero(target as IHero);
+    this.battleService.applyCharEffects(battle, heroes, target, false, isSimulation);
+
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
     return battle;
   }
@@ -353,7 +357,7 @@ export class AbilityService {
     return battle;
   }
 
-  '13-healing-wounds'(
+  '13-wound-healing'(
     battle: IBattle,
     heroes: IHero[],
     ability: IAbility,
@@ -444,6 +448,35 @@ export class AbilityService {
     return battle;
   }
 
+  '23-breath-of-life'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(caster, ability);
+
+    target.health += 2;
+
+    if (target.health > target.maxHealth) {
+      target.health = target.maxHealth;
+    }
+
+    battle.log.push({
+      type: LogMessageType.ABILITY_HEAL,
+      casterId: caster.id,
+      targetId: target.id,
+      abilityId: ability.id,
+      value: '2'
+    });
+
+    this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
+    return battle;
+  }
+
   // Oracle
   '11-kinetic-impact'(
     battle: IBattle,
@@ -490,6 +523,101 @@ export class AbilityService {
       abilityId: ability.id,
       isSimulation
     });
+    return battle;
+  }
+
+  '21-mind-blow'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(caster, ability);
+    let leftCounter = 0;
+
+    if (target.isPet) {
+      leftCounter += (target as IPet).ability.left;
+    } else {
+      for (let i = 0; i < (target as IHero).abilities.length; i++) {
+        leftCounter += (target as IHero).abilities[i].left;
+      }
+    }
+
+    this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      magicDamage: caster.intellect * leftCounter,
+      abilityId: ability.id,
+      isSimulation
+    });
+
+    return battle;
+  }
+
+  '22-knowledge-steal'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(caster, ability);
+    for (let i = target.effects.length - 1; i >= 0; i--) {
+      if (target.effects[i].isRemovable && target.effects[i].isBuff) {
+        caster.effects.push(target.effects[i]);
+        this.battleService.applyEffect(battle, heroes, caster, target.effects[i], false, isSimulation);
+        target.effects.splice(i, 1);
+      }
+    }
+
+    if (target.isPet) {
+      target = this.heroService.resetPetState(target as IPet);
+      target = this.heroService.calcPet(target as IPet);
+    } else {
+      target = this.heroService.resetHeroState(target as IHero);
+      target = this.heroService.calcHero(target as IHero);
+    }
+    this.battleService.applyCharEffects(battle, heroes, target, false, isSimulation);
+
+    battle.log.push({
+      type: LogMessageType.ABILITY_CAST,
+      casterId: caster.id,
+      targetId: target.id,
+      abilityId: ability.id
+    });
+
+    return battle;
+  }
+
+  '23-paranoia'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(caster, ability);
+
+    this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      magicDamage: 2 + caster.intellect,
+      abilityId: ability.id,
+      isSimulation
+    });
+
+    this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
     return battle;
   }
 }

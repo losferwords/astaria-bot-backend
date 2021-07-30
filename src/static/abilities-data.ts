@@ -85,7 +85,7 @@ export class AbilitiesData {
 
   public static readonly highlander: IAbility[] = [
     {
-      id: '11-shoulder-punch',
+      id: '11-heavy-strike',
       level: 1,
       range: 1,
       cd: 2,
@@ -192,7 +192,7 @@ export class AbilitiesData {
       targetType: AbilityTargetType.ENEMY
     },
     {
-      id: '13-healing-wounds',
+      id: '13-wound-healing',
       level: 1,
       range: 3,
       cd: 4,
@@ -229,6 +229,19 @@ export class AbilitiesData {
       isSpell: true,
       left: 0,
       targetType: AbilityTargetType.MAP
+    },
+    {
+      id: '23-breath-of-life',
+      level: 2,
+      range: 3,
+      cd: 3,
+      energyCost: 3,
+      manaCost: 4,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: true,
+      left: 0,
+      targetType: AbilityTargetType.ALLY
     }
   ];
 
@@ -271,6 +284,45 @@ export class AbilitiesData {
       isSpell: true,
       left: 0,
       targetType: AbilityTargetType.ENEMY
-    }
+    },
+    {
+      id: '21-mind-blow',
+      level: 2,
+      range: 3,
+      cd: 2,
+      energyCost: 3,
+      manaCost: 4,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: true,
+      left: 0,
+      targetType: AbilityTargetType.ENEMY
+    },
+    {
+      id: '22-knowledge-steal',
+      level: 2,
+      range: 3,
+      cd: 3,
+      energyCost: 3,
+      manaCost: 2,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: true,
+      left: 0,
+      targetType: AbilityTargetType.ENEMY
+    },
+    {
+      id: '23-paranoia',
+      level: 2,
+      range: 3,
+      cd: 2,
+      energyCost: 3,
+      manaCost: 4,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: true,
+      left: 0,
+      targetType: AbilityTargetType.ENEMY
+    },
   ];
 }

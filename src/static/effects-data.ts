@@ -38,8 +38,8 @@ export class EffectsData {
   };
 
   // Highlander
-  public static readonly '11-shoulder-punch': IEffect = {
-    id: '11-shoulder-punch',
+  public static readonly '11-heavy-strike': IEffect = {
+    id: '11-heavy-strike',
     duration: 1,
     isBuff: true,
     isRemovable: true
@@ -74,8 +74,8 @@ export class EffectsData {
     isRemovable: true
   };
 
-  public static readonly '13-healing-wounds': IEffect = {
-    id: '13-healing-wounds',
+  public static readonly '13-wound-healing': IEffect = {
+    id: '13-wound-healing',
     duration: 3,
     isBuff: true,
     isRemovable: true
@@ -83,6 +83,21 @@ export class EffectsData {
 
   public static readonly '21-entangling-roots': IEffect = {
     id: '21-entangling-roots',
+    duration: 1,
+    isBuff: false,
+    isRemovable: true
+  };
+
+  public static readonly '23-breath-of-life': IEffect = {
+    id: '23-breath-of-life',
+    duration: 2,
+    isBuff: true,
+    isRemovable: true
+  };
+
+  // Oracle
+  public static readonly '23-paranoia': IEffect = {
+    id: '23-paranoia',
     duration: 1,
     isBuff: false,
     isRemovable: true

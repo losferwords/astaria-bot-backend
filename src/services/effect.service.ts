@@ -53,7 +53,7 @@ export class EffectService {
   }
 
   // Highlander
-  '11-shoulder-punch'(effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+  '11-heavy-strike'(effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
       (target as IHero).strength = (target as IHero).strength + 1;
       if ((target as IHero).strength > Const.maxPrimaryAttributes) {
@@ -85,7 +85,7 @@ export class EffectService {
     }
   }
 
-  '13-healing-wounds'(effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+  '13-wound-healing'(effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     target.regeneration = target.regeneration + 1;
     if (target.regeneration > Const.maxSecondaryAttributes) {
       target.regeneration = Const.maxSecondaryAttributes;
@@ -106,5 +106,26 @@ export class EffectService {
     }
 
     target.isImmobilized = true;
+  }
+
+  '23-breath-of-life'(effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    if (!target.isPet) {
+      (target as IHero).moveEnergyCost = (target as IHero).moveEnergyCost - 1;
+    }
+  }
+
+  // Oracle
+  '23-paranoia'(effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    if (!target.isPet) {
+      (target as IHero).will = (target as IHero).will - 2;
+      if ((target as IHero).will < 0) {
+        (target as IHero).will = 0;
+      }
+
+      (target as IHero).mind = (target as IHero).mind - 2;
+      if ((target as IHero).mind < 0) {
+        (target as IHero).mind = 0;
+      }
+    }
   }
 }

@@ -148,9 +148,6 @@ export class HeroService {
       hero.primaryWeapon.strength +
       (hero.secondaryWeapon ? hero.secondaryWeapon.strength : 0) +
       hero.chestpiece.strength;
-    if (hero.strength < 0) {
-      hero.strength = 0;
-    }
     if (hero.strength > Const.maxPrimaryAttributes) {
       hero.strength = Const.maxPrimaryAttributes;
     }
@@ -159,26 +156,17 @@ export class HeroService {
       hero.primaryWeapon.intellect +
       (hero.secondaryWeapon ? hero.secondaryWeapon.intellect : 0) +
       hero.chestpiece.intellect;
-    if (hero.intellect < 0) {
-      hero.intellect = 0;
-    }
     if (hero.intellect > Const.maxPrimaryAttributes) {
       hero.intellect = Const.maxPrimaryAttributes;
     }
 
     hero.armor =
       hero.primaryWeapon.armor + (hero.secondaryWeapon ? hero.secondaryWeapon.armor : 0) + hero.chestpiece.armor;
-    if (hero.armor < 0) {
-      hero.armor = 0;
-    }
     if (hero.armor > Const.maxPrimaryAttributes) {
       hero.armor = Const.maxPrimaryAttributes;
     }
 
     hero.will = hero.primaryWeapon.will + (hero.secondaryWeapon ? hero.secondaryWeapon.will : 0) + hero.chestpiece.will;
-    if (hero.will < 0) {
-      hero.will = 0;
-    }
     if (hero.will > Const.maxPrimaryAttributes) {
       hero.will = Const.maxPrimaryAttributes;
     }
@@ -187,26 +175,25 @@ export class HeroService {
       hero.primaryWeapon.regeneration +
       (hero.secondaryWeapon ? hero.secondaryWeapon.regeneration : 0) +
       hero.chestpiece.regeneration;
-    if (hero.regeneration < 0) {
-      hero.regeneration = 0;
-    }
     if (hero.regeneration > Const.maxSecondaryAttributes) {
       hero.regeneration = Const.maxSecondaryAttributes;
     }
 
     hero.mind = hero.primaryWeapon.mind + (hero.secondaryWeapon ? hero.secondaryWeapon.mind : 0) + hero.chestpiece.mind;
-    if (hero.mind < 0) {
-      hero.mind = 0;
-    }
     if (hero.mind > Const.maxSecondaryAttributes) {
       hero.mind = Const.maxSecondaryAttributes;
     }
 
     for (let i = 0; i < hero.pets.length; i++) {
-      hero.pets[i].regeneration = 0;
+      hero.pets[i] = this.calcPet(hero.pets[i]);
     }
 
     return hero;
+  }
+
+  calcPet(pet: IPet): IPet {
+    pet.regeneration = 0;
+    return pet;
   }
 
   resetHeroState(hero: IHero): IHero {
@@ -223,11 +210,19 @@ export class HeroService {
     }
 
     for (let i = 0; i < hero.pets.length; i++) {
-      hero.pets[i].isMoved = false;
-      hero.pets[i].isStunned = false;
+      hero.pets[i] = this.resetPetState(hero.pets[i]);
     }
 
     return hero;
+  }
+
+  resetPetState(pet: IPet): IPet {
+    pet.isMoved = false;
+    pet.isStunned = false;
+    pet.isDisarmed = false;
+    pet.isImmobilized = false;
+    pet.isSilenced = false;
+    return pet;
   }
 
   moveChar(battle: IBattle, activeChar: IChar, position: IPosition, isPet: boolean): IBattle {

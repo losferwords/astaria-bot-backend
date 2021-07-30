@@ -24,6 +24,7 @@ import { AbilityTargetType } from 'src/enums/ability-target-type.enum';
 import { IEquip } from 'src/interfaces/IEquip';
 import { ICharTakesDamageArgs } from 'src/interfaces/backend-side-only/ICharTakesDamageArgs';
 import { ILogMessage } from 'src/interfaces/ILogMessage';
+import { IPet } from 'src/interfaces/IPet';
 
 @Injectable()
 export class BattleService {
@@ -232,16 +233,25 @@ export class BattleService {
     }
   }
 
-  applyHeroEffects(battle: IBattle, heroes: IHero[], hero: IHero, isBeforeTurn: boolean, isSimulation: boolean) {
-    for (let i = 0; i < hero.effects.length; i++) {
-      if (hero.effects[i].left > 0) {
-        this.applyEffect(battle, heroes, hero, hero.effects[i], isBeforeTurn, isSimulation);
+  applyCharEffects(battle: IBattle, heroes: IHero[], char: IChar, isBeforeTurn: boolean, isSimulation: boolean) {
+    for (let i = 0; i < char.effects.length; i++) {
+      if (char.effects[i].left > 0) {
+        this.applyEffect(battle, heroes, char, char.effects[i], isBeforeTurn, isSimulation);
       }
     }
-    for (let i = 0; i < hero.pets.length; i++) {
-      for (let j = 0; j < hero.pets[i].effects.length; j++) {
-        if (hero.pets[i].effects[j].left > 0) {
-          this.applyEffect(battle, heroes, hero.pets[i], hero.pets[i].effects[j], isBeforeTurn, isSimulation);
+    if (!char.isPet) {
+      for (let i = 0; i < (char as IHero).pets.length; i++) {
+        for (let j = 0; j < (char as IHero).pets[i].effects.length; j++) {
+          if ((char as IHero).pets[i].effects[j].left > 0) {
+            this.applyEffect(
+              battle,
+              heroes,
+              (char as IHero).pets[i],
+              (char as IHero).pets[i].effects[j],
+              isBeforeTurn,
+              isSimulation
+            );
+          }
         }
       }
     }
@@ -254,7 +264,7 @@ export class BattleService {
 
     hero = this.heroService.resetHeroState(hero);
     hero = this.heroService.calcHero(hero);
-    this.applyHeroEffects(battle, heroes, hero, true, isSimulation);
+    this.applyCharEffects(battle, heroes, hero, true, isSimulation);
 
     if (hero.isDead) {
       return; // check again because after DOT hero can die
@@ -505,8 +515,8 @@ export class BattleService {
     return this.heroService.learnAbility(battle, heroes, abilityId);
   }
 
-  checkAbilityForUse(ability: IAbility, char: IChar): boolean {
-    if (char.isStunned) {
+  checkAbilityForUse(ability: IAbility, caster: IChar): boolean {
+    if (caster.isStunned) {
       return false;
     }
 
@@ -514,35 +524,61 @@ export class BattleService {
       return false;
     }
 
-    if (ability.needWeapon && char.isDisarmed) {
+    if (ability.needWeapon && caster.isDisarmed) {
       return false;
     }
 
-    if (ability.isSpell && char.isSilenced) {
+    if (ability.isSpell && caster.isSilenced) {
       return false;
     }
 
-    if (ability.targetType === AbilityTargetType.MOVE && char.isImmobilized) {
+    if (ability.targetType === AbilityTargetType.MOVE && caster.isImmobilized) {
       return false;
     }
 
-    if (char.isPet) {
+    if (caster.isPet) {
       return ability.left === 0;
     } else {
-      const hero: IHero = char as IHero;
-
-      if (ability.left === 0 && hero.energy - ability.energyCost >= 0 && hero.mana - ability.manaCost >= 0) {
-        switch (ability.id) {
-          case '13-dangerous-knowledge':
-            return hero.intellect > 0;
-          case '22-wolf':
-            return hero.pets.findIndex((p) => p.id === 'wolf') < 0;
-          default:
-            return true;
-        }
-      }
+      return (
+        ability.left === 0 &&
+        (caster as IHero).energy - ability.energyCost >= 0 &&
+        (caster as IHero).mana - ability.manaCost >= 0
+      );
     }
-    return false;
+  }
+
+  checkAbilityAction(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IChar,
+    targetId: string,
+    position?: IPosition
+  ): boolean {
+    let target: IChar;
+    switch (ability.id) {
+      case '22-wolf':
+        return (caster as IHero).pets.findIndex((p) => p.id === 'wolf') < 0;
+      case '13-dangerous-knowledge':
+        return (caster as IHero).intellect > 0;
+      case '21-mind-blow':
+        target = this.heroService.getCharById(targetId, heroes);
+        let leftCounter = 0;
+
+        if (target.isPet) {
+          leftCounter += (target as IPet).ability.left;
+        } else {
+          for (let i = 0; i < (target as IHero).abilities.length; i++) {
+            leftCounter += (target as IHero).abilities[i].left;
+          }
+        }
+        return leftCounter > 0;
+      case '22-knowledge-steal':
+        target = this.heroService.getCharById(targetId, heroes);
+        return !!target.effects.find((e) => e.isBuff && e.isRemovable);
+      default:
+        return true;
+    }
   }
 
   charTakesDamage({
@@ -837,54 +873,64 @@ export class BattleService {
           case AbilityTargetType.ENEMY:
             const enemies = this.findEnemies(battle, activeHero.id, ability.range);
             for (let j = 0; j < enemies.length; j++) {
-              actions.push({
-                type: ActionType.ABILITY,
-                abilityId: ability.id,
-                casterId: activeHero.id,
-                targetId: enemies[j]
-              });
+              if (this.checkAbilityAction(battle, heroes, ability, activeHero, enemies[j])) {
+                actions.push({
+                  type: ActionType.ABILITY,
+                  abilityId: ability.id,
+                  casterId: activeHero.id,
+                  targetId: enemies[j]
+                });
+              }
             }
             break;
           case AbilityTargetType.ALLY:
             const allies = this.findAllies(battle, activeHero.id, ability.range, true);
             for (let j = 0; j < allies.length; j++) {
-              actions.push({
-                type: ActionType.ABILITY,
-                abilityId: ability.id,
-                casterId: activeHero.id,
-                targetId: allies[j]
-              });
+              if (this.checkAbilityAction(battle, heroes, ability, activeHero, allies[j])) {
+                actions.push({
+                  type: ActionType.ABILITY,
+                  abilityId: ability.id,
+                  casterId: activeHero.id,
+                  targetId: allies[j]
+                });
+              }
             }
             break;
           case AbilityTargetType.ALLY_NOT_ME:
             const alliesWithoutMe = this.findAllies(battle, activeHero.id, ability.range, false);
             for (let j = 0; j < alliesWithoutMe.length; j++) {
-              actions.push({
-                type: ActionType.ABILITY,
-                abilityId: ability.id,
-                casterId: activeHero.id,
-                targetId: alliesWithoutMe[j]
-              });
+              if (this.checkAbilityAction(battle, heroes, ability, activeHero, alliesWithoutMe[j])) {
+                actions.push({
+                  type: ActionType.ABILITY,
+                  abilityId: ability.id,
+                  casterId: activeHero.id,
+                  targetId: alliesWithoutMe[j]
+                });
+              }
             }
             break;
           case AbilityTargetType.ALLY_OR_ENEMY:
             const allHeroes = this.findHeroes(battle, activeHero.id, ability.range);
             for (let j = 0; j < allHeroes.length; j++) {
+              if (this.checkAbilityAction(battle, heroes, ability, activeHero, allHeroes[j])) {
+                actions.push({
+                  type: ActionType.ABILITY,
+                  abilityId: ability.id,
+                  casterId: activeHero.id,
+                  targetId: allHeroes[j]
+                });
+              }
+            }
+            break;
+          case AbilityTargetType.SELF:
+            if (this.checkAbilityAction(battle, heroes, ability, activeHero, activeHero.id)) {
               actions.push({
                 type: ActionType.ABILITY,
                 abilityId: ability.id,
                 casterId: activeHero.id,
-                targetId: allHeroes[j]
+                targetId: activeHero.id
               });
             }
-            break;
-          case AbilityTargetType.SELF:
-            actions.push({
-              type: ActionType.ABILITY,
-              abilityId: ability.id,
-              casterId: activeHero.id,
-              targetId: activeHero.id
-            });
             break;
           case AbilityTargetType.MOVE:
             const movePoints = this.mapService.getMovePoints(
@@ -900,13 +946,15 @@ export class BattleService {
               ) {
                 continue;
               }
-              actions.push({
-                type: ActionType.ABILITY,
-                abilityId: ability.id,
-                casterId: activeHero.id,
-                positionX: movePoints[j].x,
-                positionY: movePoints[j].y
-              });
+              if (this.checkAbilityAction(battle, heroes, ability, activeHero, activeHero.id, movePoints[j])) {
+                actions.push({
+                  type: ActionType.ABILITY,
+                  abilityId: ability.id,
+                  casterId: activeHero.id,
+                  positionX: movePoints[j].x,
+                  positionY: movePoints[j].y
+                });
+              }
             }
             break;
           case AbilityTargetType.MAP:
@@ -917,13 +965,15 @@ export class BattleService {
               heroes
             );
             for (let j = 0; j < mapPoints.length; j++) {
-              actions.push({
-                type: ActionType.ABILITY,
-                abilityId: ability.id,
-                casterId: activeHero.id,
-                positionX: mapPoints[j].x,
-                positionY: mapPoints[j].y
-              });
+              if (this.checkAbilityAction(battle, heroes, ability, activeHero, activeHero.id, mapPoints[j])) {
+                actions.push({
+                  type: ActionType.ABILITY,
+                  abilityId: ability.id,
+                  casterId: activeHero.id,
+                  positionX: mapPoints[j].x,
+                  positionY: mapPoints[j].y
+                });
+              }
             }
             break;
         }
@@ -941,12 +991,14 @@ export class BattleService {
               activeHero.pets[i].id
             );
             for (let j = 0; j < enemies.length; j++) {
-              actions.push({
-                type: ActionType.PET_ABILITY,
-                abilityId: activeHero.pets[i].ability.id,
-                casterId: activeHero.pets[i].id,
-                targetId: enemies[j]
-              });
+              if (this.checkAbilityAction(battle, heroes, activeHero.pets[i].ability, activeHero.pets[i], enemies[j])) {
+                actions.push({
+                  type: ActionType.PET_ABILITY,
+                  abilityId: activeHero.pets[i].ability.id,
+                  casterId: activeHero.pets[i].id,
+                  targetId: enemies[j]
+                });
+              }
             }
             break;
         }
