@@ -52,6 +52,39 @@ export class EffectService {
     }
   }
 
+  '32-no-step-back'(effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    (target as IHero).strength = (target as IHero).strength + 2;
+    if ((target as IHero).strength > Const.maxPrimaryAttributes) {
+      (target as IHero).strength = Const.maxPrimaryAttributes;
+    }
+    target.isImmuneToDebuffs = true;
+  }
+
+  '42-breakthrough'(effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    target.isStunned = true;
+  }
+
+  '43-rallying'(effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    if (!target.isPet) {
+      (target as IHero).strength = (target as IHero).strength + 2;
+      if ((target as IHero).strength > Const.maxPrimaryAttributes) {
+        (target as IHero).strength = Const.maxPrimaryAttributes;
+      }
+      (target as IHero).intellect = (target as IHero).intellect + 2;
+      if ((target as IHero).intellect > Const.maxPrimaryAttributes) {
+        (target as IHero).intellect = Const.maxPrimaryAttributes;
+      }
+      (target as IHero).armor = (target as IHero).armor + 2;
+      if ((target as IHero).armor > Const.maxPrimaryAttributes) {
+        (target as IHero).armor = Const.maxPrimaryAttributes;
+      }
+      (target as IHero).will = (target as IHero).will + 2;
+      if ((target as IHero).will > Const.maxPrimaryAttributes) {
+        (target as IHero).will = Const.maxPrimaryAttributes;
+      }
+    }
+  }
+
   // Highlander
   '11-heavy-strike'(effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {

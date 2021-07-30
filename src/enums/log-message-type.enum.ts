@@ -14,6 +14,7 @@ export enum LogMessageType {
   TAKE_ENERGY,
   PET_SUMMON,
   PET_MOVE,
+  TURN_SKIP,
   DEATH,
   WIN
 }

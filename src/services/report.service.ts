@@ -124,6 +124,9 @@ export class ReportService {
         case LogMessageType.TAKE_ENERGY:
           battleLogData += i + ',' + turn + ',' + battle.log[i].id + ',TAKE_ENERGY,,,' + battle.log[i].value + '\n';
           break;
+        case LogMessageType.TURN_SKIP:
+          battleLogData += i + ',' + turn + ',' + battle.log[i].id + ',TURN_SKIP\n';
+          break;
         case LogMessageType.DEATH:
           battleLogData += i + ',' + turn + ',' + battle.log[i].id + ',DEATH\n';
           break;

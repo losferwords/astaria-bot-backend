@@ -37,6 +37,35 @@ export class EffectsData {
     isRemovable: false
   };
 
+  public static readonly '32-no-step-back': IEffect = {
+    id: '32-no-step-back',
+    duration: 2,
+    isBuff: true,
+    isRemovable: true
+  };
+
+  public static readonly '41-piercing-strike': IEffect = {
+    id: '41-piercing-strike',
+    duration: 2,
+    isBuff: false,
+    isRemovable: true
+  };
+
+  public static readonly '42-breakthrough': IEffect = {
+    id: '42-breakthrough',
+    duration: 1,
+    isBuff: false,
+    isRemovable: true
+  };
+
+  public static readonly '43-rallying': IEffect = {
+    id: '43-rallying',
+    duration: 2,
+    isBuff: true,
+    isRemovable: false,
+    range: 1
+  };
+
   // Highlander
   public static readonly '11-heavy-strike': IEffect = {
     id: '11-heavy-strike',

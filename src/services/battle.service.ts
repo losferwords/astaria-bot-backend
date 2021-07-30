@@ -119,6 +119,7 @@ export class BattleService {
           scenario: new ChthonRuins(),
           teams: [new Team(battleSetup.teamSetup[0]), new Team(battleSetup.teamSetup[1])],
           crystalPositions: [],
+          mapEffects: [],
           queue: [],
           log: []
         };
@@ -160,7 +161,7 @@ export class BattleService {
     return movePoints;
   }
 
-  moveChar(battle: IBattle, targetPosition: IPosition, petId?: string): IBattle {
+  moveChar(battle: IBattle, targetPosition: IPosition, isSimulation: boolean, petId?: string): IBattle {
     const heroes = this.getHeroesInBattle(battle);
     const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
     let activeChar: IChar = activeHero;
@@ -175,6 +176,8 @@ export class BattleService {
         positionY: targetPosition.y,
         id: activeChar.id
       });
+
+      this.applyMapEffects(battle, heroes, false, isSimulation);
 
       const crystalPositionIndex = battle.crystalPositions.findIndex((cp: IPosition) => {
         return cp.x === targetPosition.x && cp.y === targetPosition.y;
@@ -192,14 +195,16 @@ export class BattleService {
     return battle;
   }
 
-  knockBack(battle: IBattle, target: IChar, charPosition: IPosition) {
+  knockBack(battle: IBattle, target: IChar, charPosition: IPosition, isSimulation: boolean) {
     const heroes = this.getHeroesInBattle(battle);
     this.mapService.knockBack(target, charPosition, battle.scenario.tiles, heroes);
+    this.applyMapEffects(battle, heroes, false, isSimulation);
   }
 
-  charge(battle: IBattle, targetPosition: IPosition, char: IChar) {
+  charge(battle: IBattle, targetPosition: IPosition, char: IChar, isSimulation: boolean) {
     const heroes = this.getHeroesInBattle(battle);
     this.mapService.charge(targetPosition, char, battle.scenario.tiles, heroes);
+    this.applyMapEffects(battle, heroes, false, isSimulation);
   }
 
   applyEffect(
@@ -211,6 +216,19 @@ export class BattleService {
     isSimulation: boolean
   ) {
     switch (effect.id) {
+      case '41-piercing-strike':
+        if (isBeforeTurn) {
+          this.charTakesDamage({
+            battle,
+            caster: this.heroService.getHeroById(effect.casterId, heroes),
+            heroes,
+            target: char,
+            directDamage: 2,
+            effectId: effect.id,
+            isSimulation
+          });
+        }
+        break;
       case '12-poison-touch':
         if (isBeforeTurn) {
           this.charTakesDamage({
@@ -257,6 +275,54 @@ export class BattleService {
     }
   }
 
+  applyMapEffects(battle: IBattle, heroes: IHero[], isBeforeTurn: boolean, isSimulation: boolean) {
+    if (battle.mapEffects.length > 0) {
+      const mapEffectsToApply: { effect: IEffect; target: IChar }[] = [];
+      for (let i = 0; i < battle.mapEffects.length; i++) {
+        const effect = battle.mapEffects[i];
+        switch (effect.id) {
+          // Buff Auras
+          case '43-rallying':
+            const auraHero = this.heroService.getHeroById(effect.casterId, heroes);
+            effect.position = {
+              x: auraHero.position.x,
+              y: auraHero.position.y
+            };
+            const allies = this.getPossibleAllies(battle, effect.casterId, false);
+            const alliesInRange = this.findAllies(battle, effect.casterId, effect.range, false);
+            for (let j = 0; j < allies.length; j++) {
+              if (!allies[j].isPet) {
+                allies[j] = this.heroService.resetHeroState(allies[j] as IHero);
+                allies[j] = this.heroService.calcHero(allies[j] as IHero);
+              } else {
+                allies[j] = this.heroService.resetPetState(allies[j] as IPet);
+                allies[j] = this.heroService.calcPet(allies[j] as IPet);
+              }
+              this.applyCharEffects(battle, heroes, allies[j], true, isSimulation);
+              if (alliesInRange.find((a) => a === allies[j].id)) {
+                mapEffectsToApply.push({
+                  effect,
+                  target: allies[j]
+                });
+              }
+            }
+            break;
+        }
+      }
+
+      for (let i = 0; i < mapEffectsToApply.length; i++) {
+        this.applyEffect(
+          battle,
+          heroes,
+          mapEffectsToApply[i].target,
+          mapEffectsToApply[i].effect,
+          isBeforeTurn,
+          isSimulation
+        );
+      }
+    }
+  }
+
   beforeTurn(battle: IBattle, heroes: IHero[], hero: IHero, isSimulation: boolean) {
     if (hero.isDead) {
       return;
@@ -293,9 +359,30 @@ export class BattleService {
       if (hero.effects[i].left > 0) {
         hero.effects[i].left--;
       } else {
+        switch (hero.effects[i].id) {
+          // Remove Aura effects
+          case '43-rallying':
+            const mapEffectIndex = battle.mapEffects.findIndex((me) => me.id === hero.effects[i].id);
+            battle.mapEffects.splice(mapEffectIndex, 1);
+
+            const allies = this.getPossibleAllies(battle, hero.effects[i].casterId, false);
+            for (let j = 0; j < allies.length; j++) {
+              if (!allies[j].isPet) {
+                allies[j] = this.heroService.resetHeroState(allies[j] as IHero);
+                allies[j] = this.heroService.calcHero(allies[j] as IHero);
+              } else {
+                allies[j] = this.heroService.resetPetState(allies[j] as IPet);
+                allies[j] = this.heroService.calcPet(allies[j] as IPet);
+              }
+              this.applyCharEffects(battle, heroes, allies[j], true, isSimulation);
+            }
+            break;
+        }
         hero.effects.splice(i, 1);
       }
     }
+
+    this.applyMapEffects(battle, heroes, true, isSimulation);
 
     hero.primaryWeapon.isUsed = false;
     if (hero.secondaryWeapon && !hero.secondaryWeapon.isPassive) {
@@ -339,8 +426,18 @@ export class BattleService {
     });
 
     this.beforeTurn(battle, heroes, activeHero, isSimulation);
-
     battle.scenario.beforeTurn(battle);
+
+    if (battle.queue[0]) {
+      const newActiveHero = this.heroService.getHeroById(battle.queue[0], heroes);
+      if (newActiveHero.isStunned) {
+        battle.log.push({
+          type: LogMessageType.TURN_SKIP,
+          id: newActiveHero.id
+        });
+        this.endTurn(battle, isSimulation);
+      }
+    }
     return battle;
   }
 
@@ -557,6 +654,9 @@ export class BattleService {
   ): boolean {
     let target: IChar;
     switch (ability.id) {
+      case '33-bandaging':
+        target = this.heroService.getCharById(targetId, heroes);
+        return target.health < target.maxHealth;
       case '22-wolf':
         return (caster as IHero).pets.findIndex((p) => p.id === 'wolf') < 0;
       case '13-dangerous-knowledge':

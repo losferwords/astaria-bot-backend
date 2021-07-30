@@ -41,6 +41,7 @@ export class Hero implements IHero {
   isStunned = false;
   isImmobilized = false;
   isImmuneToDisarm = false;
+  isImmuneToDebuffs = false;
 
   moveEnergyCost = Const.moveEnergyCost;
   position = { x: 0, y: 0 };

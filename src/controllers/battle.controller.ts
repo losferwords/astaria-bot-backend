@@ -50,7 +50,7 @@ export class BattleController {
   @Post('/move-char')
   async moveChar(@Body() moveCharDto: MoveCharDto): Promise<IBattle> {
     const battle = this.battleService.getBattleById(moveCharDto.battleId);
-    return this.battleService.moveChar(battle, moveCharDto.position, moveCharDto.petId);
+    return this.battleService.moveChar(battle, moveCharDto.position, false, moveCharDto.petId);
   }
 
   @Post('/end-turn')
@@ -63,22 +63,22 @@ export class BattleController {
   async findEnemies(
     @Query('battleId') battleId: string,
     @Query('sourceHeroId') sourceHeroId: string,
-    @Query('radius') radius: number,
+    @Query('radius') radius: string,
     @Query('petId') petId: string
   ): Promise<string[]> {
     const battle = this.battleService.getBattleById(battleId);
-    return this.battleService.findEnemies(battle, sourceHeroId, radius, petId);
+    return this.battleService.findEnemies(battle, sourceHeroId, +radius, petId);
   }
 
   @Get('/find-allies')
   async findAllies(
     @Query('battleId') battleId: string,
     @Query('sourceHeroId') sourceHeroId: string,
-    @Query('radius') radius: number,
-    @Query('includeSelf') includeSelf: boolean
+    @Query('radius') radius: string,
+    @Query('includeSelf') includeSelf: string
   ): Promise<string[]> {
     const battle = this.battleService.getBattleById(battleId);
-    return this.battleService.findAllies(battle, sourceHeroId, radius, includeSelf);
+    return this.battleService.findAllies(battle, sourceHeroId, +radius, JSON.parse(includeSelf));
   }
 
   @Get('/get-map-ability-positions')
@@ -98,10 +98,10 @@ export class BattleController {
   async findHeroes(
     @Query('battleId') battleId: string,
     @Query('sourceHeroId') sourceHeroId: string,
-    @Query('radius') radius: number
+    @Query('radius') radius: string
   ): Promise<string[]> {
     const battle = this.battleService.getBattleById(battleId);
-    return this.battleService.findHeroes(battle, sourceHeroId, radius);
+    return this.battleService.findHeroes(battle, sourceHeroId, +radius);
   }
 
   @Post('/use-weapon')
@@ -117,15 +117,15 @@ export class BattleController {
     const activeHero: IHero = this.heroService.getHeroById(battle.queue[0], heroes);
     let activeChar: IChar = activeHero;
     const target: IChar =
-    activeChar.id === castAbilityDto.targetId
+      activeChar.id === castAbilityDto.targetId
         ? activeChar
         : this.heroService.getCharById(castAbilityDto.targetId, heroes);
     let ability: IAbility = this.heroService.getHeroAbilityById(activeHero, castAbilityDto.abilityId);
 
     //Maybe it is a pet ability
-    if(!ability) {
-      for(let i = 0; i < activeHero.pets.length; i++) {
-        if(activeHero.pets[i].ability.id === castAbilityDto.abilityId) {
+    if (!ability) {
+      for (let i = 0; i < activeHero.pets.length; i++) {
+        if (activeHero.pets[i].ability.id === castAbilityDto.abilityId) {
           ability = activeHero.pets[i].ability;
           activeChar = activeHero.pets[i];
         }

@@ -1,3 +1,5 @@
+import { IPosition } from "./IPosition";
+
 export interface IEffect {
   id: string;
   duration: number;
@@ -5,4 +7,6 @@ export interface IEffect {
   casterId?: string;
   isBuff: boolean;
   isRemovable: boolean;
+  position?: IPosition;
+  range?: number;
 }

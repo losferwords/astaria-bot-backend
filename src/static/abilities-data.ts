@@ -80,6 +80,84 @@ export class AbilitiesData {
       isSpell: false,
       left: 0,
       targetType: AbilityTargetType.ALLY_NOT_ME
+    },
+    {
+      id: '31-assault',
+      level: 3,
+      range: 3,
+      cd: 2,
+      energyCost: 6,
+      manaCost: 0,
+      isPassive: false,
+      needWeapon: true,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.ENEMY
+    },
+    {
+      id: '32-no-step-back',
+      level: 3,
+      range: 0,
+      cd: 4,
+      energyCost: 4,
+      manaCost: 4,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.SELF
+    },
+    {
+      id: '33-bandaging',
+      level: 3,
+      range: 1,
+      cd: 3,
+      energyCost: 3,
+      manaCost: 4,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.ALLY
+    },
+    {
+      id: '41-piercing-strike',
+      level: 4,
+      range: 2,
+      cd: 3,
+      energyCost: 7,
+      manaCost: 0,
+      isPassive: false,
+      needWeapon: true,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.ENEMY
+    },
+    {
+      id: '42-breakthrough',
+      level: 4,
+      range: 1,
+      cd: 3,
+      energyCost: 8,
+      manaCost: 0,
+      isPassive: false,
+      needWeapon: true,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.ENEMY
+    },
+    {
+      id: '43-rallying',
+      level: 4,
+      range: 3,
+      cd: 4,
+      energyCost: 5,
+      manaCost: 5,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.ALLY_NOT_ME
     }
   ];
 
@@ -323,6 +401,6 @@ export class AbilitiesData {
       isSpell: true,
       left: 0,
       targetType: AbilityTargetType.ENEMY
-    },
+    }
   ];
 }

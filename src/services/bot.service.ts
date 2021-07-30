@@ -48,7 +48,8 @@ export class BotService {
     return {
       id: state.id,
       scenario: state.scenario,
-      crystalPositions: state.crystalPositions.slice(0),
+      crystalPositions: state.crystalPositions.length > 0 ? rfdc({ proto: true })(state.crystalPositions) : [],
+      mapEffects: state.mapEffects.length > 0 ? rfdc({ proto: true })(state.mapEffects) : [],
       teams: newTeams,
       queue: state.queue.slice(0),
       log: state.log.slice(0)
@@ -72,6 +73,7 @@ export class BotService {
         return this.battleService.moveChar(
           battle,
           { x: action.positionX, y: action.positionY },
+          isSimulation,
           action.casterId ? action.casterId : undefined
         );
       case ActionType.WEAPON_DAMAGE:

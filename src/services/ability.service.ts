@@ -1,3 +1,4 @@
+import * as rfdc from 'rfdc';
 import { Injectable } from '@nestjs/common';
 import { HeroService } from './hero.service';
 import { IAbility } from 'src/interfaces/IAbility';
@@ -23,15 +24,21 @@ export class AbilityService {
     effectId: string,
     casterId: string,
     isSimulation: boolean
-  ) {
+  ): IEffect {
     if ((target as IHero).isDead) {
       return;
     }
     const effect: IEffect = { ...EffectsData[effectId] };
+
+    if (!effect.isBuff && target.isImmuneToDebuffs) {
+      return undefined;
+    }
+
     effect.left = effect.duration;
     effect.casterId = casterId;
     target.effects.push(effect);
     this.battleService.applyEffect(battle, heroes, target, effect, false, isSimulation);
+    return effect;
   }
 
   private spendResouces(caster: IHero, ability: IAbility) {
@@ -173,6 +180,171 @@ export class AbilityService {
     return battle;
   }
 
+  '31-assault'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(caster, ability);
+
+    this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      physDamage: caster.primaryWeapon.physDamage + caster.strength + 2,
+      abilityId: ability.id,
+      isSimulation
+    });
+
+    this.battleService.charge(battle, target.position, caster, isSimulation);
+    return battle;
+  }
+
+  '32-no-step-back'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(caster, ability);
+
+    battle.log.push({
+      type: LogMessageType.ABILITY_CAST,
+      casterId: caster.id,
+      targetId: target.id,
+      abilityId: ability.id
+    });
+
+    for (let i = target.effects.length - 1; i > -1; i--) {
+      if (!target.effects[i].isBuff) {
+        target.effects.splice(i, 1);
+      }
+    }
+
+    target = this.heroService.resetHeroState(target as IHero);
+    target = this.heroService.calcHero(target as IHero);
+    this.battleService.applyCharEffects(battle, heroes, target, false, isSimulation);
+
+    this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
+    return battle;
+  }
+
+  '33-bandaging'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(caster, ability);
+
+    target.health += 4;
+
+    if (target.health > target.maxHealth) {
+      target.health = target.maxHealth;
+    }
+
+    battle.log.push({
+      type: LogMessageType.ABILITY_HEAL,
+      casterId: caster.id,
+      targetId: target.id,
+      abilityId: ability.id,
+      value: '4'
+    });
+
+    return battle;
+  }
+
+  '41-piercing-strike'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(caster, ability);
+
+    this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      physDamage: caster.primaryWeapon.physDamage + caster.strength + 3,
+      abilityId: ability.id,
+      isSimulation
+    });
+
+    this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
+    return battle;
+  }
+
+  '42-breakthrough'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(caster, ability);
+
+    this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      physDamage: caster.primaryWeapon.physDamage + caster.strength + 3,
+      abilityId: ability.id,
+      isSimulation
+    });
+
+    this.battleService.knockBack(battle, target, caster.position, isSimulation);
+    this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
+    return battle;
+  }
+
+  '43-rallying'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(caster, ability);
+
+    battle.log.push({
+      type: LogMessageType.ABILITY_CAST,
+      casterId: caster.id,
+      targetId: target.id,
+      abilityId: ability.id
+    });
+
+    const effect: IEffect = this.addEffect(battle, heroes, caster, ability.id, caster.id, isSimulation);
+    effect.position = {
+      x: caster.position.x,
+      y: caster.position.y
+    };
+    battle.mapEffects.push(rfdc({ proto: true })(effect));
+
+    this.battleService.charge(battle, target.position, caster, isSimulation);
+    return battle;
+  }
+
   // Highlander
   '11-heavy-strike'(
     battle: IBattle,
@@ -302,7 +474,7 @@ export class AbilityService {
       isSimulation
     });
 
-    this.battleService.charge(battle, caster.position, target);
+    this.battleService.charge(battle, caster.position, target, isSimulation);
     return battle;
   }
 
@@ -422,6 +594,7 @@ export class AbilityService {
     });
 
     caster.pets.push(new Pet('wolf', position));
+    this.battleService.applyMapEffects(battle, heroes, false, isSimulation);
     return battle;
   }
 
@@ -499,7 +672,7 @@ export class AbilityService {
       isSimulation
     });
 
-    this.battleService.knockBack(battle, target, caster.position);
+    this.battleService.knockBack(battle, target, caster.position, isSimulation);
     return battle;
   }
 

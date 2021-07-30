@@ -203,11 +203,13 @@ export class HeroService {
     hero.isDisarmed = false;
     hero.isStunned = false;
     hero.isImmobilized = false;
+    hero.isImmuneToDebuffs = false;
     if (hero.id === 'avatar') {
       hero.isImmuneToDisarm = true;
     } else {
       hero.isImmuneToDisarm = false;
     }
+    
 
     for (let i = 0; i < hero.pets.length; i++) {
       hero.pets[i] = this.resetPetState(hero.pets[i]);
