@@ -193,6 +193,8 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(caster, ability);
 
+    this.battleService.charge(battle, heroes, target.position, caster, isSimulation);
+
     this.battleService.charTakesDamage({
       battle,
       caster,
@@ -203,10 +205,6 @@ export class AbilityService {
       isSimulation
     });
 
-    if (!target || target.health < 1) {
-      return battle;
-    }
-    this.battleService.charge(battle, heroes, target.position, caster, isSimulation);
     return battle;
   }
 
@@ -1374,6 +1372,62 @@ export class AbilityService {
     });
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
+    return battle;
+  }
+
+  // Avatar
+  '11-furious-strike'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(caster, ability);
+
+    this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      physDamage: caster.primaryWeapon.physDamage + caster.strength + 2,
+      magicDamage: 1 + caster.intellect,
+      abilityId: ability.id,
+      isSimulation
+    });
+
+    return battle;
+  }
+
+  '12-flame-dash'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(caster, ability);
+
+    battle.log.push({
+      type: LogMessageType.ABILITY_CAST,
+      casterId: caster.id,
+      abilityId: ability.id,
+      targetId: target.id
+    });
+
+    this.battleService.charge(battle, heroes, target.position, caster, isSimulation);
+
+    this.heroService.takeEnergy(caster, 2);
+
+    caster.health += 1;
+
+    if (caster.health > caster.maxHealth) {
+      caster.health = caster.maxHealth;
+    }
     return battle;
   }
 }

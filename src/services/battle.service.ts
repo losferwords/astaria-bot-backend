@@ -198,9 +198,6 @@ export class BattleService {
     });
     if (crystalPositionIndex > -1) {
       const movedCharTeam = this.heroService.getTeamByCharId(movedChar.id, battle.teams);
-      if (!movedCharTeam) {
-        console.log(movedChar);
-      }
       movedCharTeam.crystals += 1;
       battle.log.push({
         type: LogMessageType.TAKE_CRYSTAL,
@@ -573,7 +570,6 @@ export class BattleService {
     sourceCharId: string,
     radius: number,
     includeSelf: boolean,
-    petId?: string,
     ignoreRaytrace?: boolean
   ): string[] {
     const heroes = this.getHeroesInBattle(battle);
@@ -616,7 +612,10 @@ export class BattleService {
     const possibleChars: IChar[] = [];
 
     for (let i = 0; i < heroes.length; i++) {
-      possibleChars.push(heroes[i]);
+      // NOT_ME
+      if (heroes[i].id !== sourceCharId) {
+        possibleChars.push(heroes[i]);
+      }
       possibleChars.push(...heroes[i].pets);
     }
 
@@ -889,8 +888,6 @@ export class BattleService {
     }
     target.health -= healthDamage;
 
-    this.afterDamageTaken(battle, caster, heroes, target, healthDamage, isSimulation);
-
     if (target.health <= 0) {
       if (target.isPet) {
         for (let i = 0; i < heroes.length; i++) {
@@ -910,6 +907,8 @@ export class BattleService {
         this.heroDeath(battle, target as IHero, isSimulation);
       }
     }
+
+    this.afterDamageTaken(battle, caster, heroes, target, healthDamage, isSimulation);
 
     return healthDamage;
   }
@@ -1029,7 +1028,7 @@ export class BattleService {
         }
         break;
       case '12-reflection':
-        if (target.id === 'oracle' && this.heroService.getHeroAbilityById(target as IHero, '12-reflection')) {
+        if (target && target.id === 'oracle' && this.heroService.getHeroAbilityById(target as IHero, '12-reflection')) {
           this.heroService.takeMana(target as IHero, damageValue);
           battle.log.push({
             id: target.id,
@@ -1138,7 +1137,7 @@ export class BattleService {
             }
             break;
           case AbilityTargetType.ALLY:
-            const allies = this.findAllies(battle, activeHero.id, ability.range, true, '', ability.ignoreRaytrace);
+            const allies = this.findAllies(battle, activeHero.id, ability.range, true, ability.ignoreRaytrace);
             for (let j = 0; j < allies.length; j++) {
               if (this.checkAbilityAction(battle, heroes, ability, activeHero, allies[j])) {
                 actions.push({
@@ -1156,7 +1155,6 @@ export class BattleService {
               activeHero.id,
               ability.range,
               false,
-              '',
               ability.ignoreRaytrace
             );
             for (let j = 0; j < alliesWithoutMe.length; j++) {

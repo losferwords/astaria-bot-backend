@@ -89,7 +89,6 @@ export class BattleController {
       sourceCharId,
       +radius,
       JSON.parse(includeSelf),
-      '',
       ignoreRaytrace ? JSON.parse(ignoreRaytrace) : null
     );
   }

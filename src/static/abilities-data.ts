@@ -641,4 +641,46 @@ export class AbilitiesData {
       targetType: AbilityTargetType.ENEMY
     }
   ];
+
+  public static readonly avatar: IAbility[] = [
+    {
+      id: '11-furious-strike',
+      level: 1,
+      range: 1,
+      cd: 2,
+      energyCost: 3,
+      manaCost: 1,
+      isPassive: false,
+      needWeapon: true,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.ENEMY
+    },
+    {
+      id: '12-flame-dash',
+      level: 1,
+      range: 3,
+      cd: 2,
+      energyCost: 0,
+      manaCost: 3,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.ALLY_OR_ENEMY
+    },
+    {
+      id: '13-fireball',
+      level: 1,
+      range: 3,
+      cd: 3,
+      energyCost: 2,
+      manaCost: 3,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: true,
+      left: 0,
+      targetType: AbilityTargetType.ENEMY
+    }
+  ];
 }

@@ -43,4 +43,14 @@ export class HeroesData {
     chestpieces: EquipData.oracle.chestpieces,
     abilities: AbilitiesData.oracle
   };
+
+  public static readonly avatar: IHeroData = {
+    id: 'avatar',
+    maxEnergy: 12,
+    maxHealth: 14,
+    maxMana: 18,
+    primaryWeapons: EquipData.avatar.primaryWeapons,
+    chestpieces: EquipData.avatar.chestpieces,
+    abilities: AbilitiesData.avatar
+  };
 }
