@@ -16,6 +16,7 @@ import { AbilityService } from './ability.service';
 import { IHero } from 'src/interfaces/IHero';
 import { IAbility } from 'src/interfaces/IAbility';
 import { IChar } from 'src/interfaces/IChar';
+import { Helper } from 'src/static/helper';
 
 @Injectable()
 export class BotService {
@@ -152,7 +153,7 @@ export class BotService {
     }
     const rootNode = new BotNode(null, null, state, unexpandedActions);
     nodes.set(stateHash, rootNode);
-    const currentTeamId = this.heroService.getTeamIdByHeroId(state.queue[0], state.teams);
+    const currentTeamId = this.heroService.getTeamByHeroId(state.queue[0], state.teams).id;
 
     let end = Date.now() + Const.botThinkTime;
     const simulationTime = [];
@@ -262,8 +263,8 @@ export class BotService {
 
   expand(nodes: Map<string, BotNode>, node: BotNode): BotNode {
     const actions = node.unexpandedActions();
-    //const actionIndex = actions.length === 1 ? 0 : Helper.randomInt(0, actions.length - 1);
-    const randomAction = actions[0];
+    const actionIndex = actions.length === 1 ? 0 : Helper.randomInt(0, actions.length - 1);
+    const randomAction = actions[actionIndex];
     const newState = this.cloneState(node.state);
     this.doAction(newState, randomAction, true);
 
@@ -283,8 +284,8 @@ export class BotService {
       chainLength += 1;
       const previousMoves = this.getPreviousMoves(state);
       const actions = this.battleService.getAvailableActions(state, previousMoves);
-      //const actionIndex = actions.length === 1 ? 0 : Helper.randomInt(0, actions.length - 1);
-      const randomAction = actions[0];
+      const actionIndex = actions.length === 1 ? 0 : Helper.randomInt(0, actions.length - 1);
+      const randomAction = actions[actionIndex];
 
       state = this.cloneState(state);
       this.doAction(state, randomAction, true);
@@ -408,13 +409,17 @@ export class BotService {
         if (childNode.sims < minSims) {
           minSims = childNode.sims;
         }
-        if (childNode.shortestWin > longestWin) {
+        if (childNode.shortestWin < 10000 && childNode.shortestWin > longestWin) {
           longestWin = childNode.shortestWin;
         }
         if (childNode.shortestWin < shortestWin) {
           shortestWin = childNode.shortestWin;
         }
       }
+    }
+
+    if (longestWin === 0) {
+      longestWin = 10000;
     }
 
     const nodesQualities: { node: BotNode; quality: number }[] = [];

@@ -11,5 +11,7 @@ export interface IAbility {
   isSpell: boolean;
   isPassive: boolean;
   left: number;
-  targetType: AbilityTargetType,
+  targetType: AbilityTargetType;
+  ignoreRaytrace?: boolean;
+  ignoreObstacles?: boolean;
 }

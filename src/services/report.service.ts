@@ -13,6 +13,9 @@ import { IAction } from 'src/interfaces/IAction';
 export class ReportService {
   constructor() {}
 
+  totalNodes: number = 0;
+  unexpandedNodes: number = 0;
+
   saveBattleResults(battle: IBattle) {
     let battleLogData = 'SEP=,\ncount,turn,hero,action,position,weapon/ability,target,value\n';
     let turn = 1;
@@ -182,6 +185,11 @@ export class ReportService {
 
   saveTreeVisualization(rootNode: BotNode) {
     const tree = this.expandChildren(rootNode);
+    if (Const.simulationInfo) {
+      console.log('Total Nodes: ' + this.totalNodes + ', Unexpanded Nodes: ' + this.unexpandedNodes + ', Covarage: ' + ((1 - this.unexpandedNodes / this.totalNodes) * 100).toFixed(2) + '%');
+    }
+    this.totalNodes = 0;
+    this.unexpandedNodes = 0;
     fs.writeFileSync(
       Const.mctsTreeReportPath + '/' + rootNode.state.id + '-' + +new Date() + '.json',
       JSON.stringify(tree)
@@ -192,9 +200,11 @@ export class ReportService {
     const childrenNodeArray = Array.from(parentNode.children.values());
     const childrenArray = [];
     for (const child of childrenNodeArray) {
+      this.totalNodes++;
       if (child.node) {
         childrenArray.push(this.expandChildren(child.node));
       } else {
+        this.unexpandedNodes++;
         childrenArray.push({
           name: 'unexpanded',
           children: []

@@ -4,7 +4,7 @@ import { IPetData } from 'src/interfaces/IPetData';
 export class PetsData {
   public static readonly 'wolf': IPetData = {
     id: 'wolf',
-    maxHealth: 4,
+    maxHealth: 6,
     ability: {
       id: '22-wolf-bite',
       level: 0,
@@ -15,6 +15,24 @@ export class PetsData {
       isPassive: false,
       needWeapon: false,
       isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.ENEMY
+    }
+  };
+
+  public static readonly 'dryad': IPetData = {
+    id: 'dryad',
+    maxHealth: 8,
+    ability: {
+      id: '42-dryad-forest-wrath',
+      level: 0,
+      range: 3,
+      cd: 1,
+      energyCost: 0,
+      manaCost: 0,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: true,
       left: 0,
       targetType: AbilityTargetType.ENEMY
     }

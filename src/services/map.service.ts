@@ -77,8 +77,11 @@ export class MapService {
     return false;
   }
 
-  checkTileForObstacle(position: IPosition, tiles: ITile[][], heroes: IHero[]): boolean {
+  checkTileForObstacle(position: IPosition, tiles: ITile[][], heroes: IHero[], ignoreObstacles?: boolean): boolean {
     if (tiles[position.y] && tiles[position.y][position.x] && tiles[position.y][position.x].type === TileType.FLOOR) {
+      if (ignoreObstacles) {
+        return false;
+      }
       for (let i = 0; i < heroes.length; i++) {
         for (let j = 0; j < heroes[i].pets.length; j++) {
           if (heroes[i].pets[j].position.x === position.x && heroes[i].pets[j].position.y === position.y) {
@@ -95,12 +98,27 @@ export class MapService {
     }
   }
 
-  getMovePoints(activeHeroPosition: IPosition, radius: number = 1, tiles: ITile[][], heroes: IHero[]): IPosition[] {
+  getMovePoints(
+    activeHeroPosition: IPosition,
+    radius: number = 1,
+    tiles: ITile[][],
+    heroes: IHero[],
+    ignoreRaytrace?: boolean,
+    ignoreObstacles?: boolean
+  ): IPosition[] {
     const points = this.findNearestPoints(activeHeroPosition, tiles, radius);
     const availablePoints = [];
     for (let i = 0; i < points.length; i++) {
-      if (!this.checkTileForObstacle(points[i], tiles, heroes)) {
-        availablePoints.push(points[i]);
+      if (radius === 1 || ignoreRaytrace) {
+        if (ignoreObstacles || !this.checkTileForObstacle(points[i], tiles, heroes)) {
+          availablePoints.push(points[i]);
+        }
+      } else {
+        if (!this.rayTrace(activeHeroPosition, points[i], tiles, heroes)) {
+          if (!this.checkTileForObstacle(points[i], tiles, heroes, ignoreObstacles)) {
+            availablePoints.push(points[i]);
+          }
+        }
       }
     }
     return availablePoints;
@@ -130,7 +148,8 @@ export class MapService {
       newPosition.y >= 0 &&
       newPosition.y < tiles.length
     ) {
-      target.position = { x: newPosition.x, y: newPosition.y };
+      target.position.x = newPosition.x;
+      target.position.y = newPosition.y;
     }
   }
 
@@ -152,7 +171,8 @@ export class MapService {
     const newPosition = { x: targetPosition.x - direction.x, y: targetPosition.y - direction.y };
 
     if (!this.checkTileForObstacle(newPosition, tiles, heroes)) {
-      char.position = { x: newPosition.x, y: newPosition.y };
+      char.position.x = newPosition.x;
+      char.position.y = newPosition.y;
     }
   }
 }

@@ -80,7 +80,7 @@ export class HeroService {
 
   canUseWeapon(hero: IHero, weapon: IEquip): boolean {
     return (
-      hero.energy - weapon.energyCost >= 0 &&
+      hero.energy - (weapon.energyCost + hero.extraWeaponEnergyCost) >= 0 &&
       (!hero.isDisarmed || hero.isImmuneToDisarm) &&
       !weapon.isUsed &&
       !weapon.isPassive
@@ -107,18 +107,18 @@ export class HeroService {
     return undefined;
   }
 
-  getTeamIdByHeroId(heroId: string, teams: ITeam[]): string {
-    return teams.find((team: ITeam) => {
-      return team.heroes.find((hero: IHero) => {
-        return hero.id === heroId;
-      });
-    }).id;
-  }
-
   getTeamByHeroId(heroId: string, teams: ITeam[]): ITeam {
     return teams.find((team: ITeam) => {
       return team.heroes.find((hero: IHero) => {
         return hero.id === heroId;
+      });
+    });
+  }
+
+  getTeamByCharId(charId: string, teams: ITeam[]): ITeam {
+    return teams.find((team: ITeam) => {
+      return team.heroes.find((hero: IHero) => {
+        return hero.id === charId || hero.pets.find(p => p.id === charId);
       });
     });
   }
@@ -184,32 +184,29 @@ export class HeroService {
       hero.mind = Const.maxSecondaryAttributes;
     }
 
-    for (let i = 0; i < hero.pets.length; i++) {
-      hero.pets[i] = this.calcPet(hero.pets[i]);
+    if (hero.id === 'druid' && this.getHeroAbilityById(hero, '32-war-tree')) {
+      hero.primaryWeapon.range = 2;
     }
 
     return hero;
   }
 
-  calcPet(pet: IPet): IPet {
-    pet.regeneration = 0;
-    return pet;
-  }
-
   resetHeroState(hero: IHero): IHero {
     hero.moveEnergyCost = Const.moveEnergyCost;
+    hero.extraWeaponEnergyCost = 0;
     hero.isInvisible = false;
     hero.isSilenced = false;
     hero.isDisarmed = false;
     hero.isStunned = false;
     hero.isImmobilized = false;
     hero.isImmuneToDebuffs = false;
+    hero.maxAllowedAbilityLevel = 4;
+
     if (hero.id === 'avatar') {
       hero.isImmuneToDisarm = true;
     } else {
       hero.isImmuneToDisarm = false;
     }
-    
 
     for (let i = 0; i < hero.pets.length; i++) {
       hero.pets[i] = this.resetPetState(hero.pets[i]);
@@ -219,6 +216,7 @@ export class HeroService {
   }
 
   resetPetState(pet: IPet): IPet {
+    pet.regeneration = 0;
     pet.isMoved = false;
     pet.isStunned = false;
     pet.isDisarmed = false;
@@ -245,14 +243,18 @@ export class HeroService {
       const heroData = this.getHeroData(activeHero.id);
 
       if (activeHero.primaryWeapon.id === equipId && activeHero.primaryWeapon.level < 3) {
+        const primaryWeaponIsUsed = activeHero.primaryWeapon.isUsed;
         activeHero.primaryWeapon = heroData.primaryWeapons[activeHero.primaryWeapon.level];
+        activeHero.primaryWeapon.isUsed = primaryWeaponIsUsed;
         battle.log.push({
           type: LogMessageType.UPGRADE_EQUIP,
           id: activeHero.id,
           equipId: activeHero.primaryWeapon.id
         });
       } else if (activeHero.secondaryWeapon?.id === equipId && activeHero.secondaryWeapon?.level < 3) {
+        const secondaryWeaponIsUsed = activeHero.secondaryWeapon.isUsed;
         activeHero.secondaryWeapon = heroData.secondaryWeapons[activeHero.secondaryWeapon.level];
+        activeHero.secondaryWeapon.isUsed = secondaryWeaponIsUsed;
         battle.log.push({
           type: LogMessageType.UPGRADE_EQUIP,
           id: activeHero.id,
@@ -299,6 +301,10 @@ export class HeroService {
         } else if (activeHero.crystals > 0) {
           activeHero.crystals -= 1;
         }
+      }
+
+      if (activeHero.id === 'druid' && abilityId === '32-war-tree') {
+        activeHero.primaryWeapon.range = 2;
       }
     }
     return battle;

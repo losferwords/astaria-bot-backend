@@ -27,7 +27,9 @@ export interface IHero extends IChar {
   isDead: boolean;
   isInvisible: boolean;
   isImmuneToDisarm: boolean;
+  maxAllowedAbilityLevel: number;
 
   moveEnergyCost: number;
+  extraWeaponEnergyCost: number;
   crystals: number;
 }

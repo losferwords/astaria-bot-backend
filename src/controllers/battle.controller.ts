@@ -62,46 +62,74 @@ export class BattleController {
   @Get('/find-enemies')
   async findEnemies(
     @Query('battleId') battleId: string,
-    @Query('sourceHeroId') sourceHeroId: string,
+    @Query('sourceCharId') sourceCharId: string,
     @Query('radius') radius: string,
-    @Query('petId') petId: string
+    @Query('ignoreRaytrace') ignoreRaytrace: string
   ): Promise<string[]> {
     const battle = this.battleService.getBattleById(battleId);
-    return this.battleService.findEnemies(battle, sourceHeroId, +radius, petId);
+    return this.battleService.findEnemies(
+      battle,
+      sourceCharId,
+      +radius,
+      ignoreRaytrace ? JSON.parse(ignoreRaytrace) : null
+    );
   }
 
   @Get('/find-allies')
   async findAllies(
     @Query('battleId') battleId: string,
-    @Query('sourceHeroId') sourceHeroId: string,
+    @Query('sourceCharId') sourceCharId: string,
     @Query('radius') radius: string,
-    @Query('includeSelf') includeSelf: string
+    @Query('includeSelf') includeSelf: string,
+    @Query('ignoreRaytrace') ignoreRaytrace: string
   ): Promise<string[]> {
     const battle = this.battleService.getBattleById(battleId);
-    return this.battleService.findAllies(battle, sourceHeroId, +radius, JSON.parse(includeSelf));
+    return this.battleService.findAllies(
+      battle,
+      sourceCharId,
+      +radius,
+      JSON.parse(includeSelf),
+      '',
+      ignoreRaytrace ? JSON.parse(ignoreRaytrace) : null
+    );
   }
 
-  @Get('/get-map-ability-positions')
-  async getMapAbilityPositions(
+  @Get('/find-heroes')
+  async findHeroes(
     @Query('battleId') battleId: string,
-    @Query('abilityId') abilityId: string
+    @Query('sourceCharId') sourceCharId: string,
+    @Query('radius') radius: string,
+    @Query('ignoreRaytrace') ignoreRaytrace: string
+  ): Promise<string[]> {
+    const battle = this.battleService.getBattleById(battleId);
+    return this.battleService.findHeroes(
+      battle,
+      sourceCharId,
+      +radius,
+      ignoreRaytrace ? JSON.parse(ignoreRaytrace) : null
+    );
+  }
+
+  @Get('/map-ability-positions')
+  async mapAbilityPositions(
+    @Query('battleId') battleId: string,
+    @Query('abilityId') abilityId: string,
+    @Query('ignoreRaytrace') ignoreRaytrace: string,
+    @Query('ignoreObstacles') ignoreObstacles: string
   ): Promise<IPosition[]> {
     const battle = this.battleService.getBattleById(battleId);
     const heroes = this.battleService.getHeroesInBattle(battle);
     const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
     const ability: IAbility = this.heroService.getHeroAbilityById(activeHero, abilityId);
 
-    return this.mapService.getMovePoints(activeHero.position, ability.range, battle.scenario.tiles, heroes);
-  }
-
-  @Get('/find-heroes')
-  async findHeroes(
-    @Query('battleId') battleId: string,
-    @Query('sourceHeroId') sourceHeroId: string,
-    @Query('radius') radius: string
-  ): Promise<string[]> {
-    const battle = this.battleService.getBattleById(battleId);
-    return this.battleService.findHeroes(battle, sourceHeroId, +radius);
+    return this.mapService.getMovePoints(
+      activeHero.position,
+      ability.range,
+      battle.scenario.tiles,
+      heroes,
+      ignoreRaytrace ? JSON.parse(ignoreRaytrace) : null,
+      ignoreObstacles ? JSON.parse(ignoreObstacles) : null
+    );
   }
 
   @Post('/use-weapon')

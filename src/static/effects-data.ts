@@ -88,6 +88,27 @@ export class EffectsData {
     isRemovable: true
   };
 
+  public static readonly '31-halving': IEffect = {
+    id: '31-halving',
+    duration: 1,
+    isBuff: false,
+    isRemovable: true
+  };
+
+  public static readonly '32-thunderer': IEffect = {
+    id: '32-thunderer',
+    duration: 1,
+    isBuff: false,
+    isRemovable: true
+  };
+
+  public static readonly '42-ancestral-power': IEffect = {
+    id: '42-ancestral-power',
+    duration: 2,
+    isBuff: true,
+    isRemovable: true
+  };
+
   // Druid
   public static readonly '11-crown-of-thorns': IEffect = {
     id: '11-crown-of-thorns',
@@ -124,10 +145,53 @@ export class EffectsData {
     isRemovable: true
   };
 
+  public static readonly '31-choking-vine': IEffect = {
+    id: '31-choking-vine',
+    duration: 2,
+    isBuff: false,
+    isRemovable: true
+  };
+
+  public static readonly '33-power-of-the-pack': IEffect = {
+    id: '33-power-of-the-pack',
+    duration: 2,
+    isBuff: true,
+    isRemovable: true
+  };
+
+  public static readonly '43-symbiosis': IEffect = {
+    id: '43-symbiosis',
+    duration: 2,
+    isBuff: true,
+    isRemovable: true
+  };
+
   // Oracle
   public static readonly '23-paranoia': IEffect = {
     id: '23-paranoia',
     duration: 1,
+    isBuff: false,
+    isRemovable: true
+  };
+
+  public static readonly '33-mind-control': IEffect = {
+    id: '33-mind-control',
+    duration: 1,
+    isBuff: false,
+    isRemovable: true
+  };
+
+  public static readonly '41-void-vortex': IEffect = {
+    id: '41-void-vortex',
+    duration: 2,
+    isBuff: true,
+    isRemovable: false,
+    range: 1
+  };
+
+  public static readonly '43-amnesia': IEffect = {
+    id: '43-amnesia',
+    duration: 2,
     isBuff: false,
     isRemovable: true
   };

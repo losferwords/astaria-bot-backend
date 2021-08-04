@@ -53,12 +53,12 @@ export class BattleService {
     });
   }
 
-  getPossibleEnemies(battle: IBattle, sourceHeroId: string): IChar[] {
+  getPossibleEnemies(battle: IBattle, sourceCharId: string): IChar[] {
     const possibleEnemies: IChar[] = [];
     let enemyHeroes: IHero[] = [];
     enemyHeroes = battle.teams.find((team: ITeam) => {
       return !team.heroes.find((hero: IHero) => {
-        return hero.id === sourceHeroId;
+        return hero.id === sourceCharId || hero.pets.find((p) => p.id === sourceCharId);
       });
     }).heroes;
 
@@ -69,24 +69,32 @@ export class BattleService {
     return possibleEnemies;
   }
 
-  getPossibleAllies(battle: IBattle, sourceHeroId: string, includeSelf: boolean): IChar[] {
+  getPossibleAllies(battle: IBattle, sourceCharId: string, includeSelf: boolean): IChar[] {
     const possibleAllies: IChar[] = [];
     let allyHeroes: IHero[] = [];
     allyHeroes = battle.teams.find((team: ITeam) => {
       return team.heroes.find((hero: IHero) => {
-        return hero.id === sourceHeroId;
+        return hero.id === sourceCharId || hero.pets.find((p) => p.id === sourceCharId);
       });
     }).heroes;
 
     for (let i = 0; i < allyHeroes.length; i++) {
-      if (allyHeroes[i].id === sourceHeroId) {
+      if (allyHeroes[i].id === sourceCharId) {
         if (includeSelf) {
           possibleAllies.push(allyHeroes[i]);
         }
       } else {
         possibleAllies.push(allyHeroes[i]);
       }
-      possibleAllies.push(...allyHeroes[i].pets);
+      for (let j = 0; j < allyHeroes[i].pets.length; j++) {
+        if (allyHeroes[i].pets[j].id === sourceCharId) {
+          if (includeSelf) {
+            possibleAllies.push(allyHeroes[i].pets[j]);
+          }
+        } else {
+          possibleAllies.push(allyHeroes[i].pets[j]);
+        }
+      }
     }
     return possibleAllies;
   }
@@ -177,34 +185,39 @@ export class BattleService {
         id: activeChar.id
       });
 
-      this.applyMapEffects(battle, heroes, false, isSimulation);
-
-      const crystalPositionIndex = battle.crystalPositions.findIndex((cp: IPosition) => {
-        return cp.x === targetPosition.x && cp.y === targetPosition.y;
-      });
-      if (crystalPositionIndex > -1) {
-        const activeTeam = this.heroService.getTeamByHeroId(activeHero.id, battle.teams);
-        activeTeam.crystals += 1;
-        battle.log.push({
-          type: LogMessageType.TAKE_CRYSTAL,
-          id: activeChar.id
-        });
-        battle.crystalPositions.splice(crystalPositionIndex, 1);
-      }
+      this.afterMoveChar(battle, heroes, activeHero, isSimulation);
     }
     return battle;
   }
 
-  knockBack(battle: IBattle, target: IChar, charPosition: IPosition, isSimulation: boolean) {
-    const heroes = this.getHeroesInBattle(battle);
-    this.mapService.knockBack(target, charPosition, battle.scenario.tiles, heroes);
+  afterMoveChar(battle: IBattle, heroes: IHero[], movedChar: IChar, isSimulation: boolean) {
     this.applyMapEffects(battle, heroes, false, isSimulation);
+
+    const crystalPositionIndex = battle.crystalPositions.findIndex((cp: IPosition) => {
+      return cp.x === movedChar.position.x && cp.y === movedChar.position.y;
+    });
+    if (crystalPositionIndex > -1) {
+      const movedCharTeam = this.heroService.getTeamByCharId(movedChar.id, battle.teams);
+      if (!movedCharTeam) {
+        console.log(movedChar);
+      }
+      movedCharTeam.crystals += 1;
+      battle.log.push({
+        type: LogMessageType.TAKE_CRYSTAL,
+        id: movedChar.id
+      });
+      battle.crystalPositions.splice(crystalPositionIndex, 1);
+    }
   }
 
-  charge(battle: IBattle, targetPosition: IPosition, char: IChar, isSimulation: boolean) {
-    const heroes = this.getHeroesInBattle(battle);
+  knockBack(battle: IBattle, heroes: IHero[], target: IChar, charPosition: IPosition, isSimulation: boolean) {
+    this.mapService.knockBack(target, charPosition, battle.scenario.tiles, heroes);
+    this.afterMoveChar(battle, heroes, target, isSimulation);
+  }
+
+  charge(battle: IBattle, heroes: IHero[], targetPosition: IPosition, char: IChar, isSimulation: boolean) {
     this.mapService.charge(targetPosition, char, battle.scenario.tiles, heroes);
-    this.applyMapEffects(battle, heroes, false, isSimulation);
+    this.afterMoveChar(battle, heroes, char, isSimulation);
   }
 
   applyEffect(
@@ -216,6 +229,11 @@ export class BattleService {
     isSimulation: boolean
   ) {
     switch (effect.id) {
+      case '23-defender':
+      case '41-void-vortex':
+      case '43-symbiosis':
+        //No need to apply, just effect existance
+        break;
       case '41-piercing-strike':
         if (isBeforeTurn) {
           this.charTakesDamage({
@@ -242,11 +260,22 @@ export class BattleService {
           });
         }
         break;
-      case '23-defender':
-        //No need to apply, just effect existance
+      case '31-choking-vine':
+        if (isBeforeTurn) {
+          this.charTakesDamage({
+            battle,
+            caster: this.heroService.getHeroById(effect.casterId, heroes),
+            heroes,
+            target: char,
+            directDamage: 1,
+            effectId: effect.id,
+            isSimulation
+          });
+        }
+        this.effectService.apply(battle, heroes, effect, char, isBeforeTurn);
         break;
       default:
-        this.effectService.apply(effect, char, isBeforeTurn);
+        this.effectService.apply(battle, heroes, effect, char, isBeforeTurn);
         break;
     }
   }
@@ -258,8 +287,8 @@ export class BattleService {
       }
     }
     if (!char.isPet) {
-      for (let i = 0; i < (char as IHero).pets.length; i++) {
-        for (let j = 0; j < (char as IHero).pets[i].effects.length; j++) {
+      for (let i = (char as IHero).pets.length - 1; i >= 0; i--) {
+        for (let j = (char as IHero).pets[i].effects.length - 1; j >= 0; j--) {
           if ((char as IHero).pets[i].effects[j].left > 0) {
             this.applyEffect(
               battle,
@@ -269,9 +298,29 @@ export class BattleService {
               isBeforeTurn,
               isSimulation
             );
+            if (!(char as IHero).pets[i] || (char as IHero).pets[i].health < 1) {
+              break;
+            }
           }
         }
       }
+    }
+  }
+
+  applyPostEffects(battle: IBattle, heroes: IHero[], isBeforeTurn: boolean, isSimulation: boolean) {
+    // For symbiosis we need to track heroes parameters to apply
+    let heroWithSymbiosis: IHero;
+    let symbiosisEffect: IEffect;
+    for (let i = 0; i < heroes.length; i++) {
+      symbiosisEffect = this.heroService.getCharEffectById(heroes[i], '43-symbiosis');
+      if (symbiosisEffect) {
+        heroWithSymbiosis = heroes[i];
+        break;
+      }
+    }
+
+    if (heroWithSymbiosis) {
+      this.effectService.apply(battle, heroes, symbiosisEffect, heroWithSymbiosis, isBeforeTurn);
     }
   }
 
@@ -288,22 +337,63 @@ export class BattleService {
               x: auraHero.position.x,
               y: auraHero.position.y
             };
-            const allies = this.getPossibleAllies(battle, effect.casterId, false);
             const alliesInRange = this.findAllies(battle, effect.casterId, effect.range, false);
-            for (let j = 0; j < allies.length; j++) {
-              if (!allies[j].isPet) {
-                allies[j] = this.heroService.resetHeroState(allies[j] as IHero);
-                allies[j] = this.heroService.calcHero(allies[j] as IHero);
+
+            const possibleChars: IChar[] = [];
+
+            for (let j = 0; j < heroes.length; j++) {
+              possibleChars.push(heroes[j]);
+              possibleChars.push(...heroes[j].pets);
+            }
+
+            for (let j = 0; j < possibleChars.length; j++) {
+              if (!possibleChars[j].isPet) {
+                possibleChars[j] = this.heroService.resetHeroState(possibleChars[j] as IHero);
+                possibleChars[j] = this.heroService.calcHero(possibleChars[j] as IHero);
               } else {
-                allies[j] = this.heroService.resetPetState(allies[j] as IPet);
-                allies[j] = this.heroService.calcPet(allies[j] as IPet);
+                possibleChars[j] = this.heroService.resetPetState(possibleChars[j] as IPet);
               }
-              this.applyCharEffects(battle, heroes, allies[j], true, isSimulation);
-              if (alliesInRange.find((a) => a === allies[j].id)) {
+              this.applyCharEffects(battle, heroes, possibleChars[j], true, isSimulation);
+              if (alliesInRange.find((a) => a === possibleChars[j].id)) {
                 mapEffectsToApply.push({
                   effect,
-                  target: allies[j]
+                  target: possibleChars[j]
                 });
+              }
+            }
+            break;
+
+          // Map effects
+          case '41-void-vortex':
+            if (isBeforeTurn) {
+              const vortexCaster = this.heroService.getHeroById(effect.casterId, heroes);
+              const vortexBuff = this.heroService.getCharEffectById(vortexCaster, effect.id);
+              effect.range = vortexBuff.left === 2 ? 1 : 1;
+              const vortexPoints = this.mapService.findNearestPoints(
+                effect.position,
+                battle.scenario.tiles,
+                effect.range
+              );
+              const vortexEnemies = this.getPossibleEnemies(battle, effect.casterId);
+              const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
+              for (let j = 0; j < vortexEnemies.length; j++) {
+                if (
+                  ((vortexEnemies[j].isPet && activeHero.pets.find((p) => p.id === vortexEnemies[j].id)) ||
+                    (!vortexEnemies[j].isPet && activeHero.id === vortexEnemies[j].id)) &&
+                  vortexPoints.find(
+                    (vp) => vp.x === vortexEnemies[j].position.x && vp.y === vortexEnemies[j].position.y
+                  )
+                ) {
+                  this.charTakesDamage({
+                    battle,
+                    caster: vortexCaster,
+                    heroes,
+                    target: vortexEnemies[j],
+                    magicDamage: 4 + vortexCaster.intellect,
+                    effectId: effect.id,
+                    isSimulation
+                  });
+                }
               }
             }
             break;
@@ -321,6 +411,7 @@ export class BattleService {
         );
       }
     }
+    this.applyPostEffects(battle, heroes, isBeforeTurn, isSimulation);
   }
 
   beforeTurn(battle: IBattle, heroes: IHero[], hero: IHero, isSimulation: boolean) {
@@ -362,8 +453,8 @@ export class BattleService {
         switch (hero.effects[i].id) {
           // Remove Aura effects
           case '43-rallying':
-            const mapEffectIndex = battle.mapEffects.findIndex((me) => me.id === hero.effects[i].id);
-            battle.mapEffects.splice(mapEffectIndex, 1);
+            const rallyingEffectIndex = battle.mapEffects.findIndex((me) => me.id === hero.effects[i].id);
+            battle.mapEffects.splice(rallyingEffectIndex, 1);
 
             const allies = this.getPossibleAllies(battle, hero.effects[i].casterId, false);
             for (let j = 0; j < allies.length; j++) {
@@ -372,10 +463,13 @@ export class BattleService {
                 allies[j] = this.heroService.calcHero(allies[j] as IHero);
               } else {
                 allies[j] = this.heroService.resetPetState(allies[j] as IPet);
-                allies[j] = this.heroService.calcPet(allies[j] as IPet);
               }
               this.applyCharEffects(battle, heroes, allies[j], true, isSimulation);
             }
+            break;
+          case '41-void-vortex':
+            const vortexEffectIndex = battle.mapEffects.findIndex((me) => me.id === hero.effects[i].id);
+            battle.mapEffects.splice(vortexEffectIndex, 1);
             break;
         }
         hero.effects.splice(i, 1);
@@ -408,6 +502,8 @@ export class BattleService {
         }
       }
     }
+
+    this.applyPostEffects(battle, heroes, true, isSimulation);
   }
 
   endTurn(battle: IBattle, isSimulation: boolean): IBattle {
@@ -441,14 +537,14 @@ export class BattleService {
     return battle;
   }
 
-  findEnemies(battle: IBattle, sourceHeroId: string, radius: number, petId?: string): string[] {
+  findEnemies(battle: IBattle, sourceCharId: string, radius: number, ignoreRaytrace?: boolean): string[] {
     const heroes = this.getHeroesInBattle(battle);
-    let sourceChar: IChar = this.heroService.getHeroById(sourceHeroId, heroes);
-    if (petId) {
-      sourceChar = (sourceChar as IHero).pets.find((pet) => pet.id === petId);
+    const sourceChar: IChar = this.heroService.getCharById(sourceCharId, heroes);
+    if (!sourceChar) {
+      return [];
     }
     const points = this.mapService.findNearestPoints(sourceChar.position, battle.scenario.tiles, radius);
-    const possibleEnemies = this.getPossibleEnemies(battle, sourceHeroId);
+    const possibleEnemies = this.getPossibleEnemies(battle, sourceCharId);
 
     const enemies: string[] = [];
     for (let i = 0; i < points.length; i++) {
@@ -457,12 +553,13 @@ export class BattleService {
           points[i].x === possibleEnemies[j].position.x &&
           points[i].y === possibleEnemies[j].position.y &&
           !(possibleEnemies[j] as IHero).isDead &&
-          !this.mapService.rayTrace(
-            { x: sourceChar.position.x, y: sourceChar.position.y },
-            { x: points[i].x, y: points[i].y },
-            battle.scenario.tiles,
-            heroes
-          )
+          (ignoreRaytrace ||
+            !this.mapService.rayTrace(
+              { x: sourceChar.position.x, y: sourceChar.position.y },
+              { x: points[i].x, y: points[i].y },
+              battle.scenario.tiles,
+              heroes
+            ))
         ) {
           enemies.push(possibleEnemies[j].id);
         }
@@ -471,11 +568,21 @@ export class BattleService {
     return enemies;
   }
 
-  findAllies(battle: IBattle, sourceHeroId: string, radius: number, includeSelf: boolean): string[] {
+  findAllies(
+    battle: IBattle,
+    sourceCharId: string,
+    radius: number,
+    includeSelf: boolean,
+    petId?: string,
+    ignoreRaytrace?: boolean
+  ): string[] {
     const heroes = this.getHeroesInBattle(battle);
-    const sourceHero = this.heroService.getHeroById(sourceHeroId, heroes);
-    const points = this.mapService.findNearestPoints(sourceHero.position, battle.scenario.tiles, radius);
-    const possibleAllies = this.getPossibleAllies(battle, sourceHeroId, includeSelf);
+    const sourceChar = this.heroService.getHeroById(sourceCharId, heroes);
+    if (!sourceChar) {
+      return [];
+    }
+    const points = this.mapService.findNearestPoints(sourceChar.position, battle.scenario.tiles, radius);
+    const possibleAllies = this.getPossibleAllies(battle, sourceCharId, includeSelf);
 
     const allies: string[] = [];
     for (let i = 0; i < points.length; i++) {
@@ -484,12 +591,13 @@ export class BattleService {
           points[i].x === possibleAllies[j].position.x &&
           points[i].y === possibleAllies[j].position.y &&
           !(possibleAllies[j] as IHero).isDead &&
-          !this.mapService.rayTrace(
-            { x: sourceHero.position.x, y: sourceHero.position.y },
-            { x: points[i].x, y: points[i].y },
-            battle.scenario.tiles,
-            heroes
-          )
+          (ignoreRaytrace ||
+            !this.mapService.rayTrace(
+              { x: sourceChar.position.x, y: sourceChar.position.y },
+              { x: points[i].x, y: points[i].y },
+              battle.scenario.tiles,
+              heroes
+            ))
         ) {
           allies.push(possibleAllies[j].id);
         }
@@ -498,10 +606,13 @@ export class BattleService {
     return allies;
   }
 
-  findHeroes(battle: IBattle, sourceHeroId: string, radius: number): string[] {
+  findHeroes(battle: IBattle, sourceCharId: string, radius: number, ignoreRaytrace?: boolean): string[] {
     const heroes = this.getHeroesInBattle(battle);
-    const sourceHero = this.heroService.getHeroById(sourceHeroId, heroes);
-    const points = this.mapService.findNearestPoints(sourceHero.position, battle.scenario.tiles, radius);
+    const sourceChar = this.heroService.getHeroById(sourceCharId, heroes);
+    if (!sourceChar) {
+      return [];
+    }
+    const points = this.mapService.findNearestPoints(sourceChar.position, battle.scenario.tiles, radius);
     const possibleChars: IChar[] = [];
 
     for (let i = 0; i < heroes.length; i++) {
@@ -516,12 +627,13 @@ export class BattleService {
           points[i].x === possibleChars[j].position.x &&
           points[i].y === possibleChars[j].position.y &&
           !(possibleChars[j] as IHero).isDead &&
-          !this.mapService.rayTrace(
-            { x: sourceHero.position.x, y: sourceHero.position.y },
-            { x: points[i].x, y: points[i].y },
-            battle.scenario.tiles,
-            heroes
-          )
+          (ignoreRaytrace ||
+            !this.mapService.rayTrace(
+              { x: sourceChar.position.x, y: sourceChar.position.y },
+              { x: points[i].x, y: points[i].y },
+              battle.scenario.tiles,
+              heroes
+            ))
         ) {
           chars.push(possibleChars[j].id);
         }
@@ -550,7 +662,7 @@ export class BattleService {
 
     const { physDamage, magicDamage } = this.calculateWeaponDamage(weapon, activeHero);
 
-    activeHero.energy -= weapon.energyCost;
+    activeHero.energy -= weapon.energyCost + activeHero.extraWeaponEnergyCost;
     weapon.isUsed = true;
 
     const healthDamage = this.charTakesDamage({
@@ -621,7 +733,7 @@ export class BattleService {
       return false;
     }
 
-    if (ability.needWeapon && caster.isDisarmed) {
+    if (ability.needWeapon && !(caster as IHero).isImmuneToDisarm && caster.isDisarmed) {
       return false;
     }
 
@@ -637,6 +749,7 @@ export class BattleService {
       return ability.left === 0;
     } else {
       return (
+        ability.level <= (caster as IHero).maxAllowedAbilityLevel &&
         ability.left === 0 &&
         (caster as IHero).energy - ability.energyCost >= 0 &&
         (caster as IHero).mana - ability.manaCost >= 0
@@ -654,11 +767,32 @@ export class BattleService {
   ): boolean {
     let target: IChar;
     switch (ability.id) {
+      // Paragon
+      case '13-shoulder-to-shoulder':
+        target = this.heroService.getCharById(targetId, heroes);
+        return !target.isPet;
       case '33-bandaging':
         target = this.heroService.getCharById(targetId, heroes);
         return target.health < target.maxHealth;
+
+      // Highlander
+      case '21-sweeping-strike':
+        const sweepingStrikeEnemies = this.findEnemies(battle, caster.id, 2);
+        return sweepingStrikeEnemies.length > 0;
+      case '42-ancestral-power':
+        target = this.heroService.getCharById(targetId, heroes);
+        return !target.isPet;
+
+      // Druid
       case '22-wolf':
         return (caster as IHero).pets.findIndex((p) => p.id === 'wolf') < 0;
+      case '41-wrath-of-nature':
+        const wrathOfNatureEnemies = this.findEnemies(battle, caster.id, 3);
+        return wrathOfNatureEnemies.length > 0;
+      case '42-dryad':
+        return (caster as IHero).pets.findIndex((p) => p.id === 'dryad') < 0;
+
+      // Oracle
       case '13-dangerous-knowledge':
         return (caster as IHero).intellect > 0;
       case '21-mind-blow':
@@ -676,6 +810,12 @@ export class BattleService {
       case '22-knowledge-steal':
         target = this.heroService.getCharById(targetId, heroes);
         return !!target.effects.find((e) => e.isBuff && e.isRemovable);
+      case '33-mind-control':
+        target = this.heroService.getCharById(targetId, heroes);
+        return !target.isStunned && !target.isImmuneToDebuffs;
+      case '43-amnesia':
+        target = this.heroService.getCharById(targetId, heroes);
+        return !target.isPet && !target.isImmuneToDebuffs && (target as IHero).abilities.length > 1;
       default:
         return true;
     }
@@ -695,6 +835,10 @@ export class BattleService {
     isSimulation
   }: ICharTakesDamageArgs): number {
     let healthDamage = 0;
+
+    if (!target || target.health < 1) {
+      return 0;
+    }
 
     if (this.heroService.getCharEffectById(target, '23-defender')) {
       target = this.heroService.getHeroById('paragon', heroes);
@@ -756,9 +900,9 @@ export class BattleService {
                 type: LogMessageType.DEATH,
                 id: heroes[i].pets[j].id
               });
-              heroes[i].pets[j] = undefined;
               target = undefined;
               heroes[i].pets.splice(j, 1);
+              break;
             }
           }
         }
@@ -778,7 +922,14 @@ export class BattleService {
     hero.energy = 0;
     hero.mana = 0;
     hero.effects = [];
+    hero.pets = [];
     hero.isDead = true;
+
+    for (let i = battle.mapEffects.length - 1; i >= 0; i--) {
+      if (battle.mapEffects[i].casterId === hero.id) {
+        battle.mapEffects.splice(i, 1);
+      }
+    }
 
     battle.log.push({
       type: LogMessageType.DEATH,
@@ -832,6 +983,11 @@ export class BattleService {
       magicDamage = magicDamage + 2;
     }
 
+    if (activeHero.id === 'druid' && this.heroService.getHeroAbilityById(activeHero, '32-war-tree')) {
+      physDamage = physDamage + 2;
+      magicDamage = magicDamage + 2;
+    }
+
     if (magicDamage > 0) {
       magicDamage = magicDamage + activeHero.intellect;
     }
@@ -851,11 +1007,7 @@ export class BattleService {
     switch (passiveAbility) {
       case '22-counterattack':
         if (activeChar && activeChar.id !== 'paragon' && activeChar.health > 0) {
-          let activeHero: IHero = activeChar as IHero;
-          if (activeChar.isPet) {
-            activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
-          }
-          const enemies = this.findEnemies(battle, activeHero.id, 2, activeChar.isPet ? activeChar.id : undefined);
+          const enemies = this.findEnemies(battle, activeChar.id, 2);
           for (let i = 0; i < enemies.length; i++) {
             if (enemies[i] === 'paragon') {
               const paragon = this.heroService.getHeroById(enemies[i], heroes);
@@ -887,16 +1039,18 @@ export class BattleService {
           const enemies = this.findEnemies(battle, target.id, 1);
           for (let i = 0; i < enemies.length; i++) {
             const enemyChar = this.heroService.getCharById(enemies[i], heroes);
-            const magicDamage = damageValue + (target as IHero).intellect;
-            this.charTakesDamage({
-              battle,
-              caster: target,
-              heroes,
-              target: enemyChar,
-              abilityId: passiveAbility,
-              magicDamage,
-              isSimulation
-            });
+            if (enemyChar) {
+              const magicDamage = damageValue + (target as IHero).intellect;
+              this.charTakesDamage({
+                battle,
+                caster: target,
+                heroes,
+                target: enemyChar,
+                abilityId: passiveAbility,
+                magicDamage,
+                isSimulation
+              });
+            }
           }
         }
         break;
@@ -971,7 +1125,7 @@ export class BattleService {
         const ability = activeHero.abilities[i];
         switch (ability.targetType) {
           case AbilityTargetType.ENEMY:
-            const enemies = this.findEnemies(battle, activeHero.id, ability.range);
+            const enemies = this.findEnemies(battle, activeHero.id, ability.range, ability.ignoreRaytrace);
             for (let j = 0; j < enemies.length; j++) {
               if (this.checkAbilityAction(battle, heroes, ability, activeHero, enemies[j])) {
                 actions.push({
@@ -984,7 +1138,7 @@ export class BattleService {
             }
             break;
           case AbilityTargetType.ALLY:
-            const allies = this.findAllies(battle, activeHero.id, ability.range, true);
+            const allies = this.findAllies(battle, activeHero.id, ability.range, true, '', ability.ignoreRaytrace);
             for (let j = 0; j < allies.length; j++) {
               if (this.checkAbilityAction(battle, heroes, ability, activeHero, allies[j])) {
                 actions.push({
@@ -997,7 +1151,14 @@ export class BattleService {
             }
             break;
           case AbilityTargetType.ALLY_NOT_ME:
-            const alliesWithoutMe = this.findAllies(battle, activeHero.id, ability.range, false);
+            const alliesWithoutMe = this.findAllies(
+              battle,
+              activeHero.id,
+              ability.range,
+              false,
+              '',
+              ability.ignoreRaytrace
+            );
             for (let j = 0; j < alliesWithoutMe.length; j++) {
               if (this.checkAbilityAction(battle, heroes, ability, activeHero, alliesWithoutMe[j])) {
                 actions.push({
@@ -1010,7 +1171,7 @@ export class BattleService {
             }
             break;
           case AbilityTargetType.ALLY_OR_ENEMY:
-            const allHeroes = this.findHeroes(battle, activeHero.id, ability.range);
+            const allHeroes = this.findHeroes(battle, activeHero.id, ability.range, ability.ignoreRaytrace);
             for (let j = 0; j < allHeroes.length; j++) {
               if (this.checkAbilityAction(battle, heroes, ability, activeHero, allHeroes[j])) {
                 actions.push({
@@ -1037,7 +1198,9 @@ export class BattleService {
               activeHero.position,
               ability.range,
               battle.scenario.tiles,
-              heroes
+              heroes,
+              ability.ignoreRaytrace,
+              ability.ignoreObstacles
             );
             for (let j = 0; j < movePoints.length; j++) {
               if (
@@ -1062,7 +1225,9 @@ export class BattleService {
               activeHero.position,
               ability.range,
               battle.scenario.tiles,
-              heroes
+              heroes,
+              ability.ignoreRaytrace,
+              ability.ignoreObstacles
             );
             for (let j = 0; j < mapPoints.length; j++) {
               if (this.checkAbilityAction(battle, heroes, ability, activeHero, activeHero.id, mapPoints[j])) {
@@ -1081,14 +1246,17 @@ export class BattleService {
     }
 
     for (let i = 0; i < activeHero.pets.length; i++) {
+      if (activeHero.pets[i].isStunned) {
+        continue;
+      }
       if (this.checkAbilityForUse(activeHero.pets[i].ability, activeHero.pets[i])) {
         switch (activeHero.pets[i].ability.targetType) {
           case AbilityTargetType.ENEMY:
             const enemies = this.findEnemies(
               battle,
-              activeHero.id,
+              activeHero.pets[i].id,
               activeHero.pets[i].ability.range,
-              activeHero.pets[i].id
+              activeHero.pets[i].ability.ignoreRaytrace
             );
             for (let j = 0; j < enemies.length; j++) {
               if (this.checkAbilityAction(battle, heroes, activeHero.pets[i].ability, activeHero.pets[i], enemies[j])) {
@@ -1103,7 +1271,7 @@ export class BattleService {
             break;
         }
       }
-      if (!activeHero.pets[i].isMoved) {
+      if (!activeHero.pets[i].isMoved && !activeHero.pets[i].isImmobilized) {
         const petMovePoints = this.mapService.getMovePoints(
           activeHero.pets[i].position,
           1,

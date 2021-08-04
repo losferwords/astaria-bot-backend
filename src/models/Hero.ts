@@ -42,8 +42,10 @@ export class Hero implements IHero {
   isImmobilized = false;
   isImmuneToDisarm = false;
   isImmuneToDebuffs = false;
+  maxAllowedAbilityLevel = 4;
 
   moveEnergyCost = Const.moveEnergyCost;
+  extraWeaponEnergyCost = 0;
   position = { x: 0, y: 0 };
   crystals = 0;
 
