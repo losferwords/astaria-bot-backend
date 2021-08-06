@@ -71,6 +71,7 @@ export class BattleController {
       battle,
       sourceCharId,
       +radius,
+      false,
       ignoreRaytrace ? JSON.parse(ignoreRaytrace) : null
     );
   }
@@ -89,6 +90,7 @@ export class BattleController {
       sourceCharId,
       +radius,
       JSON.parse(includeSelf),
+      false,
       ignoreRaytrace ? JSON.parse(ignoreRaytrace) : null
     );
   }
@@ -105,6 +107,7 @@ export class BattleController {
       battle,
       sourceCharId,
       +radius,
+      false,
       ignoreRaytrace ? JSON.parse(ignoreRaytrace) : null
     );
   }
@@ -181,12 +184,12 @@ export class BattleController {
   @Post('/upgrade-equip')
   async upgradeEquip(@Body() upgradeEquipDto: UpgradeEquipDto): Promise<IBattle> {
     const battle = this.battleService.getBattleById(upgradeEquipDto.battleId);
-    return this.battleService.upgradeEquip(battle, upgradeEquipDto.equipId);
+    return this.battleService.upgradeEquip(battle, upgradeEquipDto.equipId, false);
   }
 
   @Post('/learn-ability')
   async learnAbility(@Body() learnAbilityDto: LearnAbilityDto): Promise<IBattle> {
     const battle = this.battleService.getBattleById(learnAbilityDto.battleId);
-    return this.battleService.learnAbility(battle, learnAbilityDto.abilityId);
+    return this.battleService.learnAbility(battle, learnAbilityDto.abilityId, false);
   }
 }

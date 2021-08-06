@@ -118,7 +118,7 @@ export class HeroService {
   getTeamByCharId(charId: string, teams: ITeam[]): ITeam {
     return teams.find((team: ITeam) => {
       return team.heroes.find((hero: IHero) => {
-        return hero.id === charId || hero.pets.find(p => p.id === charId);
+        return hero.id === charId || hero.pets.find((p) => p.id === charId);
       });
     });
   }
@@ -162,6 +162,9 @@ export class HeroService {
 
     hero.armor =
       hero.primaryWeapon.armor + (hero.secondaryWeapon ? hero.secondaryWeapon.armor : 0) + hero.chestpiece.armor;
+    if (hero.id === 'avatar' && this.getHeroAbilityById(hero, '21-flame-claws')) {
+      hero.armor += 1;
+    }
     if (hero.armor > Const.maxPrimaryAttributes) {
       hero.armor = Const.maxPrimaryAttributes;
     }
@@ -201,9 +204,14 @@ export class HeroService {
     hero.isImmobilized = false;
     hero.isImmuneToDebuffs = false;
     hero.maxAllowedAbilityLevel = 4;
+    hero.maxAllowedAbilityRange = 100;
 
     if (hero.id === 'avatar') {
       hero.isImmuneToDisarm = true;
+
+      if (this.getHeroAbilityById(hero, '21-flame-claws')) {
+        hero.extraWeaponEnergyCost = -hero.primaryWeapon.energyCost;
+      }
     } else {
       hero.isImmuneToDisarm = false;
     }
@@ -283,7 +291,7 @@ export class HeroService {
   }
 
   learnAbility(battle: IBattle, heroes: IHero[], abilityId: string): IBattle {
-    let activeHero = this.getHeroById(battle.queue[0], heroes);
+    const activeHero = this.getHeroById(battle.queue[0], heroes);
     const team = this.getTeamByHeroId(activeHero.id, battle.teams);
     if (activeHero.abilities.length === 0 || team.crystals > 0 || activeHero.crystals > 0) {
       const heroData = this.getHeroData(activeHero.id);
@@ -301,10 +309,6 @@ export class HeroService {
         } else if (activeHero.crystals > 0) {
           activeHero.crystals -= 1;
         }
-      }
-
-      if (activeHero.id === 'druid' && abilityId === '32-war-tree') {
-        activeHero.primaryWeapon.range = 2;
       }
     }
     return battle;

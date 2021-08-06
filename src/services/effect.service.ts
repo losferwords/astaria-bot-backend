@@ -232,4 +232,57 @@ export class EffectService {
       (target as IHero).maxAllowedAbilityLevel = 1;
     }
   }
+
+  // Avatar
+  '23-scorch'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    target.isDisarmed = true;
+  }
+
+  '31-dragon-tail'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    target.isStunned = true;
+  }
+
+  '32-elements-control'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    (target as IHero).mind = (target as IHero).mind + 2;
+    if ((target as IHero).mind > Const.maxSecondaryAttributes) {
+      (target as IHero).mind = Const.maxSecondaryAttributes;
+    }
+  }
+
+  '41-harmony'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    const maxStat = Math.max(
+      (target as IHero).strength,
+      (target as IHero).intellect,
+      (target as IHero).armor,
+      (target as IHero).will
+    );
+
+    (target as IHero).strength = maxStat;
+    (target as IHero).intellect = maxStat;
+    (target as IHero).armor = maxStat;
+    (target as IHero).will = maxStat;
+  }
+
+  // Shadow
+  '13-debilitating-shot'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    if (!target.isPet) {
+      (target as IHero).strength = (target as IHero).strength - 1;
+      if ((target as IHero).strength < 0) {
+        (target as IHero).strength = 0;
+      }
+
+      (target as IHero).intellect = (target as IHero).intellect - 1;
+      if ((target as IHero).intellect < 0) {
+        (target as IHero).intellect = 0;
+      }
+    }
+  }
+
+  '23-blind'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    target.maxAllowedAbilityRange = 1;
+  }
+
+  '32-shadow-cloak'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    (target as IHero).isInvisible = true;
+  }
 }

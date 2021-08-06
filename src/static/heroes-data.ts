@@ -53,4 +53,14 @@ export class HeroesData {
     chestpieces: EquipData.avatar.chestpieces,
     abilities: AbilitiesData.avatar
   };
+
+  public static readonly shadow: IHeroData = {
+    id: 'shadow',
+    maxEnergy: 14,
+    maxHealth: 14,
+    maxMana: 14,
+    primaryWeapons: EquipData.shadow.primaryWeapons,
+    chestpieces: EquipData.shadow.chestpieces,
+    abilities: AbilitiesData.shadow
+  };
 }

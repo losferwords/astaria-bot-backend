@@ -117,9 +117,9 @@ export class BotService {
           isSimulation
         );
       case ActionType.UPGRADE_EQUIP:
-        return this.battleService.upgradeEquip(battle, action.equipId);
+        return this.battleService.upgradeEquip(battle, action.equipId, isSimulation);
       case ActionType.LEARN_ABILITY:
-        return this.battleService.learnAbility(battle, action.abilityId);
+        return this.battleService.learnAbility(battle, action.abilityId, isSimulation);
       case ActionType.TURN_END:
         return this.battleService.endTurn(battle, isSimulation);
     }

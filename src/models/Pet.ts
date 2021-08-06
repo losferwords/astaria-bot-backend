@@ -23,6 +23,8 @@ export class Pet implements IPet {
   isMoved = false;
   isImmuneToDebuffs = false;
 
+  maxAllowedAbilityRange = 100;
+
   position = { x: 0, y: 0 };
 
   constructor(id: string, position: IPosition) {

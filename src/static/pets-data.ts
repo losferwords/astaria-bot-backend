@@ -37,4 +37,22 @@ export class PetsData {
       targetType: AbilityTargetType.ENEMY
     }
   };
+
+  public static readonly 'dragon-spirit': IPetData = {
+    id: 'dragon-spirit',
+    maxHealth: 8,
+    ability: {
+      id: '42-dragon-spirit-breath',
+      level: 0,
+      range: 3,
+      cd: 1,
+      energyCost: 0,
+      manaCost: 0,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.ENEMY
+    }
+  };
 }

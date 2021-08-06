@@ -43,6 +43,7 @@ export class Hero implements IHero {
   isImmuneToDisarm = false;
   isImmuneToDebuffs = false;
   maxAllowedAbilityLevel = 4;
+  maxAllowedAbilityRange = 100;
 
   moveEnergyCost = Const.moveEnergyCost;
   extraWeaponEnergyCost = 0;

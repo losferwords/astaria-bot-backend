@@ -195,4 +195,77 @@ export class EffectsData {
     isBuff: false,
     isRemovable: true
   };
+
+  // Avatar
+  public static readonly '13-fireball': IEffect = {
+    id: '13-fireball',
+    duration: 2,
+    isBuff: false,
+    isRemovable: true
+  };
+
+  public static readonly '22-cauterization': IEffect = {
+    id: '22-cauterization',
+    duration: 2,
+    isBuff: false,
+    isRemovable: true
+  };
+
+  public static readonly '23-scorch': IEffect = {
+    id: '23-scorch',
+    duration: 1,
+    isBuff: false,
+    isRemovable: true
+  };
+
+  public static readonly '31-dragon-tail': IEffect = {
+    id: '31-dragon-tail',
+    duration: 1,
+    isBuff: false,
+    isRemovable: true
+  };
+
+  public static readonly '32-elements-control': IEffect = {
+    id: '32-elements-control',
+    duration: 100,
+    isBuff: true,
+    isRemovable: true
+  };
+
+  public static readonly '41-harmony': IEffect = {
+    id: '41-harmony',
+    duration: 2,
+    isBuff: true,
+    isRemovable: true
+  };
+
+  public static readonly '43-fire': IEffect = {
+    id: '43-fire',
+    duration: 2,
+    isBuff: true,
+    isRemovable: false,
+    range: 2
+  };
+
+  // Shadow
+  public static readonly '13-debilitating-shot': IEffect = {
+    id: '13-debilitating-shot',
+    duration: 2,
+    isBuff: false,
+    isRemovable: true
+  };
+
+  public static readonly '23-blind': IEffect = {
+    id: '23-blind',
+    duration: 2,
+    isBuff: false,
+    isRemovable: true
+  };
+
+  public static readonly '32-shadow-cloak': IEffect = {
+    id: '32-shadow-cloak',
+    duration: 2,
+    isBuff: true,
+    isRemovable: true
+  };
 }

@@ -159,11 +159,67 @@ export class ReportService {
           ',1,' +
           winner.heroes[0].id +
           ',' +
+          winner.heroes[0].primaryWeapon.level +
+          ',' +
+          (winner.heroes[0].secondaryWeapon ? winner.heroes[0].secondaryWeapon.level : '') +
+          ',' +
+          winner.heroes[0].chestpiece.level +
+          ',' +
+          (winner.heroes[0].abilities[0] ? winner.heroes[0].abilities[0].id : '') +
+          ',' +
+          (winner.heroes[0].abilities[1] ? winner.heroes[0].abilities[1].id : '') +
+          ',' +
+          (winner.heroes[0].abilities[2] ? winner.heroes[0].abilities[2].id : '') +
+          ',' +
+          (winner.heroes[0].abilities[3] ? winner.heroes[0].abilities[3].id : '') +
+          ',' +
           winner.heroes[1].id +
+          ',' +
+          winner.heroes[1].primaryWeapon.level +
+          ',' +
+          (winner.heroes[1].secondaryWeapon ? winner.heroes[1].secondaryWeapon.level : '') +
+          ',' +
+          winner.heroes[1].chestpiece.level +
+          ',' +
+          (winner.heroes[1].abilities[0] ? winner.heroes[1].abilities[0].id : '') +
+          ',' +
+          (winner.heroes[1].abilities[1] ? winner.heroes[1].abilities[1].id : '') +
+          ',' +
+          (winner.heroes[1].abilities[2] ? winner.heroes[1].abilities[2].id : '') +
+          ',' +
+          (winner.heroes[1].abilities[3] ? winner.heroes[1].abilities[3].id : '') +
           ',' +
           loserTeam.heroes[0].id +
           ',' +
+          loserTeam.heroes[0].primaryWeapon.level +
+          ',' +
+          (loserTeam.heroes[0].secondaryWeapon ? loserTeam.heroes[0].secondaryWeapon.level : '') +
+          ',' +
+          loserTeam.heroes[0].chestpiece.level +
+          ',' +
+          (loserTeam.heroes[0].abilities[0] ? loserTeam.heroes[0].abilities[0].id : '') +
+          ',' +
+          (loserTeam.heroes[0].abilities[1] ? loserTeam.heroes[0].abilities[1].id : '') +
+          ',' +
+          (loserTeam.heroes[0].abilities[2] ? loserTeam.heroes[0].abilities[2].id : '') +
+          ',' +
+          (loserTeam.heroes[0].abilities[3] ? loserTeam.heroes[0].abilities[3].id : '') +
+          ',' +
           loserTeam.heroes[1].id +
+          ',' +
+          loserTeam.heroes[1].primaryWeapon.level +
+          ',' +
+          (loserTeam.heroes[1].secondaryWeapon ? loserTeam.heroes[1].secondaryWeapon.level : '') +
+          ',' +
+          loserTeam.heroes[1].chestpiece.level +
+          ',' +
+          (loserTeam.heroes[1].abilities[0] ? loserTeam.heroes[1].abilities[0].id : '') +
+          ',' +
+          (loserTeam.heroes[1].abilities[1] ? loserTeam.heroes[1].abilities[1].id : '') +
+          ',' +
+          (loserTeam.heroes[1].abilities[2] ? loserTeam.heroes[1].abilities[2].id : '') +
+          ',' +
+          (loserTeam.heroes[1].abilities[3] ? loserTeam.heroes[1].abilities[3].id : '') +
           ',' +
           battle.log.filter((message: ILogMessage) => message.type === LogMessageType.TURN_END).length +
           '\n';
@@ -174,7 +230,8 @@ export class ReportService {
       let headers = 'SEP=,\nbattle,scenario,';
       switch (battle.scenario.id) {
         case '0':
-          headers += 'winner1,winner2,loser1,loser2,turns\n';
+          headers +=
+            'winner1,winner1-pw,winner1-sw,winner1-cp,winner1-ability1,winner1-ability2,winner1-ability3,winner1-ability4,winner2,winner2-pw,winner2-sw,winner2-cp,winner2-ability1,winner2-ability2,winner2-ability3,winner2-ability4,loser1,loser1-pw,loser1-sw,loser1-cp,loser1-ability1,loser1-ability2,loser1-ability3,loser1-ability4,loser2,loser2-pw,loser2-sw,loser2-cp,loser2-ability1,loser1-ability2,loser2-ability3,loser2-ability4,turns\n';
           break;
       }
       fs.writeFileSync(targetFile, headers + statisticsData);
@@ -186,7 +243,15 @@ export class ReportService {
   saveTreeVisualization(rootNode: BotNode) {
     const tree = this.expandChildren(rootNode);
     if (Const.simulationInfo) {
-      console.log('Total Nodes: ' + this.totalNodes + ', Unexpanded Nodes: ' + this.unexpandedNodes + ', Covarage: ' + ((1 - this.unexpandedNodes / this.totalNodes) * 100).toFixed(2) + '%');
+      console.log(
+        'Total Nodes: ' +
+          this.totalNodes +
+          ', Unexpanded Nodes: ' +
+          this.unexpandedNodes +
+          ', Coverage: ' +
+          ((1 - this.unexpandedNodes / this.totalNodes) * 100).toFixed(2) +
+          '%'
+      );
     }
     this.totalNodes = 0;
     this.unexpandedNodes = 0;

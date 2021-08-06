@@ -16,5 +16,7 @@ export interface IChar {
   isDisarmed: boolean;
   isImmuneToDebuffs: boolean;
 
+  maxAllowedAbilityRange: number;
+
   effects: IEffect[];
 }

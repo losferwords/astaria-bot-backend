@@ -229,6 +229,8 @@ export class BattleService {
       case '23-defender':
       case '41-void-vortex':
       case '43-symbiosis':
+      case '41-harmony':
+      case '43-fire':
         //No need to apply, just effect existance
         break;
       case '41-piercing-strike':
@@ -271,6 +273,32 @@ export class BattleService {
         }
         this.effectService.apply(battle, heroes, effect, char, isBeforeTurn);
         break;
+      case '13-fireball':
+        if (isBeforeTurn) {
+          this.charTakesDamage({
+            battle,
+            caster: this.heroService.getHeroById(effect.casterId, heroes),
+            heroes,
+            target: char,
+            directDamage: 1,
+            effectId: effect.id,
+            isSimulation
+          });
+        }
+        break;
+      case '22-cauterization':
+        if (isBeforeTurn) {
+          this.charTakesDamage({
+            battle,
+            caster: this.heroService.getHeroById(effect.casterId, heroes),
+            heroes,
+            target: char,
+            directDamage: 1,
+            effectId: effect.id,
+            isSimulation
+          });
+        }
+        break;
       default:
         this.effectService.apply(battle, heroes, effect, char, isBeforeTurn);
         break;
@@ -305,15 +333,31 @@ export class BattleService {
   }
 
   applyPostEffects(battle: IBattle, heroes: IHero[], isBeforeTurn: boolean, isSimulation: boolean) {
-    // For symbiosis we need to track heroes parameters to apply
+    // For Post Effects we need to track heroes parameters to apply
+    let heroWithHarmony: IHero;
+    let harmonyEffect: IEffect;
+
     let heroWithSymbiosis: IHero;
     let symbiosisEffect: IEffect;
+
     for (let i = 0; i < heroes.length; i++) {
-      symbiosisEffect = this.heroService.getCharEffectById(heroes[i], '43-symbiosis');
-      if (symbiosisEffect) {
-        heroWithSymbiosis = heroes[i];
-        break;
+      if (!harmonyEffect) {
+        harmonyEffect = this.heroService.getCharEffectById(heroes[i], '41-harmony');
+        if (harmonyEffect) {
+          heroWithHarmony = heroes[i];
+        }
       }
+
+      if (!symbiosisEffect) {
+        symbiosisEffect = this.heroService.getCharEffectById(heroes[i], '43-symbiosis');
+        if (symbiosisEffect) {
+          heroWithSymbiosis = heroes[i];
+        }
+      }
+    }
+
+    if (heroWithHarmony) {
+      this.effectService.apply(battle, heroes, harmonyEffect, heroWithHarmony, isBeforeTurn);
     }
 
     if (heroWithSymbiosis) {
@@ -334,7 +378,7 @@ export class BattleService {
               x: auraHero.position.x,
               y: auraHero.position.y
             };
-            const alliesInRange = this.findAllies(battle, effect.casterId, effect.range, false);
+            const alliesInRange = this.findAllies(battle, effect.casterId, effect.range, true, false, false);
 
             const possibleChars: IChar[] = [];
 
@@ -365,7 +409,7 @@ export class BattleService {
             if (isBeforeTurn) {
               const vortexCaster = this.heroService.getHeroById(effect.casterId, heroes);
               const vortexBuff = this.heroService.getCharEffectById(vortexCaster, effect.id);
-              effect.range = vortexBuff.left === 2 ? 1 : 1;
+              effect.range = vortexBuff.left === 2 ? 1 : 2;
               const vortexPoints = this.mapService.findNearestPoints(
                 effect.position,
                 battle.scenario.tiles,
@@ -386,7 +430,36 @@ export class BattleService {
                     caster: vortexCaster,
                     heroes,
                     target: vortexEnemies[j],
-                    magicDamage: 4 + vortexCaster.intellect,
+                    magicDamage: 5 + vortexCaster.intellect,
+                    effectId: effect.id,
+                    isSimulation
+                  });
+                }
+              }
+            }
+            break;
+          case '43-fire':
+            if (isBeforeTurn) {
+              const fireCaster = this.heroService.getHeroById(effect.casterId, heroes);
+              const firePoints = this.mapService.findNearestPoints(
+                effect.position,
+                battle.scenario.tiles,
+                effect.range
+              );
+              const fireEnemies = this.getPossibleEnemies(battle, effect.casterId);
+              const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
+              for (let j = 0; j < fireEnemies.length; j++) {
+                if (
+                  ((fireEnemies[j].isPet && activeHero.pets.find((p) => p.id === fireEnemies[j].id)) ||
+                    (!fireEnemies[j].isPet && activeHero.id === fireEnemies[j].id)) &&
+                  firePoints.find((vp) => vp.x === fireEnemies[j].position.x && vp.y === fireEnemies[j].position.y)
+                ) {
+                  this.charTakesDamage({
+                    battle,
+                    caster: fireCaster,
+                    heroes,
+                    target: fireEnemies[j],
+                    magicDamage: 4 + fireCaster.intellect,
                     effectId: effect.id,
                     isSimulation
                   });
@@ -444,7 +517,7 @@ export class BattleService {
     }
 
     for (let i = hero.effects.length - 1; i > -1; i--) {
-      if (hero.effects[i].left > 0) {
+      if (hero.effects[i].left > 0 && hero.effects[i].left < 100) {
         hero.effects[i].left--;
       } else {
         switch (hero.effects[i].id) {
@@ -463,13 +536,20 @@ export class BattleService {
               }
               this.applyCharEffects(battle, heroes, allies[j], true, isSimulation);
             }
+            hero.effects.splice(i, 1);
             break;
           case '41-void-vortex':
-            const vortexEffectIndex = battle.mapEffects.findIndex((me) => me.id === hero.effects[i].id);
-            battle.mapEffects.splice(vortexEffectIndex, 1);
+          case '43-fire':
+            const mapEffectIndex = battle.mapEffects.findIndex((me) => me.id === hero.effects[i].id);
+            battle.mapEffects.splice(mapEffectIndex, 1);
+            hero.effects.splice(i, 1);
             break;
+          case '32-elements-control':
+            // Do nothing
+            break;
+          default:
+            hero.effects.splice(i, 1);
         }
-        hero.effects.splice(i, 1);
       }
     }
 
@@ -534,7 +614,13 @@ export class BattleService {
     return battle;
   }
 
-  findEnemies(battle: IBattle, sourceCharId: string, radius: number, ignoreRaytrace?: boolean): string[] {
+  findEnemies(
+    battle: IBattle,
+    sourceCharId: string,
+    radius: number,
+    includeInvisible: boolean,
+    ignoreRaytrace: boolean
+  ): string[] {
     const heroes = this.getHeroesInBattle(battle);
     const sourceChar: IChar = this.heroService.getCharById(sourceCharId, heroes);
     if (!sourceChar) {
@@ -549,6 +635,7 @@ export class BattleService {
         if (
           points[i].x === possibleEnemies[j].position.x &&
           points[i].y === possibleEnemies[j].position.y &&
+          (includeInvisible || !(possibleEnemies[j] as IHero).isInvisible) &&
           !(possibleEnemies[j] as IHero).isDead &&
           (ignoreRaytrace ||
             !this.mapService.rayTrace(
@@ -570,7 +657,8 @@ export class BattleService {
     sourceCharId: string,
     radius: number,
     includeSelf: boolean,
-    ignoreRaytrace?: boolean
+    includeInvisible: boolean,
+    ignoreRaytrace: boolean
   ): string[] {
     const heroes = this.getHeroesInBattle(battle);
     const sourceChar = this.heroService.getHeroById(sourceCharId, heroes);
@@ -586,6 +674,7 @@ export class BattleService {
         if (
           points[i].x === possibleAllies[j].position.x &&
           points[i].y === possibleAllies[j].position.y &&
+          (includeInvisible || !(possibleAllies[j] as IHero).isInvisible) &&
           !(possibleAllies[j] as IHero).isDead &&
           (ignoreRaytrace ||
             !this.mapService.rayTrace(
@@ -602,7 +691,13 @@ export class BattleService {
     return allies;
   }
 
-  findHeroes(battle: IBattle, sourceCharId: string, radius: number, ignoreRaytrace?: boolean): string[] {
+  findHeroes(
+    battle: IBattle,
+    sourceCharId: string,
+    radius: number,
+    includeInvisible: boolean,
+    ignoreRaytrace: boolean
+  ): string[] {
     const heroes = this.getHeroesInBattle(battle);
     const sourceChar = this.heroService.getHeroById(sourceCharId, heroes);
     if (!sourceChar) {
@@ -625,6 +720,7 @@ export class BattleService {
         if (
           points[i].x === possibleChars[j].position.x &&
           points[i].y === possibleChars[j].position.y &&
+          (includeInvisible || !(possibleChars[j] as IHero).isInvisible) &&
           !(possibleChars[j] as IHero).isDead &&
           (ignoreRaytrace ||
             !this.mapService.rayTrace(
@@ -713,14 +809,26 @@ export class BattleService {
     this.battles.splice(battleIndex, 1);
   }
 
-  upgradeEquip(battle: IBattle, equipId: string): IBattle {
+  upgradeEquip(battle: IBattle, equipId: string, isSimulation: boolean): IBattle {
     const heroes = this.getHeroesInBattle(battle);
-    return this.heroService.upgradeEquip(battle, heroes, equipId);
+    battle = this.heroService.upgradeEquip(battle, heroes, equipId);
+    this.applyMapEffects(battle, heroes, true, isSimulation);
+    return battle;
   }
 
-  learnAbility(battle: IBattle, abilityId: string): IBattle {
+  learnAbility(battle: IBattle, abilityId: string, isSimulation: boolean): IBattle {
     const heroes = this.getHeroesInBattle(battle);
-    return this.heroService.learnAbility(battle, heroes, abilityId);
+    battle = this.heroService.learnAbility(battle, heroes, abilityId);
+    switch (abilityId) {
+      case '32-war-tree':
+      case '21-flame-claws':
+        let activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
+        activeHero = this.heroService.resetHeroState(activeHero);
+        activeHero = this.heroService.calcHero(activeHero);
+        this.applyCharEffects(battle, heroes, activeHero, false, isSimulation);
+        break;
+    }
+    return battle;
   }
 
   checkAbilityForUse(ability: IAbility, caster: IChar): boolean {
@@ -747,8 +855,12 @@ export class BattleService {
     if (caster.isPet) {
       return ability.left === 0;
     } else {
+      if (ability.id === '32-elements-control' && this.heroService.getCharEffectById(caster, '32-elements-control')) {
+        return false;
+      }
       return (
         ability.level <= (caster as IHero).maxAllowedAbilityLevel &&
+        ability.range <= caster.maxAllowedAbilityRange &&
         ability.left === 0 &&
         (caster as IHero).energy - ability.energyCost >= 0 &&
         (caster as IHero).mana - ability.manaCost >= 0
@@ -776,7 +888,7 @@ export class BattleService {
 
       // Highlander
       case '21-sweeping-strike':
-        const sweepingStrikeEnemies = this.findEnemies(battle, caster.id, 2);
+        const sweepingStrikeEnemies = this.findEnemies(battle, caster.id, 2, true, false);
         return sweepingStrikeEnemies.length > 0;
       case '42-ancestral-power':
         target = this.heroService.getCharById(targetId, heroes);
@@ -786,7 +898,7 @@ export class BattleService {
       case '22-wolf':
         return (caster as IHero).pets.findIndex((p) => p.id === 'wolf') < 0;
       case '41-wrath-of-nature':
-        const wrathOfNatureEnemies = this.findEnemies(battle, caster.id, 3);
+        const wrathOfNatureEnemies = this.findEnemies(battle, caster.id, 3, true, false);
         return wrathOfNatureEnemies.length > 0;
       case '42-dryad':
         return (caster as IHero).pets.findIndex((p) => p.id === 'dryad') < 0;
@@ -815,6 +927,20 @@ export class BattleService {
       case '43-amnesia':
         target = this.heroService.getCharById(targetId, heroes);
         return !target.isPet && !target.isImmuneToDebuffs && (target as IHero).abilities.length > 1;
+
+      // Avatar
+      case '22-cauterization':
+        target = this.heroService.getCharById(targetId, heroes);
+        return target.health < target.maxHealth;
+      case '42-dragon-spirit':
+        return (caster as IHero).pets.findIndex((p) => p.id === 'dragon-spirit') < 0;
+
+      // Shadow
+      case '21-rapid-fire':
+        return (
+          (caster as IHero).primaryWeapon.isUsed &&
+          (caster as IHero).energy >= (caster as IHero).primaryWeapon.energyCost
+        );
       default:
         return true;
     }
@@ -892,7 +1018,7 @@ export class BattleService {
       if (target.isPet) {
         for (let i = 0; i < heroes.length; i++) {
           for (let j = heroes[i].pets.length - 1; j >= 0; j--) {
-            if (heroes[i].pets[j].id === target.id) {
+            if (target && heroes[i].pets[j].id === target.id) {
               battle.log.push({
                 type: LogMessageType.DEATH,
                 id: heroes[i].pets[j].id
@@ -987,6 +1113,10 @@ export class BattleService {
       magicDamage = magicDamage + 2;
     }
 
+    if (activeHero.id === 'avatar' && this.heroService.getHeroAbilityById(activeHero, '21-flame-claws')) {
+      magicDamage = magicDamage + 2;
+    }
+
     if (magicDamage > 0) {
       magicDamage = magicDamage + activeHero.intellect;
     }
@@ -1006,7 +1136,7 @@ export class BattleService {
     switch (passiveAbility) {
       case '22-counterattack':
         if (activeChar && activeChar.id !== 'paragon' && activeChar.health > 0) {
-          const enemies = this.findEnemies(battle, activeChar.id, 2);
+          const enemies = this.findEnemies(battle, activeChar.id, 2, false, false);
           for (let i = 0; i < enemies.length; i++) {
             if (enemies[i] === 'paragon') {
               const paragon = this.heroService.getHeroById(enemies[i], heroes);
@@ -1035,7 +1165,7 @@ export class BattleService {
             type: LogMessageType.TAKE_MANA,
             value: damageValue + ''
           });
-          const enemies = this.findEnemies(battle, target.id, 1);
+          const enemies = this.findEnemies(battle, target.id, 1, true, true);
           for (let i = 0; i < enemies.length; i++) {
             const enemyChar = this.heroService.getCharById(enemies[i], heroes);
             if (enemyChar) {
@@ -1124,7 +1254,7 @@ export class BattleService {
         const ability = activeHero.abilities[i];
         switch (ability.targetType) {
           case AbilityTargetType.ENEMY:
-            const enemies = this.findEnemies(battle, activeHero.id, ability.range, ability.ignoreRaytrace);
+            const enemies = this.findEnemies(battle, activeHero.id, ability.range, false, ability.ignoreRaytrace);
             for (let j = 0; j < enemies.length; j++) {
               if (this.checkAbilityAction(battle, heroes, ability, activeHero, enemies[j])) {
                 actions.push({
@@ -1137,7 +1267,7 @@ export class BattleService {
             }
             break;
           case AbilityTargetType.ALLY:
-            const allies = this.findAllies(battle, activeHero.id, ability.range, true, ability.ignoreRaytrace);
+            const allies = this.findAllies(battle, activeHero.id, ability.range, true, false, ability.ignoreRaytrace);
             for (let j = 0; j < allies.length; j++) {
               if (this.checkAbilityAction(battle, heroes, ability, activeHero, allies[j])) {
                 actions.push({
@@ -1155,6 +1285,7 @@ export class BattleService {
               activeHero.id,
               ability.range,
               false,
+              false,
               ability.ignoreRaytrace
             );
             for (let j = 0; j < alliesWithoutMe.length; j++) {
@@ -1169,7 +1300,7 @@ export class BattleService {
             }
             break;
           case AbilityTargetType.ALLY_OR_ENEMY:
-            const allHeroes = this.findHeroes(battle, activeHero.id, ability.range, ability.ignoreRaytrace);
+            const allHeroes = this.findHeroes(battle, activeHero.id, ability.range, false, ability.ignoreRaytrace);
             for (let j = 0; j < allHeroes.length; j++) {
               if (this.checkAbilityAction(battle, heroes, ability, activeHero, allHeroes[j])) {
                 actions.push({
@@ -1254,6 +1385,7 @@ export class BattleService {
               battle,
               activeHero.pets[i].id,
               activeHero.pets[i].ability.range,
+              false,
               activeHero.pets[i].ability.ignoreRaytrace
             );
             for (let j = 0; j < enemies.length; j++) {
@@ -1288,7 +1420,7 @@ export class BattleService {
     }
 
     if (this.heroService.canUseWeapon(activeHero, activeHero.primaryWeapon)) {
-      const enemies = this.findEnemies(battle, activeHero.id, activeHero.primaryWeapon.range);
+      const enemies = this.findEnemies(battle, activeHero.id, activeHero.primaryWeapon.range, false, false);
       for (let i = 0; i < enemies.length; i++) {
         const target = this.heroService.getCharById(enemies[i], heroes);
         const { physDamage, magicDamage } = this.calculateWeaponDamage(activeHero.primaryWeapon, activeHero);
@@ -1303,7 +1435,7 @@ export class BattleService {
       }
     }
     if (activeHero.secondaryWeapon && this.heroService.canUseWeapon(activeHero, activeHero.secondaryWeapon)) {
-      const enemies = this.findEnemies(battle, activeHero.id, activeHero.secondaryWeapon.range);
+      const enemies = this.findEnemies(battle, activeHero.id, activeHero.secondaryWeapon.range, false, false);
       for (let i = 0; i < enemies.length; i++) {
         const target = this.heroService.getCharById(enemies[i], heroes);
         const { physDamage, magicDamage } = this.calculateWeaponDamage(activeHero.secondaryWeapon, activeHero);
