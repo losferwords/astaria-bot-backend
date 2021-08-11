@@ -3,7 +3,7 @@ import { ChthonRuins } from 'src/models/scenarios/chthon-ruins';
 export class Const {
   public static moveEnergyCost = 3;
   public static scenarios = [ChthonRuins];
-  public static moveOrder = ['shadow', 'avatar', 'oracle', 'paragon', 'druid', 'highlander'];
+  public static moveOrder = ['avenger', 'shadow', 'avatar', 'oracle', 'paragon', 'druid', 'highlander', 'lightbringer'];
   public static maxPrimaryAttributes = 10;
   public static maxSecondaryAttributes = 4;
   public static rayTracePrecision = 8;

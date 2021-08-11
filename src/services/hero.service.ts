@@ -148,44 +148,26 @@ export class HeroService {
       hero.primaryWeapon.strength +
       (hero.secondaryWeapon ? hero.secondaryWeapon.strength : 0) +
       hero.chestpiece.strength;
-    if (hero.strength > Const.maxPrimaryAttributes) {
-      hero.strength = Const.maxPrimaryAttributes;
-    }
 
     hero.intellect =
       hero.primaryWeapon.intellect +
       (hero.secondaryWeapon ? hero.secondaryWeapon.intellect : 0) +
       hero.chestpiece.intellect;
-    if (hero.intellect > Const.maxPrimaryAttributes) {
-      hero.intellect = Const.maxPrimaryAttributes;
-    }
 
     hero.armor =
       hero.primaryWeapon.armor + (hero.secondaryWeapon ? hero.secondaryWeapon.armor : 0) + hero.chestpiece.armor;
     if (hero.id === 'avatar' && this.getHeroAbilityById(hero, '21-flame-claws')) {
       hero.armor += 1;
     }
-    if (hero.armor > Const.maxPrimaryAttributes) {
-      hero.armor = Const.maxPrimaryAttributes;
-    }
 
     hero.will = hero.primaryWeapon.will + (hero.secondaryWeapon ? hero.secondaryWeapon.will : 0) + hero.chestpiece.will;
-    if (hero.will > Const.maxPrimaryAttributes) {
-      hero.will = Const.maxPrimaryAttributes;
-    }
 
     hero.regeneration =
       hero.primaryWeapon.regeneration +
       (hero.secondaryWeapon ? hero.secondaryWeapon.regeneration : 0) +
       hero.chestpiece.regeneration;
-    if (hero.regeneration > Const.maxSecondaryAttributes) {
-      hero.regeneration = Const.maxSecondaryAttributes;
-    }
 
     hero.mind = hero.primaryWeapon.mind + (hero.secondaryWeapon ? hero.secondaryWeapon.mind : 0) + hero.chestpiece.mind;
-    if (hero.mind > Const.maxSecondaryAttributes) {
-      hero.mind = Const.maxSecondaryAttributes;
-    }
 
     if (hero.id === 'druid' && this.getHeroAbilityById(hero, '32-war-tree')) {
       hero.primaryWeapon.range = 2;
@@ -225,12 +207,60 @@ export class HeroService {
 
   resetPetState(pet: IPet): IPet {
     pet.regeneration = 0;
-    pet.isMoved = false;
     pet.isStunned = false;
     pet.isDisarmed = false;
     pet.isImmobilized = false;
     pet.isSilenced = false;
     return pet;
+  }
+
+  normalizeCharStats(char: IChar) {
+    if (!char.isPet) {
+      if ((char as IHero).strength < 0) {
+        (char as IHero).strength = 0;
+      }
+      if ((char as IHero).strength > Const.maxPrimaryAttributes) {
+        (char as IHero).strength = Const.maxPrimaryAttributes;
+      }
+
+      if ((char as IHero).intellect < 0) {
+        (char as IHero).intellect = 0;
+      }
+      if ((char as IHero).intellect > Const.maxPrimaryAttributes) {
+        (char as IHero).intellect = Const.maxPrimaryAttributes;
+      }
+
+      if ((char as IHero).armor < 0) {
+        (char as IHero).armor = 0;
+      }
+      if ((char as IHero).armor > Const.maxPrimaryAttributes) {
+        (char as IHero).armor = Const.maxPrimaryAttributes;
+      }
+
+      if ((char as IHero).will < 0) {
+        (char as IHero).will = 0;
+      }
+      if ((char as IHero).will > Const.maxPrimaryAttributes) {
+        (char as IHero).will = Const.maxPrimaryAttributes;
+      }
+
+      if ((char as IHero).mind < 0) {
+        (char as IHero).mind = 0;
+      }
+      if ((char as IHero).mind > Const.maxSecondaryAttributes) {
+        (char as IHero).mind = Const.maxSecondaryAttributes;
+      }
+
+      if ((char as IHero).moveEnergyCost < 0) {
+        (char as IHero).moveEnergyCost = 0;
+      }
+    }
+    if (char.regeneration < 0) {
+      char.regeneration = 0;
+    }
+    if (char.regeneration > Const.maxSecondaryAttributes) {
+      char.regeneration = Const.maxSecondaryAttributes;
+    }
   }
 
   moveChar(battle: IBattle, activeChar: IChar, position: IPosition, isPet: boolean): IBattle {

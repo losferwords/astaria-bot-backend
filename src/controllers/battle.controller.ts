@@ -64,6 +64,8 @@ export class BattleController {
     @Query('battleId') battleId: string,
     @Query('sourceCharId') sourceCharId: string,
     @Query('radius') radius: string,
+    @Query('includeInvisible') includeInvisible: string,
+    @Query('abilityId') abilityId: string,
     @Query('ignoreRaytrace') ignoreRaytrace: string
   ): Promise<string[]> {
     const battle = this.battleService.getBattleById(battleId);
@@ -71,8 +73,9 @@ export class BattleController {
       battle,
       sourceCharId,
       +radius,
-      false,
-      ignoreRaytrace ? JSON.parse(ignoreRaytrace) : null
+      includeInvisible ? JSON.parse(includeInvisible) : false,
+      abilityId,
+      ignoreRaytrace ? JSON.parse(ignoreRaytrace) : false
     );
   }
 
@@ -81,6 +84,7 @@ export class BattleController {
     @Query('battleId') battleId: string,
     @Query('sourceCharId') sourceCharId: string,
     @Query('radius') radius: string,
+    @Query('includeInvisible') includeInvisible: string,
     @Query('includeSelf') includeSelf: string,
     @Query('ignoreRaytrace') ignoreRaytrace: string
   ): Promise<string[]> {
@@ -90,8 +94,8 @@ export class BattleController {
       sourceCharId,
       +radius,
       JSON.parse(includeSelf),
-      false,
-      ignoreRaytrace ? JSON.parse(ignoreRaytrace) : null
+      includeInvisible ? JSON.parse(includeInvisible) : false,
+      ignoreRaytrace ? JSON.parse(ignoreRaytrace) : false
     );
   }
 
@@ -100,6 +104,8 @@ export class BattleController {
     @Query('battleId') battleId: string,
     @Query('sourceCharId') sourceCharId: string,
     @Query('radius') radius: string,
+    @Query('includeInvisible') includeInvisible: string,
+    @Query('includeSelf') includeSelf: string,
     @Query('ignoreRaytrace') ignoreRaytrace: string
   ): Promise<string[]> {
     const battle = this.battleService.getBattleById(battleId);
@@ -107,8 +113,9 @@ export class BattleController {
       battle,
       sourceCharId,
       +radius,
-      false,
-      ignoreRaytrace ? JSON.parse(ignoreRaytrace) : null
+      JSON.parse(includeSelf),
+      includeInvisible ? JSON.parse(includeInvisible) : false,
+      ignoreRaytrace ? JSON.parse(ignoreRaytrace) : false
     );
   }
 

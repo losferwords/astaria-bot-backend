@@ -40,7 +40,8 @@ export class AbilitiesData {
       needWeapon: false,
       isSpell: false,
       left: 0,
-      targetType: AbilityTargetType.ALLY
+      targetType: AbilityTargetType.ALLY,
+      includeInvisible: true
     },
     {
       id: '21-spear-throw',
@@ -79,7 +80,8 @@ export class AbilitiesData {
       needWeapon: false,
       isSpell: false,
       left: 0,
-      targetType: AbilityTargetType.ALLY_NOT_ME
+      targetType: AbilityTargetType.ALLY_NOT_ME,
+      includeInvisible: true
     },
     {
       id: '31-assault',
@@ -118,7 +120,8 @@ export class AbilitiesData {
       needWeapon: false,
       isSpell: false,
       left: 0,
-      targetType: AbilityTargetType.ALLY
+      targetType: AbilityTargetType.ALLY,
+      includeInvisible: true
     },
     {
       id: '41-piercing-strike',
@@ -157,7 +160,8 @@ export class AbilitiesData {
       needWeapon: false,
       isSpell: false,
       left: 0,
-      targetType: AbilityTargetType.ALLY_NOT_ME
+      targetType: AbilityTargetType.ALLY_NOT_ME,
+      includeInvisible: true
     }
   ];
 
@@ -304,7 +308,8 @@ export class AbilitiesData {
       needWeapon: false,
       isSpell: true,
       left: 0,
-      targetType: AbilityTargetType.ALLY
+      targetType: AbilityTargetType.ALLY,
+      includeInvisible: true
     },
     {
       id: '43-chain-lightning',
@@ -359,7 +364,8 @@ export class AbilitiesData {
       needWeapon: false,
       isSpell: true,
       left: 0,
-      targetType: AbilityTargetType.ALLY
+      targetType: AbilityTargetType.ALLY,
+      includeInvisible: true
     },
     {
       id: '21-entangling-roots',
@@ -398,7 +404,8 @@ export class AbilitiesData {
       needWeapon: false,
       isSpell: true,
       left: 0,
-      targetType: AbilityTargetType.ALLY
+      targetType: AbilityTargetType.ALLY,
+      includeInvisible: true
     },
     {
       id: '31-choking-vine',
@@ -437,7 +444,8 @@ export class AbilitiesData {
       needWeapon: false,
       isSpell: true,
       left: 0,
-      targetType: AbilityTargetType.ALLY
+      targetType: AbilityTargetType.ALLY,
+      includeInvisible: true
     },
     {
       id: '41-wrath-of-nature',
@@ -476,7 +484,8 @@ export class AbilitiesData {
       needWeapon: false,
       isSpell: true,
       left: 0,
-      targetType: AbilityTargetType.ALLY
+      targetType: AbilityTargetType.ALLY,
+      includeInvisible: true
     }
   ];
 
@@ -624,8 +633,9 @@ export class AbilitiesData {
       needWeapon: false,
       isSpell: true,
       left: 0,
-      targetType: AbilityTargetType.ALLY_OR_ENEMY,
-      ignoreRaytrace: true
+      targetType: AbilityTargetType.ALLY_OR_ENEMY_NOT_ME,
+      ignoreRaytrace: true,
+      includeInvisible: true
     },
     {
       id: '43-amnesia',
@@ -667,7 +677,8 @@ export class AbilitiesData {
       needWeapon: false,
       isSpell: false,
       left: 0,
-      targetType: AbilityTargetType.ALLY_OR_ENEMY
+      targetType: AbilityTargetType.ALLY_OR_ENEMY_NOT_ME,
+      includeInvisible: true
     },
     {
       id: '13-fireball',
@@ -706,7 +717,8 @@ export class AbilitiesData {
       needWeapon: false,
       isSpell: true,
       left: 0,
-      targetType: AbilityTargetType.ALLY
+      targetType: AbilityTargetType.ALLY,
+      includeInvisible: true
     },
     {
       id: '23-scorch',
@@ -799,7 +811,7 @@ export class AbilitiesData {
       left: 0,
       targetType: AbilityTargetType.MAP,
       ignoreObstacles: true
-    },
+    }
   ];
 
   public static readonly shadow: IAbility[] = [
@@ -914,6 +926,223 @@ export class AbilitiesData {
       cd: 3,
       energyCost: 5,
       manaCost: 1,
+      isPassive: false,
+      needWeapon: true,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.ENEMY
+    },
+    {
+      id: '41-headshot',
+      level: 4,
+      range: 3,
+      cd: 3,
+      energyCost: 7,
+      manaCost: 0,
+      isPassive: false,
+      needWeapon: true,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.ENEMY
+    },
+    {
+      id: '42-phantom',
+      level: 4,
+      range: 1,
+      cd: 0,
+      energyCost: 4,
+      manaCost: 5,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: true,
+      left: 0,
+      targetType: AbilityTargetType.MAP
+    },
+    {
+      id: '43-oblivion',
+      level: 4,
+      range: 3,
+      cd: 4,
+      energyCost: 6,
+      manaCost: 2,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: true,
+      left: 0,
+      targetType: AbilityTargetType.ENEMY
+    }
+  ];
+
+  public static readonly lightbringer: IAbility[] = [
+    {
+      id: '11-sun-strike',
+      level: 1,
+      range: 2,
+      cd: 2,
+      energyCost: 3,
+      manaCost: 1,
+      isPassive: false,
+      needWeapon: true,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.ENEMY,
+      ignoreRaytrace: true
+    },
+    {
+      id: '12-skies-gift',
+      level: 1,
+      range: 1,
+      cd: 0,
+      energyCost: 0,
+      manaCost: 3,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: true,
+      left: 0,
+      targetType: AbilityTargetType.MOVE
+    },
+    {
+      id: '13-sun-touch',
+      level: 1,
+      range: 3,
+      cd: 2,
+      energyCost: 2,
+      manaCost: 3,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: true,
+      left: 0,
+      targetType: AbilityTargetType.ALLY_OR_ENEMY,
+      includeInvisible: true
+    },
+    {
+      id: '21-aura-of-might',
+      level: 2,
+      range: 0,
+      cd: 0,
+      energyCost: 0,
+      manaCost: 0,
+      isPassive: true,
+      needWeapon: false,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.SELF
+    },
+    {
+      id: '22-aura-of-fortitude',
+      level: 2,
+      range: 0,
+      cd: 0,
+      energyCost: 0,
+      manaCost: 0,
+      isPassive: true,
+      needWeapon: false,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.SELF
+    },
+    {
+      id: '23-aura-of-light',
+      level: 2,
+      range: 0,
+      cd: 0,
+      energyCost: 0,
+      manaCost: 0,
+      isPassive: true,
+      needWeapon: false,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.SELF
+    },
+    {
+      id: '31-retribution',
+      level: 3,
+      range: 1,
+      cd: 2,
+      energyCost: 5,
+      manaCost: 2,
+      isPassive: false,
+      needWeapon: true,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.ENEMY
+    },
+    {
+      id: '32-sun-aegis',
+      level: 3,
+      range: 0,
+      cd: 3,
+      energyCost: 3,
+      manaCost: 4,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: true,
+      left: 0,
+      targetType: AbilityTargetType.SELF
+    },
+    {
+      id: '33-cleansing',
+      level: 3,
+      range: 3,
+      cd: 2,
+      energyCost: 3,
+      manaCost: 4,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: true,
+      left: 0,
+      targetType: AbilityTargetType.ALLY_OR_ENEMY,
+      includeInvisible: true
+    },
+    {
+      id: '41-hammer-of-wrath',
+      level: 4,
+      range: 1,
+      cd: 3,
+      energyCost: 6,
+      manaCost: 3,
+      isPassive: false,
+      needWeapon: true,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.ENEMY
+    },
+    {
+      id: '42-divine-radiance',
+      level: 4,
+      range: 0,
+      cd: 3,
+      energyCost: 4,
+      manaCost: 4,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: true,
+      left: 0,
+      targetType: AbilityTargetType.SELF
+    },
+    {
+      id: '43-sunrise',
+      level: 4,
+      range: 0,
+      cd: 3,
+      energyCost: 3,
+      manaCost: 5,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: true,
+      left: 0,
+      targetType: AbilityTargetType.SELF
+    }
+  ];
+
+  public static readonly avenger: IAbility[] = [
+    {
+      id: '11-double-strike',
+      level: 1,
+      range: 1,
+      cd: 2,
+      energyCost: 4,
+      manaCost: 0,
       isPassive: false,
       needWeapon: true,
       isSpell: false,

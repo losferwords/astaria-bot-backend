@@ -18,18 +18,12 @@ export class EffectService {
   '11-sunder-armor'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
       (target as IHero).armor = (target as IHero).armor - 1;
-      if ((target as IHero).armor < 0) {
-        (target as IHero).armor = 0;
-      }
     }
   }
 
   '12-shield-bash'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
       (target as IHero).will = (target as IHero).will - 1;
-      if ((target as IHero).will < 0) {
-        (target as IHero).will = 0;
-      }
     }
     target.isSilenced = true;
   }
@@ -37,13 +31,7 @@ export class EffectService {
   '13-shoulder-to-shoulder'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
       (target as IHero).armor = (target as IHero).armor + 1;
-      if ((target as IHero).armor > Const.maxPrimaryAttributes) {
-        (target as IHero).armor = Const.maxPrimaryAttributes;
-      }
       (target as IHero).will = (target as IHero).will + 1;
-      if ((target as IHero).will > Const.maxPrimaryAttributes) {
-        (target as IHero).will = Const.maxPrimaryAttributes;
-      }
     }
   }
 
@@ -55,9 +43,6 @@ export class EffectService {
 
   '32-no-step-back'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     (target as IHero).strength = (target as IHero).strength + 2;
-    if ((target as IHero).strength > Const.maxPrimaryAttributes) {
-      (target as IHero).strength = Const.maxPrimaryAttributes;
-    }
     target.isImmuneToDebuffs = true;
   }
 
@@ -68,21 +53,9 @@ export class EffectService {
   '43-rallying'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
       (target as IHero).strength = (target as IHero).strength + 2;
-      if ((target as IHero).strength > Const.maxPrimaryAttributes) {
-        (target as IHero).strength = Const.maxPrimaryAttributes;
-      }
       (target as IHero).intellect = (target as IHero).intellect + 2;
-      if ((target as IHero).intellect > Const.maxPrimaryAttributes) {
-        (target as IHero).intellect = Const.maxPrimaryAttributes;
-      }
       (target as IHero).armor = (target as IHero).armor + 2;
-      if ((target as IHero).armor > Const.maxPrimaryAttributes) {
-        (target as IHero).armor = Const.maxPrimaryAttributes;
-      }
       (target as IHero).will = (target as IHero).will + 2;
-      if ((target as IHero).will > Const.maxPrimaryAttributes) {
-        (target as IHero).will = Const.maxPrimaryAttributes;
-      }
     }
   }
 
@@ -90,18 +63,12 @@ export class EffectService {
   '11-heavy-strike'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
       (target as IHero).strength = (target as IHero).strength + 1;
-      if ((target as IHero).strength > Const.maxPrimaryAttributes) {
-        (target as IHero).strength = Const.maxPrimaryAttributes;
-      }
     }
   }
 
   '12-strong-grip'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
       (target as IHero).strength = (target as IHero).strength + 2;
-      if ((target as IHero).strength > Const.maxPrimaryAttributes) {
-        (target as IHero).strength = Const.maxPrimaryAttributes;
-      }
       (target as IHero).isImmuneToDisarm = true;
     }
   }
@@ -123,13 +90,7 @@ export class EffectService {
   '42-ancestral-power'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
       (target as IHero).strength = (target as IHero).strength + 3;
-      if ((target as IHero).strength > Const.maxPrimaryAttributes) {
-        (target as IHero).strength = Const.maxPrimaryAttributes;
-      }
       (target as IHero).intellect = (target as IHero).intellect + 3;
-      if ((target as IHero).intellect > Const.maxPrimaryAttributes) {
-        (target as IHero).intellect = Const.maxPrimaryAttributes;
-      }
       (target as IHero).extraWeaponEnergyCost = -1;
     }
   }
@@ -143,22 +104,12 @@ export class EffectService {
 
   '13-wound-healing'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     target.regeneration = target.regeneration + 1;
-    if (target.regeneration > Const.maxSecondaryAttributes) {
-      target.regeneration = Const.maxSecondaryAttributes;
-    }
   }
 
   '21-entangling-roots'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
       (target as IHero).strength = (target as IHero).strength - 1;
-      if ((target as IHero).strength < 0) {
-        (target as IHero).strength = 0;
-      }
-
       (target as IHero).intellect = (target as IHero).intellect - 1;
-      if ((target as IHero).intellect < 0) {
-        (target as IHero).intellect = 0;
-      }
     }
 
     target.isImmobilized = true;
@@ -177,17 +128,8 @@ export class EffectService {
   '33-power-of-the-pack'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
       (target as IHero).armor = (target as IHero).armor + 2;
-      if ((target as IHero).armor > Const.maxPrimaryAttributes) {
-        (target as IHero).armor = Const.maxPrimaryAttributes;
-      }
       (target as IHero).will = (target as IHero).will + 2;
-      if ((target as IHero).will > Const.maxPrimaryAttributes) {
-        (target as IHero).will = Const.maxPrimaryAttributes;
-      }
       (target as IHero).mind = (target as IHero).mind + 2;
-      if ((target as IHero).mind > Const.maxSecondaryAttributes) {
-        (target as IHero).mind = Const.maxSecondaryAttributes;
-      }
     }
   }
 
@@ -212,14 +154,7 @@ export class EffectService {
   '23-paranoia'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
       (target as IHero).will = (target as IHero).will - 2;
-      if ((target as IHero).will < 0) {
-        (target as IHero).will = 0;
-      }
-
       (target as IHero).mind = (target as IHero).mind - 2;
-      if ((target as IHero).mind < 0) {
-        (target as IHero).mind = 0;
-      }
     }
   }
 
@@ -244,9 +179,6 @@ export class EffectService {
 
   '32-elements-control'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     (target as IHero).mind = (target as IHero).mind + 2;
-    if ((target as IHero).mind > Const.maxSecondaryAttributes) {
-      (target as IHero).mind = Const.maxSecondaryAttributes;
-    }
   }
 
   '41-harmony'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
@@ -267,14 +199,7 @@ export class EffectService {
   '13-debilitating-shot'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
       (target as IHero).strength = (target as IHero).strength - 1;
-      if ((target as IHero).strength < 0) {
-        (target as IHero).strength = 0;
-      }
-
       (target as IHero).intellect = (target as IHero).intellect - 1;
-      if ((target as IHero).intellect < 0) {
-        (target as IHero).intellect = 0;
-      }
     }
   }
 
@@ -284,5 +209,46 @@ export class EffectService {
 
   '32-shadow-cloak'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     (target as IHero).isInvisible = true;
+  }
+
+  // Lightbringer
+  '21-aura-of-might'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    if (!target.isPet) {
+      let extraStat = 1;
+      const caster: IHero = this.heroService.getHeroById(effect.casterId, heroes);
+      if (this.heroService.getCharEffectById(caster, '42-divine-radiance')) {
+        extraStat = 2;
+      }
+      (target as IHero).strength = (target as IHero).strength + extraStat;
+      (target as IHero).intellect = (target as IHero).intellect + extraStat;
+    }
+  }
+
+  '22-aura-of-fortitude'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    if (!target.isPet) {
+      let extraStat = 1;
+      const caster: IHero = this.heroService.getHeroById(effect.casterId, heroes);
+      if (this.heroService.getCharEffectById(caster, '42-divine-radiance')) {
+        extraStat = 2;
+      }
+      (target as IHero).armor = (target as IHero).armor + extraStat;
+      (target as IHero).will = (target as IHero).will + extraStat;
+    }
+  }
+
+  '23-aura-of-light'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    let extraStat = 1;
+    const caster: IHero = this.heroService.getHeroById(effect.casterId, heroes);
+    if (this.heroService.getCharEffectById(caster, '42-divine-radiance')) {
+      extraStat = 2;
+    }
+    if (!target.isPet) {
+      (target as IHero).mind = (target as IHero).mind + extraStat;
+    }
+    target.regeneration = target.regeneration + extraStat;
+  }
+
+  '41-hammer-of-wrath'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    target.isStunned = true;
   }
 }

@@ -63,4 +63,25 @@ export class HeroesData {
     chestpieces: EquipData.shadow.chestpieces,
     abilities: AbilitiesData.shadow
   };
+
+  public static readonly lightbringer: IHeroData = {
+    id: 'lightbringer',
+    maxEnergy: 10,
+    maxHealth: 18,
+    maxMana: 18,
+    primaryWeapons: EquipData.lightbringer.primaryWeapons,
+    chestpieces: EquipData.lightbringer.chestpieces,
+    abilities: AbilitiesData.lightbringer
+  };
+
+  public static readonly avenger: IHeroData = {
+    id: 'avenger',
+    maxEnergy: 14,
+    maxHealth: 16,
+    maxMana: 12,
+    primaryWeapons: EquipData.avenger.primaryWeapons,
+    secondaryWeapons: EquipData.avenger.secondaryWeapons,
+    chestpieces: EquipData.avenger.chestpieces,
+    abilities: AbilitiesData.avenger
+  };
 }

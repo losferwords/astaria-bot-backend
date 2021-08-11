@@ -55,4 +55,22 @@ export class PetsData {
       targetType: AbilityTargetType.ENEMY
     }
   };
+
+  public static readonly 'phantom': IPetData = {
+    id: 'phantom',
+    maxHealth: 8,
+    ability: {
+      id: '42-phantom-imitation-shot',
+      level: 0,
+      range: 3,
+      cd: 1,
+      energyCost: 0,
+      manaCost: 0,
+      isPassive: false,
+      needWeapon: true,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.ENEMY
+    }
+  };
 }

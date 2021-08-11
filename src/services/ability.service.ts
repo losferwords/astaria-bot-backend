@@ -99,7 +99,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.primaryWeapon.physDamage + caster.strength + 1,
+      physDamage: caster.primaryWeapon.physDamage + 1,
       abilityId: ability.id,
       isSimulation
     });
@@ -124,7 +124,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.secondaryWeapon.level + 1 + caster.strength,
+      physDamage: caster.secondaryWeapon.level + 1,
       abilityId: ability.id,
       isSimulation
     });
@@ -171,7 +171,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.primaryWeapon.physDamage + caster.strength + 1,
+      physDamage: caster.primaryWeapon.physDamage + 1,
       abilityId: ability.id,
       isSimulation
     });
@@ -220,7 +220,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.primaryWeapon.physDamage + caster.strength + 2,
+      physDamage: caster.primaryWeapon.physDamage + 2,
       abilityId: ability.id,
       isSimulation
     });
@@ -304,7 +304,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.primaryWeapon.physDamage + caster.strength + 3,
+      physDamage: caster.primaryWeapon.physDamage + 3,
       abilityId: ability.id,
       isSimulation
     });
@@ -329,7 +329,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.primaryWeapon.physDamage + caster.strength + 3,
+      physDamage: caster.primaryWeapon.physDamage + 3,
       abilityId: ability.id,
       isSimulation
     });
@@ -393,7 +393,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.primaryWeapon.physDamage + caster.strength,
+      physDamage: caster.primaryWeapon.physDamage,
       abilityId: ability.id,
       isSimulation
     });
@@ -435,19 +435,19 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
-    const enemies = this.battleService.findEnemies(battle, caster.id, 2, true, false);
+    const enemies = this.battleService.findEnemies(battle, caster.id, 2, true, ability.id, false);
     for (let i = 0; i < enemies.length; i++) {
       if (caster.isDead) {
         return battle;
       }
-      const enemyHero = this.heroService.getCharById(enemies[i], heroes);
+      const enemyChar = this.heroService.getCharById(enemies[i], heroes);
       this.battleService.charTakesDamage({
         battle,
         caster,
         heroes,
-        target: enemyHero,
+        target: enemyChar,
         abilityId: ability.id,
-        physDamage: caster.primaryWeapon.physDamage + caster.strength + 1,
+        physDamage: caster.primaryWeapon.physDamage + 1,
         isSimulation
       });
     }
@@ -503,7 +503,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      magicDamage: 3 + caster.intellect,
+      magicDamage: 3,
       abilityId: ability.id,
       isSimulation
     });
@@ -532,7 +532,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.primaryWeapon.physDamage + caster.strength + 3,
+      physDamage: caster.primaryWeapon.physDamage + 3,
       abilityId: ability.id,
       isSimulation
     });
@@ -557,8 +557,8 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.primaryWeapon.physDamage + caster.strength + 1,
-      magicDamage: 3 + caster.intellect,
+      physDamage: caster.primaryWeapon.physDamage + 1,
+      magicDamage: 3,
       abilityId: ability.id,
       isSimulation
     });
@@ -583,7 +583,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      magicDamage: 4 + caster.intellect,
+      magicDamage: 4,
       abilityId: ability.id,
       isSimulation
     });
@@ -607,7 +607,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.primaryWeapon.physDamage + caster.strength + 4,
+      physDamage: caster.primaryWeapon.physDamage + 4,
       abilityId: ability.id,
       isSimulation
     });
@@ -690,7 +690,7 @@ export class AbilityService {
         caster,
         heroes,
         target: targetAlliesChar,
-        magicDamage: 3 + caster.intellect,
+        magicDamage: 3,
         abilityId: ability.id,
         isSimulation
       });
@@ -701,7 +701,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      magicDamage: 5 + caster.intellect,
+      magicDamage: 5,
       abilityId: ability.id,
       isSimulation
     });
@@ -726,7 +726,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      magicDamage: 2 + caster.intellect,
+      magicDamage: 2,
       abilityId: ability.id,
       isSimulation
     });
@@ -751,7 +751,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.primaryWeapon.physDamage + 1 + caster.strength,
+      physDamage: caster.primaryWeapon.physDamage + 1,
       abilityId: ability.id,
       isSimulation
     });
@@ -798,7 +798,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.primaryWeapon.physDamage + 2 + caster.strength,
+      physDamage: caster.primaryWeapon.physDamage + 2,
       abilityId: ability.id,
       isSimulation
     });
@@ -824,7 +824,10 @@ export class AbilityService {
       abilityId: 'wolf'
     });
 
-    caster.pets.push(new Pet('wolf', position));
+    const newPet = new Pet('wolf', position);
+    caster.pets.push(newPet);
+
+    this.battleService.afterMoveChar(battle, heroes, newPet, isSimulation);
     this.battleService.applyMapEffects(battle, heroes, false, isSimulation);
     return battle;
   }
@@ -903,7 +906,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      magicDamage: 4 + caster.intellect,
+      magicDamage: 4,
       abilityId: ability.id,
       isSimulation
     });
@@ -954,7 +957,7 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
-    const enemies = this.battleService.findEnemies(battle, caster.id, 3, true, false);
+    const enemies = this.battleService.findEnemies(battle, caster.id, 3, true, ability.id, false);
     for (let i = 0; i < enemies.length; i++) {
       const enemyChar = this.heroService.getCharById(enemies[i], heroes);
       this.battleService.charTakesDamage({
@@ -962,7 +965,7 @@ export class AbilityService {
         caster,
         heroes,
         target: enemyChar,
-        magicDamage: 5 + caster.intellect,
+        magicDamage: 5,
         abilityId: ability.id,
         isSimulation
       });
@@ -993,7 +996,10 @@ export class AbilityService {
       abilityId: 'dryad'
     });
 
-    caster.pets.push(new Pet('dryad', position));
+    const newPet = new Pet('dryad', position);
+    caster.pets.push(newPet);
+
+    this.battleService.afterMoveChar(battle, heroes, newPet, isSimulation);
     this.battleService.applyMapEffects(battle, heroes, false, isSimulation);
     return battle;
   }
@@ -1096,7 +1102,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      magicDamage: 2 + caster.intellect,
+      magicDamage: 2,
       abilityId: ability.id,
       isSimulation
     });
@@ -1157,7 +1163,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      magicDamage: caster.intellect * leftCounter,
+      magicDamage: leftCounter,
       abilityId: ability.id,
       isSimulation
     });
@@ -1232,7 +1238,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      magicDamage: 2 + caster.intellect,
+      magicDamage: 2,
       abilityId: ability.id,
       isSimulation
     });
@@ -1257,7 +1263,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      magicDamage: Math.ceil(caster.mana / 2) + caster.intellect,
+      magicDamage: Math.ceil(caster.mana / 2),
       abilityId: ability.id,
       isSimulation
     });
@@ -1412,8 +1418,8 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.primaryWeapon.physDamage + caster.strength + 2,
-      magicDamage: 1 + caster.intellect,
+      physDamage: caster.primaryWeapon.physDamage + 2,
+      magicDamage: 1,
       abilityId: ability.id,
       isSimulation
     });
@@ -1467,7 +1473,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      magicDamage: 2 + caster.intellect,
+      magicDamage: 2,
       abilityId: ability.id,
       isSimulation
     });
@@ -1521,7 +1527,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      magicDamage: 3 + caster.intellect,
+      magicDamage: 3,
       abilityId: ability.id,
       isSimulation
     });
@@ -1546,7 +1552,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.primaryWeapon.physDamage + caster.strength + 3,
+      physDamage: caster.primaryWeapon.physDamage + 3,
       abilityId: ability.id,
       isSimulation
     });
@@ -1600,7 +1606,7 @@ export class AbilityService {
         caster,
         heroes,
         target: targetAlliesChar,
-        magicDamage: 2 + caster.intellect,
+        magicDamage: 2,
         abilityId: ability.id,
         isSimulation
       });
@@ -1611,7 +1617,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      magicDamage: 4 + caster.intellect,
+      magicDamage: 4,
       abilityId: ability.id,
       isSimulation
     });
@@ -1658,7 +1664,10 @@ export class AbilityService {
       abilityId: 'dragon-spirit'
     });
 
-    caster.pets.push(new Pet('dragon-spirit', position));
+    const newPet = new Pet('dragon-spirit', position);
+    caster.pets.push(newPet);
+
+    this.battleService.afterMoveChar(battle, heroes, newPet, isSimulation);
     this.battleService.applyMapEffects(battle, heroes, false, isSimulation);
     return battle;
   }
@@ -1752,7 +1761,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.primaryWeapon.physDamage + caster.strength + 1,
+      physDamage: caster.primaryWeapon.physDamage + 1,
       abilityId: ability.id,
       isSimulation
     });
@@ -1776,7 +1785,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.primaryWeapon.physDamage + caster.strength + 1,
+      physDamage: caster.primaryWeapon.physDamage + 1,
       abilityId: ability.id,
       isSimulation
     });
@@ -1805,7 +1814,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.primaryWeapon.physDamage + caster.strength,
+      physDamage: caster.primaryWeapon.physDamage,
       abilityId: ability.id,
       isSimulation
     });
@@ -1878,7 +1887,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      magicDamage: 3 + caster.intellect,
+      magicDamage: 3,
       abilityId: ability.id,
       isSimulation
     });
@@ -1898,7 +1907,7 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
-    const enemies = this.battleService.findEnemies(battle, caster.id, 3, true, false);
+    const enemies = this.battleService.findEnemies(battle, caster.id, 3, true, ability.id, false);
     for (let i = 0; i < enemies.length; i++) {
       if (caster.isDead) {
         return battle;
@@ -1910,7 +1919,7 @@ export class AbilityService {
         heroes,
         target: enemyHero,
         abilityId: ability.id,
-        physDamage: caster.primaryWeapon.physDamage + caster.strength + 2,
+        physDamage: caster.primaryWeapon.physDamage + 2,
         isSimulation
       });
     }
@@ -1956,8 +1965,8 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.primaryWeapon.physDamage + caster.strength + 2,
-      magicDamage: 3 + caster.intellect,
+      physDamage: caster.primaryWeapon.physDamage + 2,
+      magicDamage: 3,
       abilityId: ability.id,
       isSimulation
     });
@@ -1969,6 +1978,439 @@ export class AbilityService {
     if (!target.isPet) {
       this.heroService.spendMana(target as IHero, 2);
     }
+
+    return battle;
+  }
+
+  '41-headshot'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+
+    this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      directDamage: caster.primaryWeapon.physDamage + 1,
+      abilityId: ability.id,
+      isSimulation
+    });
+
+    return battle;
+  }
+
+  '42-phantom'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+
+    battle.log.push({
+      type: LogMessageType.PET_SUMMON,
+      casterId: caster.id,
+      abilityId: 'phantom'
+    });
+
+    const newPet = new Pet('phantom', position);
+    caster.pets.push(newPet);
+
+    this.battleService.afterMoveChar(battle, heroes, newPet, isSimulation);
+    this.battleService.applyMapEffects(battle, heroes, false, isSimulation);
+    return battle;
+  }
+
+  '42-phantom-imitation-shot'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IPet,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    ability.left = ability.cd;
+
+    const shadow = this.heroService.getHeroById('shadow', heroes);
+
+    let abilityDamage = shadow.primaryWeapon.physDamage + shadow.strength;
+
+    if (this.heroService.getCharEffectById(caster, '33-power-of-the-pack')) {
+      abilityDamage += 3;
+    }
+
+    this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      physDamage: abilityDamage,
+      abilityId: ability.id,
+      isSimulation
+    });
+
+    return battle;
+  }
+
+  '43-oblivion'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+
+    this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      magicDamage: 4,
+      abilityId: ability.id,
+      isSimulation
+    });
+
+    this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
+    return battle;
+  }
+
+  // Lightbringer
+  '11-sun-strike'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+
+    this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      physDamage: caster.primaryWeapon.physDamage,
+      magicDamage: 1,
+      abilityId: ability.id,
+      isSimulation
+    });
+
+    return battle;
+  }
+
+  '12-skies-gift'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+
+    battle.log.push({
+      type: LogMessageType.ABILITY_CAST,
+      casterId: caster.id,
+      abilityId: ability.id,
+      positionX: position.x,
+      positionY: position.y
+    });
+
+    caster.position.x = position.x;
+    caster.position.y = position.y;
+
+    this.battleService.afterMoveChar(battle, heroes, caster, isSimulation);
+    return battle;
+  }
+
+  '13-sun-touch'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+
+    const casterTeam = this.heroService.getTeamByHeroId(caster.id, battle.teams);
+    const targetTeam = this.heroService.getTeamByCharId(target.id, battle.teams);
+
+    if (casterTeam.id === targetTeam.id) {
+      target.health += 2;
+
+      if (target.health > target.maxHealth) {
+        target.health = target.maxHealth;
+      }
+
+      battle.log.push({
+        type: LogMessageType.ABILITY_HEAL,
+        casterId: caster.id,
+        targetId: target.id,
+        abilityId: ability.id,
+        value: '2'
+      });
+    } else {
+      this.battleService.charTakesDamage({
+        battle,
+        caster,
+        heroes,
+        target,
+        magicDamage: 2,
+        abilityId: ability.id,
+        isSimulation
+      });
+    }
+    return battle;
+  }
+
+  '31-retribution'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+
+    const healthDamage = this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      physDamage: caster.primaryWeapon.physDamage + 1,
+      magicDamage: 2,
+      abilityId: ability.id,
+      isSimulation
+    });
+
+    if (healthDamage > 0 && caster.health < caster.maxHealth) {
+      caster.health += healthDamage;
+
+      if (caster.health > caster.maxHealth) {
+        caster.health = caster.maxHealth;
+      }
+
+      battle.log.push({
+        type: LogMessageType.ABILITY_HEAL,
+        casterId: caster.id,
+        targetId: caster.id,
+        abilityId: ability.id,
+        value: healthDamage + ''
+      });
+    }
+
+    return battle;
+  }
+
+  '32-sun-aegis'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+
+    battle.log.push({
+      type: LogMessageType.ABILITY_CAST,
+      casterId: caster.id,
+      targetId: target.id,
+      abilityId: ability.id
+    });
+
+    this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
+    return battle;
+  }
+
+  '33-cleansing'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+
+    battle.log.push({
+      type: LogMessageType.ABILITY_CAST,
+      casterId: caster.id,
+      targetId: target.id,
+      abilityId: ability.id
+    });
+
+    const casterTeam = this.heroService.getTeamByHeroId(caster.id, battle.teams);
+    const targetTeam = this.heroService.getTeamByCharId(target.id, battle.teams);
+    let effectsRemoved = 0;
+
+    for (let i = target.effects.length - 1; i > -1; i--) {
+      if (casterTeam.id === targetTeam.id) {
+        if (!target.effects[i].isBuff) {
+          target.effects.splice(i, 1);
+          effectsRemoved++;
+        }
+      } else {
+        if (target.effects[i].isBuff) {
+          target.effects.splice(i, 1);
+          effectsRemoved++;
+        }
+      }
+    }
+
+    target = this.heroService.resetHeroState(target as IHero);
+    target = this.heroService.calcHero(target as IHero);
+    this.battleService.applyCharEffects(battle, heroes, target, false, isSimulation);
+
+    if (effectsRemoved > 0 && caster.health < caster.maxHealth) {
+      caster.health += 2 * effectsRemoved;
+
+      if (caster.health > caster.maxHealth) {
+        caster.health = caster.maxHealth;
+      }
+
+      battle.log.push({
+        type: LogMessageType.ABILITY_HEAL,
+        casterId: caster.id,
+        targetId: caster.id,
+        abilityId: ability.id,
+        value: 2 * effectsRemoved + ''
+      });
+    }
+
+    return battle;
+  }
+
+  '41-hammer-of-wrath'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+
+    this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      physDamage: caster.primaryWeapon.physDamage + 2,
+      magicDamage: 2,
+      abilityId: ability.id,
+      isSimulation
+    });
+
+    if (!target || target.health < 1) {
+      return battle;
+    }
+
+    this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
+    return battle;
+  }
+
+  '42-divine-radiance'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+
+    battle.log.push({
+      type: LogMessageType.ABILITY_CAST,
+      casterId: caster.id,
+      targetId: target.id,
+      abilityId: ability.id
+    });
+
+    this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
+    return battle;
+  }
+
+  '43-sunrise'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+
+    const allies = this.battleService.findAllies(battle, caster.id, 3, true, true, true);
+    for (let i = 0; i < allies.length; i++) {
+      const allyChar = this.heroService.getCharById(allies[i], heroes);
+      if (allyChar.health < allyChar.maxHealth) {
+        allyChar.health += caster.intellect;
+
+        if (allyChar.health > allyChar.maxHealth) {
+          allyChar.health = allyChar.maxHealth;
+        }
+
+        battle.log.push({
+          type: LogMessageType.ABILITY_HEAL,
+          casterId: caster.id,
+          targetId: allyChar.id,
+          abilityId: ability.id,
+          value: caster.intellect + ''
+        });
+      }
+    }
+
+    return battle;
+  }
+
+  // Avenger
+  '11-double-strike'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+
+    this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      physDamage: caster.primaryWeapon.physDamage + caster.secondaryWeapon.physDamage,
+      abilityId: ability.id,
+      isSimulation
+    });
 
     return battle;
   }

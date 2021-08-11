@@ -12,6 +12,7 @@ export interface IAbility {
   isPassive: boolean;
   left: number;
   targetType: AbilityTargetType;
+  includeInvisible?: boolean;
   ignoreRaytrace?: boolean;
   ignoreObstacles?: boolean;
 }

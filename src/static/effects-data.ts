@@ -268,4 +268,56 @@ export class EffectsData {
     isBuff: true,
     isRemovable: true
   };
+
+  public static readonly '43-oblivion': IEffect = {
+    id: '43-oblivion',
+    duration: 3,
+    isBuff: false,
+    isRemovable: true
+  };
+
+  public static readonly '21-aura-of-might': IEffect = {
+    id: '21-aura-of-might',
+    duration: 100,
+    isBuff: true,
+    isRemovable: false,
+    range: 2
+  };
+
+  public static readonly '22-aura-of-fortitude': IEffect = {
+    id: '22-aura-of-fortitude',
+    duration: 100,
+    isBuff: true,
+    isRemovable: false,
+    range: 2
+  };
+
+  public static readonly '23-aura-of-light': IEffect = {
+    id: '23-aura-of-light',
+    duration: 100,
+    isBuff: true,
+    isRemovable: false,
+    range: 2
+  };
+
+  public static readonly '32-sun-aegis': IEffect = {
+    id: '32-sun-aegis',
+    duration: 2,
+    isBuff: true,
+    isRemovable: false
+  };
+
+  public static readonly '41-hammer-of-wrath': IEffect = {
+    id: '41-hammer-of-wrath',
+    duration: 1,
+    isBuff: false,
+    isRemovable: true
+  };
+
+  public static readonly '42-divine-radiance': IEffect = {
+    id: '42-divine-radiance',
+    duration: 2,
+    isBuff: true,
+    isRemovable: false
+  };
 }
