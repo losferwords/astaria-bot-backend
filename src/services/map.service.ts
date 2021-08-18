@@ -78,7 +78,11 @@ export class MapService {
   }
 
   checkTileForObstacle(position: IPosition, tiles: ITile[][], heroes: IHero[], ignoreObstacles?: boolean): boolean {
-    if (tiles[position.y] && tiles[position.y][position.x] && tiles[position.y][position.x].type === TileType.FLOOR) {
+    if (
+      tiles[position.y] &&
+      tiles[position.y][position.x] &&
+      (tiles[position.y][position.x].type === TileType.FLOOR || tiles[position.y][position.x].type === TileType.ROOM)
+    ) {
       if (ignoreObstacles) {
         return false;
       }
@@ -110,7 +114,7 @@ export class MapService {
     const availablePoints = [];
     for (let i = 0; i < points.length; i++) {
       if (radius === 1 || ignoreRaytrace) {
-        if (ignoreObstacles || !this.checkTileForObstacle(points[i], tiles, heroes)) {
+        if (!this.checkTileForObstacle(points[i], tiles, heroes, ignoreObstacles)) {
           availablePoints.push(points[i]);
         }
       } else {

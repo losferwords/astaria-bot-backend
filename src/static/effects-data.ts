@@ -266,7 +266,7 @@ export class EffectsData {
     id: '32-shadow-cloak',
     duration: 2,
     isBuff: true,
-    isRemovable: true
+    isRemovable: false
   };
 
   public static readonly '43-oblivion': IEffect = {
@@ -276,6 +276,7 @@ export class EffectsData {
     isRemovable: true
   };
 
+  // Lightbringer
   public static readonly '21-aura-of-might': IEffect = {
     id: '21-aura-of-might',
     duration: 100,
@@ -316,6 +317,50 @@ export class EffectsData {
 
   public static readonly '42-divine-radiance': IEffect = {
     id: '42-divine-radiance',
+    duration: 2,
+    isBuff: true,
+    isRemovable: false
+  };
+
+  // Avenger
+  public static readonly '22-quicksands': IEffect = {
+    id: '22-quicksands',
+    duration: 2,
+    isBuff: false,
+    isRemovable: true
+  };
+
+  public static readonly '23-temporal-strike': IEffect = {
+    id: '23-temporal-strike',
+    duration: 2,
+    isBuff: false,
+    isRemovable: true
+  };
+
+  public static readonly '32-sand-storm': IEffect = {
+    id: '32-sand-storm',
+    duration: 2,
+    isBuff: true,
+    isRemovable: false,
+    range: 2
+  };
+
+  public static readonly '33-time-trap': IEffect = {
+    id: '33-time-trap',
+    duration: 2,
+    isBuff: false,
+    isRemovable: true
+  };
+
+  public static readonly '41-excellence': IEffect = {
+    id: '41-excellence',
+    duration: 2,
+    isBuff: true,
+    isRemovable: false
+  };
+
+  public static readonly '42-sand-form': IEffect = {
+    id: '42-sand-form',
     duration: 2,
     isBuff: true,
     isRemovable: false

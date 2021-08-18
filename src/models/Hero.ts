@@ -40,10 +40,10 @@ export class Hero implements IHero {
   isDisarmed = false;
   isStunned = false;
   isImmobilized = false;
+  isBlind = false;
   isImmuneToDisarm = false;
   isImmuneToDebuffs = false;
   maxAllowedAbilityLevel = 4;
-  maxAllowedAbilityRange = 100;
 
   moveEnergyCost = Const.moveEnergyCost;
   extraWeaponEnergyCost = 0;

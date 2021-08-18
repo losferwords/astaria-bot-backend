@@ -151,79 +151,180 @@ export class ReportService {
       fs.mkdirSync(Const.reportsPath);
     }
 
-    switch (battle.scenario.id) {
-      case '0':
-        const loserTeam = battle.teams[0].id === winner.id ? battle.teams[1] : battle.teams[0];
-        statisticsData +=
-          battle.id +
-          ',1,' +
-          winner.heroes[0].id +
-          ',' +
-          winner.heroes[0].primaryWeapon.level +
-          ',' +
-          (winner.heroes[0].secondaryWeapon ? winner.heroes[0].secondaryWeapon.level : '') +
-          ',' +
-          winner.heroes[0].chestpiece.level +
-          ',' +
-          (winner.heroes[0].abilities[0] ? winner.heroes[0].abilities[0].id : '') +
-          ',' +
-          (winner.heroes[0].abilities[1] ? winner.heroes[0].abilities[1].id : '') +
-          ',' +
-          (winner.heroes[0].abilities[2] ? winner.heroes[0].abilities[2].id : '') +
-          ',' +
-          (winner.heroes[0].abilities[3] ? winner.heroes[0].abilities[3].id : '') +
-          ',' +
-          winner.heroes[1].id +
-          ',' +
-          winner.heroes[1].primaryWeapon.level +
-          ',' +
-          (winner.heroes[1].secondaryWeapon ? winner.heroes[1].secondaryWeapon.level : '') +
-          ',' +
-          winner.heroes[1].chestpiece.level +
-          ',' +
-          (winner.heroes[1].abilities[0] ? winner.heroes[1].abilities[0].id : '') +
-          ',' +
-          (winner.heroes[1].abilities[1] ? winner.heroes[1].abilities[1].id : '') +
-          ',' +
-          (winner.heroes[1].abilities[2] ? winner.heroes[1].abilities[2].id : '') +
-          ',' +
-          (winner.heroes[1].abilities[3] ? winner.heroes[1].abilities[3].id : '') +
-          ',' +
-          loserTeam.heroes[0].id +
-          ',' +
-          loserTeam.heroes[0].primaryWeapon.level +
-          ',' +
-          (loserTeam.heroes[0].secondaryWeapon ? loserTeam.heroes[0].secondaryWeapon.level : '') +
-          ',' +
-          loserTeam.heroes[0].chestpiece.level +
-          ',' +
-          (loserTeam.heroes[0].abilities[0] ? loserTeam.heroes[0].abilities[0].id : '') +
-          ',' +
-          (loserTeam.heroes[0].abilities[1] ? loserTeam.heroes[0].abilities[1].id : '') +
-          ',' +
-          (loserTeam.heroes[0].abilities[2] ? loserTeam.heroes[0].abilities[2].id : '') +
-          ',' +
-          (loserTeam.heroes[0].abilities[3] ? loserTeam.heroes[0].abilities[3].id : '') +
-          ',' +
-          loserTeam.heroes[1].id +
-          ',' +
-          loserTeam.heroes[1].primaryWeapon.level +
-          ',' +
-          (loserTeam.heroes[1].secondaryWeapon ? loserTeam.heroes[1].secondaryWeapon.level : '') +
-          ',' +
-          loserTeam.heroes[1].chestpiece.level +
-          ',' +
-          (loserTeam.heroes[1].abilities[0] ? loserTeam.heroes[1].abilities[0].id : '') +
-          ',' +
-          (loserTeam.heroes[1].abilities[1] ? loserTeam.heroes[1].abilities[1].id : '') +
-          ',' +
-          (loserTeam.heroes[1].abilities[2] ? loserTeam.heroes[1].abilities[2].id : '') +
-          ',' +
-          (loserTeam.heroes[1].abilities[3] ? loserTeam.heroes[1].abilities[3].id : '') +
-          ',' +
-          battle.log.filter((message: ILogMessage) => message.type === LogMessageType.TURN_END).length +
-          '\n';
-        break;
+    if (battle.scenario.id === '0') {
+      const loserTeam = battle.teams[0].id === winner.id ? battle.teams[1] : battle.teams[0];
+      statisticsData +=
+        battle.id +
+        ',0,' +
+        winner.heroes[0].id +
+        ',' +
+        winner.heroes[0].primaryWeapon.level +
+        ',' +
+        (winner.heroes[0].secondaryWeapon ? winner.heroes[0].secondaryWeapon.level : '') +
+        ',' +
+        winner.heroes[0].chestpiece.level +
+        ',' +
+        (winner.heroes[0].abilities[0] ? winner.heroes[0].abilities[0].id : '') +
+        ',' +
+        (winner.heroes[0].abilities[1] ? winner.heroes[0].abilities[1].id : '') +
+        ',' +
+        (winner.heroes[0].abilities[2] ? winner.heroes[0].abilities[2].id : '') +
+        ',' +
+        (winner.heroes[0].abilities[3] ? winner.heroes[0].abilities[3].id : '') +
+        ',' +
+        winner.heroes[1].id +
+        ',' +
+        winner.heroes[1].primaryWeapon.level +
+        ',' +
+        (winner.heroes[1].secondaryWeapon ? winner.heroes[1].secondaryWeapon.level : '') +
+        ',' +
+        winner.heroes[1].chestpiece.level +
+        ',' +
+        (winner.heroes[1].abilities[0] ? winner.heroes[1].abilities[0].id : '') +
+        ',' +
+        (winner.heroes[1].abilities[1] ? winner.heroes[1].abilities[1].id : '') +
+        ',' +
+        (winner.heroes[1].abilities[2] ? winner.heroes[1].abilities[2].id : '') +
+        ',' +
+        (winner.heroes[1].abilities[3] ? winner.heroes[1].abilities[3].id : '') +
+        ',' +
+        loserTeam.heroes[0].id +
+        ',' +
+        loserTeam.heroes[0].primaryWeapon.level +
+        ',' +
+        (loserTeam.heroes[0].secondaryWeapon ? loserTeam.heroes[0].secondaryWeapon.level : '') +
+        ',' +
+        loserTeam.heroes[0].chestpiece.level +
+        ',' +
+        (loserTeam.heroes[0].abilities[0] ? loserTeam.heroes[0].abilities[0].id : '') +
+        ',' +
+        (loserTeam.heroes[0].abilities[1] ? loserTeam.heroes[0].abilities[1].id : '') +
+        ',' +
+        (loserTeam.heroes[0].abilities[2] ? loserTeam.heroes[0].abilities[2].id : '') +
+        ',' +
+        (loserTeam.heroes[0].abilities[3] ? loserTeam.heroes[0].abilities[3].id : '') +
+        ',' +
+        loserTeam.heroes[1].id +
+        ',' +
+        loserTeam.heroes[1].primaryWeapon.level +
+        ',' +
+        (loserTeam.heroes[1].secondaryWeapon ? loserTeam.heroes[1].secondaryWeapon.level : '') +
+        ',' +
+        loserTeam.heroes[1].chestpiece.level +
+        ',' +
+        (loserTeam.heroes[1].abilities[0] ? loserTeam.heroes[1].abilities[0].id : '') +
+        ',' +
+        (loserTeam.heroes[1].abilities[1] ? loserTeam.heroes[1].abilities[1].id : '') +
+        ',' +
+        (loserTeam.heroes[1].abilities[2] ? loserTeam.heroes[1].abilities[2].id : '') +
+        ',' +
+        (loserTeam.heroes[1].abilities[3] ? loserTeam.heroes[1].abilities[3].id : '') +
+        ',' +
+        battle.log.filter((message: ILogMessage) => message.type === LogMessageType.TURN_END).length +
+        '\n';
+    } else if (battle.scenario.id === '1') {
+      const loserTeam = battle.teams[0].id === winner.id ? battle.teams[1] : battle.teams[0];
+      statisticsData +=
+        battle.id +
+        ',1,' +
+        winner.heroes[0].id +
+        ',' +
+        winner.heroes[0].primaryWeapon.level +
+        ',' +
+        (winner.heroes[0].secondaryWeapon ? winner.heroes[0].secondaryWeapon.level : '') +
+        ',' +
+        winner.heroes[0].chestpiece.level +
+        ',' +
+        (winner.heroes[0].abilities[0] ? winner.heroes[0].abilities[0].id : '') +
+        ',' +
+        (winner.heroes[0].abilities[1] ? winner.heroes[0].abilities[1].id : '') +
+        ',' +
+        (winner.heroes[0].abilities[2] ? winner.heroes[0].abilities[2].id : '') +
+        ',' +
+        (winner.heroes[0].abilities[3] ? winner.heroes[0].abilities[3].id : '') +
+        ',' +
+        winner.heroes[1].id +
+        ',' +
+        winner.heroes[1].primaryWeapon.level +
+        ',' +
+        (winner.heroes[1].secondaryWeapon ? winner.heroes[1].secondaryWeapon.level : '') +
+        ',' +
+        winner.heroes[1].chestpiece.level +
+        ',' +
+        (winner.heroes[1].abilities[0] ? winner.heroes[1].abilities[0].id : '') +
+        ',' +
+        (winner.heroes[1].abilities[1] ? winner.heroes[1].abilities[1].id : '') +
+        ',' +
+        (winner.heroes[1].abilities[2] ? winner.heroes[1].abilities[2].id : '') +
+        ',' +
+        (winner.heroes[1].abilities[3] ? winner.heroes[1].abilities[3].id : '') +
+        ',' +
+        winner.heroes[2].id +
+        ',' +
+        winner.heroes[2].primaryWeapon.level +
+        ',' +
+        (winner.heroes[2].secondaryWeapon ? winner.heroes[2].secondaryWeapon.level : '') +
+        ',' +
+        winner.heroes[2].chestpiece.level +
+        ',' +
+        (winner.heroes[2].abilities[0] ? winner.heroes[2].abilities[0].id : '') +
+        ',' +
+        (winner.heroes[2].abilities[1] ? winner.heroes[2].abilities[1].id : '') +
+        ',' +
+        (winner.heroes[2].abilities[2] ? winner.heroes[2].abilities[2].id : '') +
+        ',' +
+        (winner.heroes[2].abilities[3] ? winner.heroes[2].abilities[3].id : '') +
+        ',' +
+        loserTeam.heroes[0].id +
+        ',' +
+        loserTeam.heroes[0].primaryWeapon.level +
+        ',' +
+        (loserTeam.heroes[0].secondaryWeapon ? loserTeam.heroes[0].secondaryWeapon.level : '') +
+        ',' +
+        loserTeam.heroes[0].chestpiece.level +
+        ',' +
+        (loserTeam.heroes[0].abilities[0] ? loserTeam.heroes[0].abilities[0].id : '') +
+        ',' +
+        (loserTeam.heroes[0].abilities[1] ? loserTeam.heroes[0].abilities[1].id : '') +
+        ',' +
+        (loserTeam.heroes[0].abilities[2] ? loserTeam.heroes[0].abilities[2].id : '') +
+        ',' +
+        (loserTeam.heroes[0].abilities[3] ? loserTeam.heroes[0].abilities[3].id : '') +
+        ',' +
+        loserTeam.heroes[1].id +
+        ',' +
+        loserTeam.heroes[1].primaryWeapon.level +
+        ',' +
+        (loserTeam.heroes[1].secondaryWeapon ? loserTeam.heroes[1].secondaryWeapon.level : '') +
+        ',' +
+        loserTeam.heroes[1].chestpiece.level +
+        ',' +
+        (loserTeam.heroes[1].abilities[0] ? loserTeam.heroes[1].abilities[0].id : '') +
+        ',' +
+        (loserTeam.heroes[1].abilities[1] ? loserTeam.heroes[1].abilities[1].id : '') +
+        ',' +
+        (loserTeam.heroes[1].abilities[2] ? loserTeam.heroes[1].abilities[2].id : '') +
+        ',' +
+        (loserTeam.heroes[1].abilities[3] ? loserTeam.heroes[1].abilities[3].id : '') +
+        ',' +
+        loserTeam.heroes[2].id +
+        ',' +
+        loserTeam.heroes[2].primaryWeapon.level +
+        ',' +
+        (loserTeam.heroes[2].secondaryWeapon ? loserTeam.heroes[2].secondaryWeapon.level : '') +
+        ',' +
+        loserTeam.heroes[2].chestpiece.level +
+        ',' +
+        (loserTeam.heroes[2].abilities[0] ? loserTeam.heroes[2].abilities[0].id : '') +
+        ',' +
+        (loserTeam.heroes[2].abilities[1] ? loserTeam.heroes[2].abilities[1].id : '') +
+        ',' +
+        (loserTeam.heroes[2].abilities[2] ? loserTeam.heroes[2].abilities[2].id : '') +
+        ',' +
+        (loserTeam.heroes[2].abilities[3] ? loserTeam.heroes[2].abilities[3].id : '') +
+        ',' +
+        battle.log.filter((message: ILogMessage) => message.type === LogMessageType.TURN_END).length +
+        '\n';
     }
 
     if (!fs.existsSync(targetFile)) {
@@ -232,6 +333,10 @@ export class ReportService {
         case '0':
           headers +=
             'winner1,winner1-pw,winner1-sw,winner1-cp,winner1-ability1,winner1-ability2,winner1-ability3,winner1-ability4,winner2,winner2-pw,winner2-sw,winner2-cp,winner2-ability1,winner2-ability2,winner2-ability3,winner2-ability4,loser1,loser1-pw,loser1-sw,loser1-cp,loser1-ability1,loser1-ability2,loser1-ability3,loser1-ability4,loser2,loser2-pw,loser2-sw,loser2-cp,loser2-ability1,loser1-ability2,loser2-ability3,loser2-ability4,turns\n';
+          break;
+        case '1':
+          headers +=
+            'winner1,winner1-pw,winner1-sw,winner1-cp,winner1-ability1,winner1-ability2,winner1-ability3,winner1-ability4,winner2,winner2-pw,winner2-sw,winner2-cp,winner2-ability1,winner2-ability2,winner2-ability3,winner2-ability4,winner3,winner3-pw,winner3-sw,winner3-cp,winner3-ability1,winner3-ability2,winner3-ability3,winner3-ability4,loser1,loser1-pw,loser1-sw,loser1-cp,loser1-ability1,loser1-ability2,loser1-ability3,loser1-ability4,loser2,loser2-pw,loser2-sw,loser2-cp,loser2-ability1,loser1-ability2,loser2-ability3,loser2-ability4,loser3,loser3-pw,loser3-sw,loser3-cp,loser3-ability1,loser3-ability2,loser3-ability3,loser3-ability4,turns\n';
           break;
       }
       fs.writeFileSync(targetFile, headers + statisticsData);
@@ -264,42 +369,69 @@ export class ReportService {
   expandChildren(parentNode: BotNode) {
     const childrenNodeArray = Array.from(parentNode.children.values());
     const childrenArray = [];
-    for (const child of childrenNodeArray) {
-      this.totalNodes++;
-      if (child.node) {
-        childrenArray.push(this.expandChildren(child.node));
-      } else {
-        this.unexpandedNodes++;
-        childrenArray.push({
-          name: 'unexpanded',
-          children: []
-        });
+    const isParentNodeWin = parentNode.state.log.find((l) => l.type === LogMessageType.WIN);
+    if (isParentNodeWin) {
+      childrenArray.push({
+        name: 'battle end',
+        children: []
+      });
+    } else {
+      for (const child of childrenNodeArray) {
+        this.totalNodes++;
+        if (child.node) {
+          childrenArray.push(this.expandChildren(child.node));
+        } else {
+          this.unexpandedNodes++;
+          childrenArray.push({
+            name: 'unexpanded',
+            children: []
+          });
+        }
       }
     }
+
     let name = '';
+    let activeCharId = parentNode.state.queue[0];
     if (parentNode.action) {
       switch (parentNode.action.type) {
         case ActionType.MOVE:
         case ActionType.PET_MOVE:
-          name =
-            parentNode.state.log.slice(-2, -1)[0].id +
-            ' move to ' +
-            parentNode.action.positionX +
-            ',' +
-            parentNode.action.positionY;
+          name = activeCharId + ' move to ' + parentNode.action.positionX + ',' + parentNode.action.positionY;
           break;
         case ActionType.WEAPON_DAMAGE:
+          const weaponDamage = parentNode.state.log
+            .slice()
+            .reverse()
+            .find(
+              (l) =>
+                l.casterId === parentNode.action.casterId &&
+                l.targetId === parentNode.action.targetId &&
+                l.equipId === parentNode.action.equipId &&
+                l.type === LogMessageType.WEAPON_DAMAGE
+            ).value;
+          activeCharId = parentNode.action.casterId;
           name =
             parentNode.action.casterId +
             ' deals ' +
-            parentNode.state.log.slice(-2, -1)[0].value +
-            ' damage to' +
+            weaponDamage +
+            ' damage to ' +
             parentNode.action.targetId +
             ' with ' +
             parentNode.action.equipId;
           break;
         case ActionType.ABILITY:
         case ActionType.PET_ABILITY:
+          const abilityWithDamageMessage = parentNode.state.log
+            .slice()
+            .reverse()
+            .find(
+              (l) =>
+                l.casterId === parentNode.action.casterId &&
+                l.targetId === parentNode.action.targetId &&
+                l.abilityId === parentNode.action.abilityId &&
+                (l.type === LogMessageType.ABILITY_DAMAGE || l.type === LogMessageType.ABILITY_HEAL)
+            );
+          activeCharId = parentNode.action.casterId;
           name =
             parentNode.action.casterId +
             ' cast ' +
@@ -308,21 +440,25 @@ export class ReportService {
             (parentNode.action.targetId
               ? parentNode.action.targetId
               : '(' + parentNode.action.positionX + ',' + parentNode.action.positionY + ')') +
-            (parentNode.state.log.slice(-2, -1)[0].value
-              ? ' (damage/heal: ' + parentNode.state.log.slice(-2, -1)[0].value + ')'
-              : '');
+            (abilityWithDamageMessage ? ' (damage/heal: ' + abilityWithDamageMessage.value + ')' : '');
           break;
         case ActionType.UPGRADE_EQUIP:
-          name = parentNode.state.log.slice(-2, -1)[0].id + ' upgrade equip: ' + parentNode.action.equipId;
+          name = activeCharId + ' upgrade equip: ' + parentNode.action.equipId;
           break;
         case ActionType.LEARN_ABILITY:
-          name = parentNode.state.log.slice(-2, -1)[0].id + ' learn ability: ' + parentNode.action.abilityId;
+          name = activeCharId + ' learn ability: ' + parentNode.action.abilityId;
           break;
         case ActionType.TURN_END:
-          name = parentNode.state.log.slice(-2, -1)[0].id + ' end turn';
+          const endTurnActiveCharId = parentNode.state.log
+            .slice()
+            .reverse()
+            .find((l) => l.type === LogMessageType.TURN_END).id;
+          activeCharId = endTurnActiveCharId;
+          name = endTurnActiveCharId + ' end turn';
           break;
       }
     } else {
+      activeCharId = parentNode.state.log[0].id;
       name =
         parentNode.state.log[0].id +
         ' starts at ' +
@@ -333,7 +469,7 @@ export class ReportService {
 
     return {
       name: name,
-      hero: parentNode.state.log.length > 1 ? parentNode.state.log.slice(-2, -1)[0].id : parentNode.state.log[0].id,
+      hero: activeCharId,
       sims: parentNode.sims,
       wins: parentNode.wins,
       shortestWin: parentNode.shortestWin,

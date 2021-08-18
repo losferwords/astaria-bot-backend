@@ -187,6 +187,21 @@ export class BotService {
     console.log('----------------------------------------');
     if (Const.simulationInfo) {
       console.log('Sims: ' + stats.sims + ', Wins: ' + stats.wins);
+      stats.children = stats.children.sort((a, b) => {
+        if (a.sims > b.sims) {
+          return -1;
+        } else if (a.sims < b.sims) {
+          return 1;
+        } else {
+          if (a.shortestWin > b.shortestWin) {
+            return 1;
+          } else if (a.shortestWin < b.shortestWin) {
+            return -1;
+          } else {
+            return 0;
+          }
+        }
+      });
       for (let i = 0; i < stats.children.length; i++) {
         let actionStr =
           'Action ' +

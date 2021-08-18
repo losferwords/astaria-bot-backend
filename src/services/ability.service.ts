@@ -28,6 +28,7 @@ export class AbilityService {
     if (!target || target.health < 1) {
       return;
     }
+
     const effect: IEffect = { ...EffectsData[effectId] };
 
     if (!effect.isBuff && target.isImmuneToDebuffs) {
@@ -59,8 +60,8 @@ export class AbilityService {
           break;
         }
       }
-      caster = this.heroService.resetHeroState(caster);
-      caster = this.heroService.calcHero(caster);
+      this.heroService.resetHeroState(caster);
+      this.heroService.calcHero(caster);
       this.battleService.applyCharEffects(battle, heroes, caster, false, isSimulation);
     } else {
       this.heroService.spendEnergy(caster, ability.energyCost);
@@ -252,8 +253,8 @@ export class AbilityService {
       }
     }
 
-    target = this.heroService.resetHeroState(target as IHero);
-    target = this.heroService.calcHero(target as IHero);
+    this.heroService.resetHeroState(target as IHero);
+    this.heroService.calcHero(target as IHero);
     this.battleService.applyCharEffects(battle, heroes, target, false, isSimulation);
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -435,7 +436,7 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
-    const enemies = this.battleService.findEnemies(battle, caster.id, 2, true, ability.id, false);
+    const enemies = this.battleService.findEnemies(battle, caster.id, 2, true, ability.id, false, false);
     for (let i = 0; i < enemies.length; i++) {
       if (caster.isDead) {
         return battle;
@@ -479,8 +480,8 @@ export class AbilityService {
       }
     }
 
-    target = this.heroService.resetHeroState(target as IHero);
-    target = this.heroService.calcHero(target as IHero);
+    this.heroService.resetHeroState(target as IHero);
+    this.heroService.calcHero(target as IHero);
     this.battleService.applyCharEffects(battle, heroes, target, false, isSimulation);
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -682,7 +683,7 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
-    const targetAllies = this.battleService.findAllies(battle, target.id, 2, false, true, false);
+    const targetAllies = this.battleService.findAllies(battle, target.id, 2, false, true, false, false);
     for (let i = 0; i < targetAllies.length; i++) {
       const targetAlliesChar = this.heroService.getCharById(targetAllies[i], heroes);
       this.battleService.charTakesDamage({
@@ -957,7 +958,7 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
-    const enemies = this.battleService.findEnemies(battle, caster.id, 3, true, ability.id, false);
+    const enemies = this.battleService.findEnemies(battle, caster.id, 3, true, ability.id, false, false);
     for (let i = 0; i < enemies.length; i++) {
       const enemyChar = this.heroService.getCharById(enemies[i], heroes);
       this.battleService.charTakesDamage({
@@ -1196,16 +1197,21 @@ export class AbilityService {
 
     if (hasPostEffects) {
       for (let i = 0; i < heroes.length; i++) {
-        heroes[i] = this.heroService.resetHeroState(heroes[i]);
-        heroes[i] = this.heroService.calcHero(heroes[i]);
+        this.heroService.resetHeroState(heroes[i]);
+        this.heroService.calcHero(heroes[i]);
         this.battleService.applyCharEffects(battle, heroes, heroes[i], false, isSimulation);
+
+        for (let j = 0; j < heroes[i].pets.length; j++) {
+          this.heroService.resetPetState(heroes[i].pets[j]);
+          this.battleService.applyCharEffects(battle, heroes, heroes[i].pets[j], false, isSimulation);
+        }
       }
     } else {
       if (target.isPet) {
-        target = this.heroService.resetPetState(target as IPet);
+        this.heroService.resetPetState(target as IPet);
       } else {
-        target = this.heroService.resetHeroState(target as IHero);
-        target = this.heroService.calcHero(target as IHero);
+        this.heroService.resetHeroState(target as IHero);
+        this.heroService.calcHero(target as IHero);
       }
       this.battleService.applyCharEffects(battle, heroes, target, false, isSimulation);
     }
@@ -1557,10 +1563,6 @@ export class AbilityService {
       isSimulation
     });
 
-    if (!target || target.health < 1) {
-      return battle;
-    }
-
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
     return battle;
   }
@@ -1598,7 +1600,7 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
-    const targetAllies = this.battleService.findAllies(battle, target.id, 1, false, true, false);
+    const targetAllies = this.battleService.findAllies(battle, target.id, 1, false, true, false, false);
     for (let i = 0; i < targetAllies.length; i++) {
       const targetAlliesChar = this.heroService.getCharById(targetAllies[i], heroes);
       this.battleService.charTakesDamage({
@@ -1689,7 +1691,7 @@ export class AbilityService {
       abilityDamage += 3;
     }
 
-    const targetAllies = this.battleService.findAllies(battle, target.id, 1, false, true, false);
+    const targetAllies = this.battleService.findAllies(battle, target.id, 1, false, true, false, false);
     for (let i = 0; i < targetAllies.length; i++) {
       const targetAlliesChar = this.heroService.getCharById(targetAllies[i], heroes);
       this.battleService.charTakesDamage({
@@ -1907,7 +1909,7 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
-    const enemies = this.battleService.findEnemies(battle, caster.id, 3, true, ability.id, false);
+    const enemies = this.battleService.findEnemies(battle, caster.id, 3, true, ability.id, false, false);
     for (let i = 0; i < enemies.length; i++) {
       if (caster.isDead) {
         return battle;
@@ -2268,21 +2270,27 @@ export class AbilityService {
     let effectsRemoved = 0;
 
     for (let i = target.effects.length - 1; i > -1; i--) {
-      if (casterTeam.id === targetTeam.id) {
-        if (!target.effects[i].isBuff) {
-          target.effects.splice(i, 1);
-          effectsRemoved++;
-        }
-      } else {
-        if (target.effects[i].isBuff) {
-          target.effects.splice(i, 1);
-          effectsRemoved++;
+      if (target.effects[i].isRemovable) {
+        if (casterTeam.id === targetTeam.id) {
+          if (!target.effects[i].isBuff) {
+            target.effects.splice(i, 1);
+            effectsRemoved++;
+          }
+        } else {
+          if (target.effects[i].isBuff) {
+            target.effects.splice(i, 1);
+            effectsRemoved++;
+          }
         }
       }
     }
 
-    target = this.heroService.resetHeroState(target as IHero);
-    target = this.heroService.calcHero(target as IHero);
+    if (!target.isPet) {
+      this.heroService.resetHeroState(target as IHero);
+      this.heroService.calcHero(target as IHero);
+    } else {
+      this.heroService.resetPetState(target as IPet);
+    }
     this.battleService.applyCharEffects(battle, heroes, target, false, isSimulation);
 
     if (effectsRemoved > 0 && caster.health < caster.maxHealth) {
@@ -2367,7 +2375,7 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
-    const allies = this.battleService.findAllies(battle, caster.id, 3, true, true, true);
+    const allies = this.battleService.findAllies(battle, caster.id, 3, true, true, true, false);
     for (let i = 0; i < allies.length; i++) {
       const allyChar = this.heroService.getCharById(allies[i], heroes);
       if (allyChar.health < allyChar.maxHealth) {
@@ -2412,6 +2420,279 @@ export class AbilityService {
       isSimulation
     });
 
+    return battle;
+  }
+
+  '12-desert-revenge'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+
+    this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      magicDamage: caster.primaryWeapon.physDamage + caster.secondaryWeapon.physDamage,
+      abilityId: ability.id,
+      isSimulation
+    });
+
+    return battle;
+  }
+
+  '13-fit-of-energy'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+
+    battle.log.push({
+      type: LogMessageType.ABILITY_CAST,
+      casterId: caster.id,
+      targetId: target.id,
+      abilityId: ability.id
+    });
+
+    this.heroService.takeEnergy(caster, 2);
+    return battle;
+  }
+
+  '21-precise-strike'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+
+    this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      physDamage: caster.primaryWeapon.physDamage + caster.secondaryWeapon.physDamage + 1,
+      abilityId: ability.id,
+      isSimulation
+    });
+
+    return battle;
+  }
+
+  '22-quicksands'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+
+    battle.log.push({
+      type: LogMessageType.ABILITY_CAST,
+      casterId: caster.id,
+      targetId: target.id,
+      abilityId: ability.id
+    });
+
+    this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
+    return battle;
+  }
+
+  '23-temporal-strike'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+
+    this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      physDamage: caster.primaryWeapon.physDamage + caster.secondaryWeapon.physDamage,
+      abilityId: ability.id,
+      isSimulation
+    });
+
+    this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
+    return battle;
+  }
+
+  '31-blade-storm'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+
+    const enemies = this.battleService.findEnemies(battle, caster.id, 1, true, ability.id, false, false);
+    if (enemies.length > 1) {
+      ability.left = 0;
+    }
+    for (let i = 0; i < enemies.length; i++) {
+      if (caster.isDead) {
+        return battle;
+      }
+      const enemyChar = this.heroService.getCharById(enemies[i], heroes);
+      this.battleService.charTakesDamage({
+        battle,
+        caster,
+        heroes,
+        target: enemyChar,
+        abilityId: ability.id,
+        physDamage: caster.primaryWeapon.physDamage + caster.secondaryWeapon.physDamage + 2,
+        isSimulation
+      });
+    }
+
+    return battle;
+  }
+
+  '32-sand-storm'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+
+    battle.log.push({
+      type: LogMessageType.ABILITY_CAST,
+      casterId: caster.id,
+      abilityId: ability.id,
+      positionX: position.x,
+      positionY: position.y
+    });
+
+    const effect: IEffect = this.addEffect(battle, heroes, caster, ability.id, caster.id, isSimulation);
+    effect.position = {
+      x: position.x,
+      y: position.y
+    };
+    battle.mapEffects.push(rfdc({ proto: true })(effect));
+    return battle;
+  }
+
+  '33-time-trap'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+
+    this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      magicDamage: 4,
+      abilityId: ability.id,
+      isSimulation
+    });
+
+    this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
+    return battle;
+  }
+
+  '41-excellence'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+
+    battle.log.push({
+      type: LogMessageType.ABILITY_CAST,
+      casterId: caster.id,
+      targetId: target.id,
+      abilityId: ability.id
+    });
+
+    this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
+    return battle;
+  }
+
+  '42-sand-form'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+
+    battle.log.push({
+      type: LogMessageType.ABILITY_CAST,
+      casterId: caster.id,
+      targetId: caster.id,
+      abilityId: ability.id
+    });
+
+    this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
+    return battle;
+  }
+
+  '43-sands-of-time'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): IBattle {
+    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+
+    battle.log.push({
+      type: LogMessageType.ABILITY_CAST,
+      casterId: caster.id,
+      abilityId: ability.id,
+      targetId: target.id
+    });
+
+    caster.energy = caster.maxEnergy;
+    caster.mana = caster.maxMana;
+    caster.primaryWeapon.isUsed = false;
+    caster.secondaryWeapon.isUsed = false;
     return battle;
   }
 }

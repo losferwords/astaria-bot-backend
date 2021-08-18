@@ -104,6 +104,9 @@ export class EffectService {
 
   '13-wound-healing'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     target.regeneration = target.regeneration + 1;
+    if (!target.isPet) {
+      (target as IHero).mind = (target as IHero).mind + 1;
+    }
   }
 
   '21-entangling-roots'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
@@ -204,7 +207,7 @@ export class EffectService {
   }
 
   '23-blind'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
-    target.maxAllowedAbilityRange = 1;
+    target.isBlind = true;
   }
 
   '32-shadow-cloak'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
@@ -250,5 +253,28 @@ export class EffectService {
 
   '41-hammer-of-wrath'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     target.isStunned = true;
+  }
+
+  //Avenger
+  '23-temporal-strike'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    target.isDisarmed = true;
+    if (!target.isPet) {
+      (target as IHero).moveEnergyCost = (target as IHero).moveEnergyCost + 1;
+    }
+  }
+
+  '32-sand-storm-blind'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    target.isBlind = true;
+  }
+
+  '41-excellence'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    (target as IHero).strength = (target as IHero).strength + 2;
+    (target as IHero).intellect = (target as IHero).intellect + 2;
+  }
+
+  '42-sand-form'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    (target as IHero).isInvisible = true;
+    (target as IHero).regeneration = (target as IHero).regeneration + 2;
+    (target as IHero).mind = (target as IHero).mind + 2;
   }
 }

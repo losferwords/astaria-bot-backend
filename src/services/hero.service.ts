@@ -176,7 +176,7 @@ export class HeroService {
     return hero;
   }
 
-  resetHeroState(hero: IHero): IHero {
+  resetHeroState(hero: IHero) {
     hero.moveEnergyCost = Const.moveEnergyCost;
     hero.extraWeaponEnergyCost = 0;
     hero.isInvisible = false;
@@ -184,9 +184,9 @@ export class HeroService {
     hero.isDisarmed = false;
     hero.isStunned = false;
     hero.isImmobilized = false;
+    hero.isBlind = false;
     hero.isImmuneToDebuffs = false;
     hero.maxAllowedAbilityLevel = 4;
-    hero.maxAllowedAbilityRange = 100;
 
     if (hero.id === 'avatar') {
       hero.isImmuneToDisarm = true;
@@ -197,21 +197,15 @@ export class HeroService {
     } else {
       hero.isImmuneToDisarm = false;
     }
-
-    for (let i = 0; i < hero.pets.length; i++) {
-      hero.pets[i] = this.resetPetState(hero.pets[i]);
-    }
-
-    return hero;
   }
 
-  resetPetState(pet: IPet): IPet {
+  resetPetState(pet: IPet) {
     pet.regeneration = 0;
     pet.isStunned = false;
     pet.isDisarmed = false;
     pet.isImmobilized = false;
     pet.isSilenced = false;
-    return pet;
+    pet.isBlind = false;
   }
 
   normalizeCharStats(char: IChar) {

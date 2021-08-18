@@ -20,10 +20,9 @@ export class Pet implements IPet {
   isImmobilized = false;
   isDisarmed = false;
   isSilenced = false;
+  isBlind = false;
   isMoved = false;
   isImmuneToDebuffs = false;
-
-  maxAllowedAbilityRange = 100;
 
   position = { x: 0, y: 0 };
 

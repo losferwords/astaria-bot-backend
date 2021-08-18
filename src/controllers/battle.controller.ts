@@ -75,7 +75,8 @@ export class BattleController {
       +radius,
       includeInvisible ? JSON.parse(includeInvisible) : false,
       abilityId,
-      ignoreRaytrace ? JSON.parse(ignoreRaytrace) : false
+      ignoreRaytrace ? JSON.parse(ignoreRaytrace) : false,
+      true
     );
   }
 
@@ -95,7 +96,8 @@ export class BattleController {
       +radius,
       JSON.parse(includeSelf),
       includeInvisible ? JSON.parse(includeInvisible) : false,
-      ignoreRaytrace ? JSON.parse(ignoreRaytrace) : false
+      ignoreRaytrace ? JSON.parse(ignoreRaytrace) : false,
+      true
     );
   }
 
@@ -115,7 +117,8 @@ export class BattleController {
       +radius,
       JSON.parse(includeSelf),
       includeInvisible ? JSON.parse(includeInvisible) : false,
-      ignoreRaytrace ? JSON.parse(ignoreRaytrace) : false
+      ignoreRaytrace ? JSON.parse(ignoreRaytrace) : false,
+      true
     );
   }
 
@@ -133,7 +136,7 @@ export class BattleController {
 
     return this.mapService.getMovePoints(
       activeHero.position,
-      ability.range,
+      activeHero.isBlind ? 1 : ability.range,
       battle.scenario.tiles,
       heroes,
       ignoreRaytrace ? JSON.parse(ignoreRaytrace) : null,

@@ -14,9 +14,8 @@ export interface IChar {
   isImmobilized: boolean;
   isSilenced: boolean;
   isDisarmed: boolean;
+  isBlind: boolean;
   isImmuneToDebuffs: boolean;
-
-  maxAllowedAbilityRange: number;
 
   effects: IEffect[];
 }

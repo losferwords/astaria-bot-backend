@@ -3,6 +3,7 @@ import { v1 as uuid } from 'uuid';
 import { IHero } from '../interfaces/IHero';
 import { Hero } from './Hero';
 import { IHeroSetup } from '../interfaces/IHeroSetup';
+import { Const } from 'src/static/const';
 
 export class Team implements ITeam {
   id: string;
@@ -11,7 +12,7 @@ export class Team implements ITeam {
 
   constructor(teamSetup: IHeroSetup[]) {
     this.id = uuid();
-    this.crystals = 20;
+    this.crystals = Const.startCrystals;
 
     for (let i = 0; i < teamSetup.length; i++) {
       this.heroes.push(new Hero(teamSetup[i]));
