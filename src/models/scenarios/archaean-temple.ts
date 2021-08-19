@@ -333,18 +333,21 @@ export class ArchaeanTemple implements IScenario {
     for (let i = 0; i < rooms.length; i++) {
       let hasChar = false;
       for (let j = 0; j < state.teams.length; j++) {
-        for (let k = 0; k < state.teams[j].heroes.length; k++) {
-          if (
-            rooms[i].find(
-              (r) =>
-                !state.teams[j].heroes[k].isDead &&
-                ((r.x === state.teams[j].heroes[k].position.x && r.y === state.teams[j].heroes[k].position.y) ||
-                  state.teams[j].heroes[k].pets.find((pet) => r.x === pet.position.x && r.y === pet.position.y))
-            )
-          ) {
-            hasChar = true;
+        if(!hasChar) {
+          for (let k = 0; k < state.teams[j].heroes.length; k++) {
+            if (
+              rooms[i].find(
+                (r) =>
+                  !state.teams[j].heroes[k].isDead &&
+                  ((r.x === state.teams[j].heroes[k].position.x && r.y === state.teams[j].heroes[k].position.y) ||
+                    state.teams[j].heroes[k].pets.find((pet) => r.x === pet.position.x && r.y === pet.position.y))
+              )
+            ) {
+              hasChar = true;
+              break;
+            }
           }
-        }
+        }        
       }
       if (
         !hasChar &&

@@ -17,6 +17,7 @@ import { IHero } from 'src/interfaces/IHero';
 import { IAbility } from 'src/interfaces/IAbility';
 import { IChar } from 'src/interfaces/IChar';
 import { Helper } from 'src/static/helper';
+import { IEffect } from 'src/interfaces/IEffect';
 
 @Injectable()
 export class BotService {
@@ -241,7 +242,9 @@ export class BotService {
     const actionFromChain = this.actionChain[0];
     this.actionChain.shift();
 
-    global.gc();
+    if (global.gc) {
+      global.gc;
+    }
 
     if (Const.memoryInfo) {
       const used = process.memoryUsage();
