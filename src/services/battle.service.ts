@@ -1767,7 +1767,7 @@ export class BattleService {
       }
     }
 
-    const moves = _.shuffle(this.getMovePoints(battle));
+    const moves = this.getMovePoints(battle);
     for (let i = 0; i < moves.length; i++) {
       if (previousMoves.length && previousMoves.find((move) => move.x === moves[i].x && move.y === moves[i].y)) {
         continue;

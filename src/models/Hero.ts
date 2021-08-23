@@ -19,9 +19,9 @@ export class Hero implements IHero {
   effects: IEffect[] = [];
   abilities: IAbility[] = [];
   pets: IPet[] = [];
-  primaryWeapon?: IEquip;
+  primaryWeapon: IEquip;
   secondaryWeapon?: IEquip;
-  chestpiece?: IEquip;
+  chestpiece: IEquip;
 
   strength = 0;
   intellect = 0;

@@ -4,16 +4,16 @@ import { IEquip } from './IEquip';
 import { IPet } from './IPet';
 
 export interface IHero extends IChar {
-  gender: string;
+  gender?: string;
 
   maxEnergy: number;
   maxMana: number;
 
   abilities: IAbility[];
   pets: IPet[];
-  primaryWeapon?: IEquip;
+  primaryWeapon: IEquip;
   secondaryWeapon?: IEquip;
-  chestpiece?: IEquip;
+  chestpiece: IEquip;
 
   strength: number;
   intellect: number;

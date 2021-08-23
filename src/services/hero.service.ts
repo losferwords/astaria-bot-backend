@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import * as rfdc from 'rfdc';
 import { LogMessageType } from 'src/enums/log-message-type.enum';
+import { IAbility } from 'src/interfaces/IAbility';
 import { IBattle } from 'src/interfaces/IBattle';
 import { IChar } from 'src/interfaces/IChar';
 import { IEquip } from 'src/interfaces/IEquip';
@@ -140,34 +140,76 @@ export class HeroService {
   }
 
   getHeroData(heroId: string): IHeroData {
-    return rfdc({ proto: true })(HeroesData[heroId]);
+    const primaryWeapons: IEquip[] = [];
+    for (let i = 0; i < HeroesData[heroId].primaryWeapons.length; i++) {
+      primaryWeapons.push(Object.assign({}, HeroesData[heroId].primaryWeapons[i]));
+    }
+
+    const chestpieces: IEquip[] = [];
+    for (let i = 0; i < HeroesData[heroId].chestpieces.length; i++) {
+      chestpieces.push(Object.assign({}, HeroesData[heroId].chestpieces[i]));
+    }
+
+    const abilities: IAbility[] = [];
+    for (let i = 0; i < HeroesData[heroId].abilities.length; i++) {
+      abilities.push(Object.assign({}, HeroesData[heroId].abilities[i]));
+    }
+
+    const heroData: IHeroData = {
+      id: HeroesData[heroId].id,
+      maxEnergy: HeroesData[heroId].maxEnergy,
+      maxHealth: HeroesData[heroId].maxHealth,
+      maxMana: HeroesData[heroId].maxMana,
+
+      primaryWeapons: primaryWeapons,
+      chestpieces: chestpieces,
+
+      abilities: abilities
+    };
+
+    if (HeroesData[heroId].secondaryWeapons) {
+      const secondaryWeapons: IEquip[] = [];
+      for (let i = 0; i < HeroesData[heroId].secondaryWeapons.length; i++) {
+        secondaryWeapons.push(Object.assign({}, HeroesData[heroId].secondaryWeapons[i]));
+      }
+      heroData.secondaryWeapons = secondaryWeapons;
+    }
+    return heroData;
   }
 
   calcHero(hero: IHero): IHero {
     hero.strength =
-      hero.primaryWeapon.strength +
-      (hero.secondaryWeapon ? hero.secondaryWeapon.strength : 0) +
-      hero.chestpiece.strength;
+      (hero.primaryWeapon.strength ? hero.primaryWeapon.strength : 0) +
+      (hero.secondaryWeapon?.strength ? hero.secondaryWeapon.strength : 0) +
+      (hero.chestpiece.strength ? hero.chestpiece.strength : 0);
 
     hero.intellect =
-      hero.primaryWeapon.intellect +
-      (hero.secondaryWeapon ? hero.secondaryWeapon.intellect : 0) +
-      hero.chestpiece.intellect;
+      (hero.primaryWeapon.intellect ? hero.primaryWeapon.intellect : 0) +
+      (hero.secondaryWeapon?.intellect ? hero.secondaryWeapon.intellect : 0) +
+      (hero.chestpiece.intellect ? hero.chestpiece.intellect : 0);
 
     hero.armor =
-      hero.primaryWeapon.armor + (hero.secondaryWeapon ? hero.secondaryWeapon.armor : 0) + hero.chestpiece.armor;
+      (hero.primaryWeapon.armor ? hero.primaryWeapon.armor : 0) +
+      (hero.secondaryWeapon?.armor ? hero.secondaryWeapon.armor : 0) +
+      (hero.chestpiece.armor ? hero.chestpiece.armor : 0);
     if (hero.id === 'avatar' && this.getHeroAbilityById(hero, '21-flame-claws')) {
       hero.armor += 1;
     }
 
-    hero.will = hero.primaryWeapon.will + (hero.secondaryWeapon ? hero.secondaryWeapon.will : 0) + hero.chestpiece.will;
+    hero.will =
+      (hero.primaryWeapon.will ? hero.primaryWeapon.will : 0) +
+      (hero.secondaryWeapon?.will ? hero.secondaryWeapon.will : 0) +
+      (hero.chestpiece.will ? hero.chestpiece.will : 0);
 
     hero.regeneration =
-      hero.primaryWeapon.regeneration +
-      (hero.secondaryWeapon ? hero.secondaryWeapon.regeneration : 0) +
-      hero.chestpiece.regeneration;
+      (hero.primaryWeapon.regeneration ? hero.primaryWeapon.regeneration : 0) +
+      (hero.secondaryWeapon?.regeneration ? hero.secondaryWeapon.regeneration : 0) +
+      (hero.chestpiece.regeneration ? hero.chestpiece.regeneration : 0);
 
-    hero.mind = hero.primaryWeapon.mind + (hero.secondaryWeapon ? hero.secondaryWeapon.mind : 0) + hero.chestpiece.mind;
+    hero.mind =
+      (hero.primaryWeapon.mind ? hero.primaryWeapon.mind : 0) +
+      (hero.secondaryWeapon?.mind ? hero.secondaryWeapon.mind : 0) +
+      (hero.chestpiece.mind ? hero.chestpiece.mind : 0);
 
     if (hero.id === 'druid' && this.getHeroAbilityById(hero, '32-war-tree')) {
       hero.primaryWeapon.range = 2;

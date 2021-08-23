@@ -8,6 +8,7 @@ import { ILogMessage } from '../interfaces/ILogMessage';
 import { BotNode } from 'src/models/BotNode';
 import { ActionType } from 'src/enums/action-type.enum';
 import { IAction } from 'src/interfaces/IAction';
+import { IHero } from 'src/interfaces/IHero';
 
 @Injectable()
 export class ReportService {
@@ -151,8 +152,11 @@ export class ReportService {
       fs.mkdirSync(Const.reportsPath);
     }
 
+    winner.heroes = this.sortHeroes(winner);
+
     if (battle.scenario.id === '0') {
       const loserTeam = battle.teams[0].id === winner.id ? battle.teams[1] : battle.teams[0];
+      loserTeam.heroes = this.sortHeroes(loserTeam);
       statisticsData +=
         battle.id +
         ',0,' +
@@ -220,10 +224,13 @@ export class ReportService {
         ',' +
         (loserTeam.heroes[1].abilities[3] ? loserTeam.heroes[1].abilities[3].id : '') +
         ',' +
-        battle.log.filter((message: ILogMessage) => message.type === LogMessageType.TURN_END).length +
+        battle.log.filter((message: ILogMessage) => message.type === LogMessageType.TAKE_CRYSTAL).length +
+        ',' +
+        (battle.log.filter((message: ILogMessage) => message.type === LogMessageType.TURN_END).length + 1) +
         '\n';
     } else if (battle.scenario.id === '1') {
       const loserTeam = battle.teams[0].id === winner.id ? battle.teams[1] : battle.teams[0];
+      loserTeam.heroes = this.sortHeroes(loserTeam);
       statisticsData +=
         battle.id +
         ',1,' +
@@ -323,7 +330,9 @@ export class ReportService {
         ',' +
         (loserTeam.heroes[2].abilities[3] ? loserTeam.heroes[2].abilities[3].id : '') +
         ',' +
-        battle.log.filter((message: ILogMessage) => message.type === LogMessageType.TURN_END).length +
+        battle.log.filter((message: ILogMessage) => message.type === LogMessageType.TAKE_CRYSTAL).length +
+        ',' +
+        (battle.log.filter((message: ILogMessage) => message.type === LogMessageType.TURN_END).length + 1) +
         '\n';
     }
 
@@ -332,17 +341,23 @@ export class ReportService {
       switch (battle.scenario.id) {
         case '0':
           headers +=
-            'winner1,winner1-pw,winner1-sw,winner1-cp,winner1-ability1,winner1-ability2,winner1-ability3,winner1-ability4,winner2,winner2-pw,winner2-sw,winner2-cp,winner2-ability1,winner2-ability2,winner2-ability3,winner2-ability4,loser1,loser1-pw,loser1-sw,loser1-cp,loser1-ability1,loser1-ability2,loser1-ability3,loser1-ability4,loser2,loser2-pw,loser2-sw,loser2-cp,loser2-ability1,loser1-ability2,loser2-ability3,loser2-ability4,turns\n';
+            'winner1,winner1-pw,winner1-sw,winner1-cp,winner1-ability1,winner1-ability2,winner1-ability3,winner1-ability4,winner2,winner2-pw,winner2-sw,winner2-cp,winner2-ability1,winner2-ability2,winner2-ability3,winner2-ability4,loser1,loser1-pw,loser1-sw,loser1-cp,loser1-ability1,loser1-ability2,loser1-ability3,loser1-ability4,loser2,loser2-pw,loser2-sw,loser2-cp,loser2-ability1,loser1-ability2,loser2-ability3,loser2-ability4,crystals,turns\n';
           break;
         case '1':
           headers +=
-            'winner1,winner1-pw,winner1-sw,winner1-cp,winner1-ability1,winner1-ability2,winner1-ability3,winner1-ability4,winner2,winner2-pw,winner2-sw,winner2-cp,winner2-ability1,winner2-ability2,winner2-ability3,winner2-ability4,winner3,winner3-pw,winner3-sw,winner3-cp,winner3-ability1,winner3-ability2,winner3-ability3,winner3-ability4,loser1,loser1-pw,loser1-sw,loser1-cp,loser1-ability1,loser1-ability2,loser1-ability3,loser1-ability4,loser2,loser2-pw,loser2-sw,loser2-cp,loser2-ability1,loser1-ability2,loser2-ability3,loser2-ability4,loser3,loser3-pw,loser3-sw,loser3-cp,loser3-ability1,loser3-ability2,loser3-ability3,loser3-ability4,turns\n';
+            'winner1,winner1-pw,winner1-sw,winner1-cp,winner1-ability1,winner1-ability2,winner1-ability3,winner1-ability4,winner2,winner2-pw,winner2-sw,winner2-cp,winner2-ability1,winner2-ability2,winner2-ability3,winner2-ability4,winner3,winner3-pw,winner3-sw,winner3-cp,winner3-ability1,winner3-ability2,winner3-ability3,winner3-ability4,loser1,loser1-pw,loser1-sw,loser1-cp,loser1-ability1,loser1-ability2,loser1-ability3,loser1-ability4,loser2,loser2-pw,loser2-sw,loser2-cp,loser2-ability1,loser1-ability2,loser2-ability3,loser2-ability4,loser3,loser3-pw,loser3-sw,loser3-cp,loser3-ability1,loser3-ability2,loser3-ability3,loser3-ability4,crystals,turns\n';
           break;
       }
       fs.writeFileSync(targetFile, headers + statisticsData);
     } else {
       fs.appendFileSync(targetFile, statisticsData);
     }
+  }
+
+  sortHeroes(team: ITeam): IHero[] {
+    return team.heroes.sort((a: IHero, b: IHero) => {
+      return Const.reportSortingArray.indexOf(a.id) - Const.reportSortingArray.indexOf(b.id);
+    });
   }
 
   saveTreeVisualization(rootNode: BotNode) {

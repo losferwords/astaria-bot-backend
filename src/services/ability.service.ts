@@ -1,4 +1,3 @@
-import * as rfdc from 'rfdc';
 import { Injectable } from '@nestjs/common';
 import { HeroService } from './hero.service';
 import { IAbility } from 'src/interfaces/IAbility';
@@ -367,7 +366,7 @@ export class AbilityService {
       x: caster.position.x,
       y: caster.position.y
     };
-    battle.mapEffects.push(rfdc({ proto: true })(effect));
+    battle.mapEffects.push(Object.assign({}, effect));
 
     if (!target || target.health < 1) {
       return battle;
@@ -1350,7 +1349,7 @@ export class AbilityService {
       x: position.x,
       y: position.y
     };
-    battle.mapEffects.push(rfdc({ proto: true })(effect));
+    battle.mapEffects.push(Object.assign({}, effect));
     return battle;
   }
 
@@ -1742,7 +1741,7 @@ export class AbilityService {
       x: position.x,
       y: position.y
     };
-    battle.mapEffects.push(rfdc({ proto: true })(effect));
+    battle.mapEffects.push(Object.assign({}, effect));
     return battle;
   }
 
@@ -2598,7 +2597,7 @@ export class AbilityService {
       x: position.x,
       y: position.y
     };
-    battle.mapEffects.push(rfdc({ proto: true })(effect));
+    battle.mapEffects.push(Object.assign({}, effect));
     return battle;
   }
 

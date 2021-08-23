@@ -18,6 +18,8 @@ import { IAbility } from 'src/interfaces/IAbility';
 import { IChar } from 'src/interfaces/IChar';
 import { Helper } from 'src/static/helper';
 import { IEffect } from 'src/interfaces/IEffect';
+import { IPet } from 'src/interfaces/IPet';
+import { IEquip } from 'src/interfaces/IEquip';
 
 @Injectable()
 export class BotService {
@@ -36,22 +38,124 @@ export class BotService {
   }
 
   private cloneState(state: IBattle): IBattle {
-    const newTeams: ITeam[] = new Array(state.teams.length);
+    const newTeams: ITeam[] = [];
     for (let i = 0; i < state.teams.length; i++) {
-      newTeams[i] = {
+      const newHeroes: IHero[] = [];
+      for (let j = 0; j < state.teams[i].heroes.length; j++) {
+        const effects: IEffect[] = [];
+        for (let k = 0; k < state.teams[i].heroes[j].effects.length; k++) {
+          effects.push(Object.assign({}, state.teams[i].heroes[j].effects[k]));
+        }
+
+        const abilities: IAbility[] = [];
+        for (let k = 0; k < state.teams[i].heroes[j].abilities.length; k++) {
+          abilities.push(Object.assign({}, state.teams[i].heroes[j].abilities[k]));
+        }
+
+        const pets: IPet[] = [];
+        for (let k = 0; k < state.teams[i].heroes[j].pets.length; k++) {
+          const petEffects: IEffect[] = [];
+          for (let l = 0; l < state.teams[i].heroes[j].pets[k].effects.length; l++) {
+            petEffects.push(Object.assign({}, state.teams[i].heroes[j].pets[k].effects[l]));
+          }
+
+          pets.push({
+            id: state.teams[i].heroes[j].pets[k].id,
+            isPet: true,
+            maxHealth: state.teams[i].heroes[j].pets[k].maxHealth,
+            effects: petEffects,
+            ability: Object.assign({}, state.teams[i].heroes[j].pets[k].ability),
+
+            health: state.teams[i].heroes[j].pets[k].health,
+            regeneration: state.teams[i].heroes[j].pets[k].regeneration,
+
+            isStunned: state.teams[i].heroes[j].pets[k].isStunned,
+            isImmobilized: state.teams[i].heroes[j].pets[k].isImmobilized,
+            isDisarmed: state.teams[i].heroes[j].pets[k].isDisarmed,
+            isSilenced: state.teams[i].heroes[j].pets[k].isSilenced,
+            isBlind: state.teams[i].heroes[j].pets[k].isBlind,
+            isMoved: state.teams[i].heroes[j].pets[k].isMoved,
+            isImmuneToDebuffs: state.teams[i].heroes[j].pets[k].isImmuneToDebuffs,
+
+            position: { x: state.teams[i].heroes[j].pets[k].position.x, y: state.teams[i].heroes[j].pets[k].position.y }
+          });
+        }
+
+        const primaryWeapon: IEquip = Object.assign({}, state.teams[i].heroes[j].primaryWeapon);
+        const chestpiece: IEquip = Object.assign({}, state.teams[i].heroes[j].chestpiece);
+
+        const newHero: IHero = {
+          id: state.teams[i].heroes[j].id,
+          isPet: false,
+          maxEnergy: state.teams[i].heroes[j].maxEnergy,
+          maxHealth: state.teams[i].heroes[j].maxHealth,
+          maxMana: state.teams[i].heroes[j].maxMana,
+          effects: effects,
+          abilities: abilities,
+          pets: pets,
+          primaryWeapon: primaryWeapon,
+          chestpiece: chestpiece,
+
+          strength: state.teams[i].heroes[j].strength,
+          intellect: state.teams[i].heroes[j].intellect,
+          armor: state.teams[i].heroes[j].armor,
+          will: state.teams[i].heroes[j].will,
+          regeneration: state.teams[i].heroes[j].regeneration,
+          mind: state.teams[i].heroes[j].mind,
+
+          energy: state.teams[i].heroes[j].energy,
+          health: state.teams[i].heroes[j].health,
+          mana: state.teams[i].heroes[j].mana,
+
+          isDead: state.teams[i].heroes[j].isDead,
+          isInvisible: state.teams[i].heroes[j].isInvisible,
+          isSilenced: state.teams[i].heroes[j].isSilenced,
+          isDisarmed: state.teams[i].heroes[j].isDisarmed,
+          isStunned: state.teams[i].heroes[j].isStunned,
+          isImmobilized: state.teams[i].heroes[j].isImmobilized,
+          isBlind: state.teams[i].heroes[j].isBlind,
+          isImmuneToDisarm: state.teams[i].heroes[j].isImmuneToDisarm,
+          isImmuneToDebuffs: state.teams[i].heroes[j].isImmuneToDebuffs,
+          maxAllowedAbilityLevel: state.teams[i].heroes[j].maxAllowedAbilityLevel,
+
+          moveEnergyCost: state.teams[i].heroes[j].moveEnergyCost,
+          extraWeaponEnergyCost: state.teams[i].heroes[j].extraWeaponEnergyCost,
+          position: { x: state.teams[i].heroes[j].position.x, y: state.teams[i].heroes[j].position.y },
+          crystals: state.teams[i].heroes[j].crystals
+        };
+
+        if (state.teams[i].heroes[j].secondaryWeapon) {
+          newHero.secondaryWeapon = Object.assign({}, state.teams[i].heroes[j].secondaryWeapon);
+        }
+
+        newHeroes.push(newHero);
+      }
+
+      newTeams.push({
         id: state.teams[i].id,
         crystals: state.teams[i].crystals,
-        heroes: new Array(state.teams[i].heroes.length)
-      };
-      for (let j = 0; j < state.teams[i].heroes.length; j++) {
-        newTeams[i].heroes[j] = rfdc({ proto: true })(state.teams[i].heroes[j]);
-      }
+        heroes: newHeroes
+      });
     }
+
+    const crystalPositions: IPosition[] = [];
+    for (let i = 0; i < state.crystalPositions.length; i++) {
+      crystalPositions.push({
+        x: state.crystalPositions[i].x,
+        y: state.crystalPositions[i].y
+      });
+    }
+
+    const mapEffects: IEffect[] = [];
+    for (let i = 0; i < mapEffects.length; i++) {
+      mapEffects.push(Object.assign({}, mapEffects[i]));
+    }
+
     return {
       id: state.id,
       scenario: state.scenario,
-      crystalPositions: state.crystalPositions.length > 0 ? rfdc({ proto: true })(state.crystalPositions) : [],
-      mapEffects: state.mapEffects.length > 0 ? rfdc({ proto: true })(state.mapEffects) : [],
+      crystalPositions: crystalPositions,
+      mapEffects: mapEffects,
       teams: newTeams,
       queue: state.queue.slice(0),
       log: state.log.slice(0)
@@ -243,7 +347,7 @@ export class BotService {
     this.actionChain.shift();
 
     if (global.gc) {
-      global.gc;
+      global.gc();
     }
 
     if (Const.memoryInfo) {

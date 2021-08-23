@@ -1,4 +1,3 @@
-import * as rfdc from 'rfdc';
 import { IEffect } from '../interfaces/IEffect';
 import { IAbility } from '../interfaces/IAbility';
 import { IPet } from '../interfaces/IPet';
@@ -27,7 +26,11 @@ export class Pet implements IPet {
   position = { x: 0, y: 0 };
 
   constructor(id: string, position: IPosition) {
-    const petData: IPetData = rfdc({ proto: true })(PetsData[id]);
+    const petData: IPetData = {
+      id: PetsData[id].id,
+      maxHealth: PetsData[id].maxHealth,
+      ability: Object.assign({}, PetsData[id].ability)
+    };
     this.id = petData.id;
     this.maxHealth = petData.maxHealth;
     this.health = this.maxHealth;
