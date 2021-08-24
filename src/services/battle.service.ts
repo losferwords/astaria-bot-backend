@@ -30,7 +30,7 @@ import { ArchaeanTemple } from 'src/models/scenarios/archaean-temple';
 
 @Injectable()
 export class BattleService {
-  battles: IBattle[] = [];
+  battle: IBattle = null;
 
   constructor(
     private mapService: MapService,
@@ -47,12 +47,6 @@ export class BattleService {
       }
     }
     return _.intersection(Const.moveOrder, heroes);
-  }
-
-  getBattleById(id: string): IBattle {
-    return this.battles.find((battle: IBattle) => {
-      return battle.id === id;
-    });
   }
 
   getPossibleEnemies(battle: IBattle, sourceCharId: string): IChar[] {
@@ -161,7 +155,7 @@ export class BattleService {
       this.beforeTurn(battle, heroes, heroes[i], false);
     }
     battle.scenario.beforeTurn(battle);
-    this.battles.push(battle);
+    this.battle = battle;
     return battle;
   }
 
@@ -981,14 +975,6 @@ export class BattleService {
     });
   }
 
-  removeBattle(battleId: string) {
-    const battleIndex = this.battles.findIndex((b: IBattle) => {
-      return b.id === battleId;
-    });
-
-    this.battles.splice(battleIndex, 1);
-  }
-
   upgradeEquip(battle: IBattle, equipId: string, isSimulation: boolean): IBattle {
     const heroes = this.getHeroesInBattle(battle);
     battle = this.heroService.upgradeEquip(battle, heroes, equipId);
@@ -1353,7 +1339,7 @@ export class BattleService {
     if (winner) {
       this.battleEnd(battle, winner);
       if (!isSimulation) {
-        this.removeBattle(battle.id);
+        this.battle = null;
         this.reportService.saveBattleResults(battle);
         this.reportService.addToStatistics(battle, winner);
       }

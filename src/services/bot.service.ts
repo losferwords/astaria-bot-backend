@@ -1,4 +1,3 @@
-import * as rfdc from 'rfdc';
 import * as _ from 'lodash';
 import { Injectable } from '@nestjs/common';
 import { BotNode } from 'src/models/BotNode';
@@ -163,7 +162,7 @@ export class BotService {
   }
 
   botAction(battleId: string): IBattle {
-    const battle = this.battleService.getBattleById(battleId);
+    const battle = this.battleService.battle;
     const chosenAction = this.chooseAction(battle);
     return this.doAction(battle, chosenAction, false);
   }
@@ -565,8 +564,6 @@ export class BotService {
       const maxQualityObj = _.maxBy(nodesQualities, 'quality');
       if (maxQualityObj) {
         bestNode = maxQualityObj.node;
-      } else {
-        console.log('no maxQualityObj');
       }
     }
 

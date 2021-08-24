@@ -341,11 +341,11 @@ export class ReportService {
       switch (battle.scenario.id) {
         case '0':
           headers +=
-            'winner1,winner1-pw,winner1-sw,winner1-cp,winner1-ability1,winner1-ability2,winner1-ability3,winner1-ability4,winner2,winner2-pw,winner2-sw,winner2-cp,winner2-ability1,winner2-ability2,winner2-ability3,winner2-ability4,loser1,loser1-pw,loser1-sw,loser1-cp,loser1-ability1,loser1-ability2,loser1-ability3,loser1-ability4,loser2,loser2-pw,loser2-sw,loser2-cp,loser2-ability1,loser1-ability2,loser2-ability3,loser2-ability4,crystals,turns\n';
+            'winner1,winner1-pw,winner1-sw,winner1-cp,winner1-ability1,winner1-ability2,winner1-ability3,winner1-ability4,winner2,winner2-pw,winner2-sw,winner2-cp,winner2-ability1,winner2-ability2,winner2-ability3,winner2-ability4,loser1,loser1-pw,loser1-sw,loser1-cp,loser1-ability1,loser1-ability2,loser1-ability3,loser1-ability4,loser2,loser2-pw,loser2-sw,loser2-cp,loser2-ability1,loser2-ability2,loser2-ability3,loser2-ability4,crystals,turns\n';
           break;
         case '1':
           headers +=
-            'winner1,winner1-pw,winner1-sw,winner1-cp,winner1-ability1,winner1-ability2,winner1-ability3,winner1-ability4,winner2,winner2-pw,winner2-sw,winner2-cp,winner2-ability1,winner2-ability2,winner2-ability3,winner2-ability4,winner3,winner3-pw,winner3-sw,winner3-cp,winner3-ability1,winner3-ability2,winner3-ability3,winner3-ability4,loser1,loser1-pw,loser1-sw,loser1-cp,loser1-ability1,loser1-ability2,loser1-ability3,loser1-ability4,loser2,loser2-pw,loser2-sw,loser2-cp,loser2-ability1,loser1-ability2,loser2-ability3,loser2-ability4,loser3,loser3-pw,loser3-sw,loser3-cp,loser3-ability1,loser3-ability2,loser3-ability3,loser3-ability4,crystals,turns\n';
+            'winner1,winner1-pw,winner1-sw,winner1-cp,winner1-ability1,winner1-ability2,winner1-ability3,winner1-ability4,winner2,winner2-pw,winner2-sw,winner2-cp,winner2-ability1,winner2-ability2,winner2-ability3,winner2-ability4,winner3,winner3-pw,winner3-sw,winner3-cp,winner3-ability1,winner3-ability2,winner3-ability3,winner3-ability4,loser1,loser1-pw,loser1-sw,loser1-cp,loser1-ability1,loser1-ability2,loser1-ability3,loser1-ability4,loser2,loser2-pw,loser2-sw,loser2-cp,loser2-ability1,loser2-ability2,loser2-ability3,loser2-ability4,loser3,loser3-pw,loser3-sw,loser3-cp,loser3-ability1,loser3-ability2,loser3-ability3,loser3-ability4,crystals,turns\n';
           break;
       }
       fs.writeFileSync(targetFile, headers + statisticsData);

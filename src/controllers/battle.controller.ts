@@ -43,20 +43,21 @@ export class BattleController {
 
   @Get('/move-points')
   async movePoints(@Query('battleId') battleId: string, @Query('petId') petId: string): Promise<IPosition[]> {
-    const battle = this.battleService.getBattleById(battleId);
-    return this.battleService.getMovePoints(battle, petId);
+    if(this.battleService.battle) {
+      return this.battleService.getMovePoints(this.battleService.battle, petId);
+    } else {
+      return [];
+    }    
   }
 
   @Post('/move-char')
   async moveChar(@Body() moveCharDto: MoveCharDto): Promise<IBattle> {
-    const battle = this.battleService.getBattleById(moveCharDto.battleId);
-    return this.battleService.moveChar(battle, moveCharDto.position, false, moveCharDto.petId);
+    return this.battleService.moveChar(this.battleService.battle, moveCharDto.position, false, moveCharDto.petId);
   }
 
   @Post('/end-turn')
   async endTurn(@Body('battleId') battleId: string): Promise<IBattle> {
-    const battle = this.battleService.getBattleById(battleId);
-    return this.battleService.endTurn(battle, false);
+    return this.battleService.endTurn(this.battleService.battle, false);
   }
 
   @Get('/find-enemies')
@@ -68,9 +69,8 @@ export class BattleController {
     @Query('abilityId') abilityId: string,
     @Query('ignoreRaytrace') ignoreRaytrace: string
   ): Promise<string[]> {
-    const battle = this.battleService.getBattleById(battleId);
     return this.battleService.findEnemies(
-      battle,
+      this.battleService.battle,
       sourceCharId,
       +radius,
       includeInvisible ? JSON.parse(includeInvisible) : false,
@@ -89,9 +89,8 @@ export class BattleController {
     @Query('includeSelf') includeSelf: string,
     @Query('ignoreRaytrace') ignoreRaytrace: string
   ): Promise<string[]> {
-    const battle = this.battleService.getBattleById(battleId);
     return this.battleService.findAllies(
-      battle,
+      this.battleService.battle,
       sourceCharId,
       +radius,
       JSON.parse(includeSelf),
@@ -110,9 +109,8 @@ export class BattleController {
     @Query('includeSelf') includeSelf: string,
     @Query('ignoreRaytrace') ignoreRaytrace: string
   ): Promise<string[]> {
-    const battle = this.battleService.getBattleById(battleId);
     return this.battleService.findHeroes(
-      battle,
+      this.battleService.battle,
       sourceCharId,
       +radius,
       JSON.parse(includeSelf),
@@ -129,7 +127,7 @@ export class BattleController {
     @Query('ignoreRaytrace') ignoreRaytrace: string,
     @Query('ignoreObstacles') ignoreObstacles: string
   ): Promise<IPosition[]> {
-    const battle = this.battleService.getBattleById(battleId);
+    const battle = this.battleService.battle;
     const heroes = this.battleService.getHeroesInBattle(battle);
     const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
     const ability: IAbility = this.heroService.getHeroAbilityById(activeHero, abilityId);
@@ -146,13 +144,12 @@ export class BattleController {
 
   @Post('/use-weapon')
   async useWeapon(@Body() useWeaponDto: UseWeaponDto): Promise<IBattle> {
-    const battle = this.battleService.getBattleById(useWeaponDto.battleId);
-    return this.battleService.useWeapon(battle, useWeaponDto.targetId, useWeaponDto.weaponId, false);
+    return this.battleService.useWeapon(this.battleService.battle, useWeaponDto.targetId, useWeaponDto.weaponId, false);
   }
 
   @Post('/cast-ability')
   async castAbility(@Body() castAbilityDto: CastAbilityDto): Promise<IBattle> {
-    const battle = this.battleService.getBattleById(castAbilityDto.battleId);
+    const battle = this.battleService.battle;
     const heroes = this.battleService.getHeroesInBattle(battle);
     const activeHero: IHero = this.heroService.getHeroById(battle.queue[0], heroes);
     let activeChar: IChar = activeHero;
@@ -193,13 +190,11 @@ export class BattleController {
 
   @Post('/upgrade-equip')
   async upgradeEquip(@Body() upgradeEquipDto: UpgradeEquipDto): Promise<IBattle> {
-    const battle = this.battleService.getBattleById(upgradeEquipDto.battleId);
-    return this.battleService.upgradeEquip(battle, upgradeEquipDto.equipId, false);
+    return this.battleService.upgradeEquip(this.battleService.battle, upgradeEquipDto.equipId, false);
   }
 
   @Post('/learn-ability')
   async learnAbility(@Body() learnAbilityDto: LearnAbilityDto): Promise<IBattle> {
-    const battle = this.battleService.getBattleById(learnAbilityDto.battleId);
-    return this.battleService.learnAbility(battle, learnAbilityDto.abilityId, false);
+    return this.battleService.learnAbility(this.battleService.battle, learnAbilityDto.abilityId, false);
   }
 }
