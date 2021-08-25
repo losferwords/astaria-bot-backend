@@ -970,7 +970,7 @@ export class AbilityService {
         isSimulation
       });
 
-      if (!enemyChar || (!enemyChar.isPet && (enemyChar as IHero).isDead)) {
+      if (!enemyChar || enemyChar.health < 0) {
         continue;
       }
       this.battleService.knockBack(battle, heroes, enemyChar, caster.position, isSimulation);
