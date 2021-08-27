@@ -66,11 +66,7 @@ treeJSON = d3.json('mcts-trees/9a3c9fa0-000a-11ec-bd64-cf5f68c4e71c-162931680976
       } else if (a.sims < b.sims) {
         return 1;
       } else {
-        if (a.shortestWin > b.shortestWin) {
-          return 1;
-        } else {
-          return -1;
-        }
+        return 0;
       }
     });
   }
@@ -447,7 +443,7 @@ treeJSON = d3.json('mcts-trees/9a3c9fa0-000a-11ec-bd64-cf5f68c4e71c-162931680976
       })
       .text((d) => {
         if (d.sims) {
-          return 's: ' + d.sims + ', w: ' + d.wins + ', sw: ' + d.shortestWin;
+          return 's: ' + d.sims + ', w: ' + d.wins;
         } else {
           return '';
         }
@@ -492,7 +488,7 @@ treeJSON = d3.json('mcts-trees/9a3c9fa0-000a-11ec-bd64-cf5f68c4e71c-162931680976
       })
       .text((d) => {
         if (d.sims) {
-          return 's: ' + d.sims + ', w: ' + d.wins + ', l: ' + d.shortestWin;
+          return 's: ' + d.sims + ', w: ' + d.wins;
         } else {
           return '';
         }

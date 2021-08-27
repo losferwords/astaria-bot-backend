@@ -297,13 +297,7 @@ export class BotService {
         } else if (a.sims < b.sims) {
           return 1;
         } else {
-          if (a.shortestWin > b.shortestWin) {
-            return 1;
-          } else if (a.shortestWin < b.shortestWin) {
-            return -1;
-          } else {
-            return 0;
-          }
+          return 0;
         }
       });
       for (let i = 0; i < stats.children.length; i++) {
@@ -313,9 +307,7 @@ export class BotService {
           '\tsims: ' +
           stats.children[i].sims +
           '\twins: ' +
-          stats.children[i].wins +
-          '\tsw: ' +
-          stats.children[i].shortestWin;
+          stats.children[i].wins;
         for (const key in stats.children[i].action) {
           if (key === 'positionX') {
             actionStr +=
@@ -422,9 +414,6 @@ export class BotService {
         });
       }
     }
-    if (winner.id === currentTeamId) {
-      node.shortestWin = chainLength + node.depth;
-    }
 
     return winner;
   }
@@ -434,9 +423,6 @@ export class BotService {
     while (node !== null) {
       node.sims += 1;
       node.wins += winNum;
-      if (winNum === 1 && node.parent && node.parent.shortestWin > node.shortestWin) {
-        node.parent.shortestWin = node.shortestWin;
-      }
       node = node.parent;
     }
   }
@@ -472,13 +458,12 @@ export class BotService {
     };
     for (const child of node.children.values()) {
       if (child.node === null) {
-        stats.children.push({ action: child.action, sims: null, wins: null, shortestWin: null });
+        stats.children.push({ action: child.action, sims: null, wins: null });
       } else {
         stats.children.push({
           action: child.action,
           sims: child.node.sims,
-          wins: child.node.wins,
-          shortestWin: child.node.shortestWin
+          wins: child.node.wins
         });
       }
     }
@@ -507,63 +492,12 @@ export class BotService {
     // }
 
     // Highest sims
-    // let maxSims = 0;
-    // for (const action of allActions) {
-    //   const childNode = node.childNode(action);
-    //   if (childNode && childNode.sims > maxSims) {
-    //     bestNode = childNode;
-    //     maxSims = childNode.sims;
-    //   }
-    // }
-
-    // Highest sims and shortest win
-    let minSims = Infinity;
     let maxSims = 0;
-    let longestWin = 0;
-    let shortestWin = Infinity;
     for (const action of allActions) {
       const childNode = node.childNode(action);
-      if (childNode) {
-        if (childNode.sims > maxSims) {
-          maxSims = childNode.sims;
-        }
-        if (childNode.sims < minSims) {
-          minSims = childNode.sims;
-        }
-        if (childNode.shortestWin < 10000 && childNode.shortestWin > longestWin) {
-          longestWin = childNode.shortestWin;
-        }
-        if (childNode.shortestWin < shortestWin) {
-          shortestWin = childNode.shortestWin;
-        }
-      }
-    }
-
-    if (longestWin === 0) {
-      longestWin = 10000;
-    }
-
-    const nodesQualities: { node: BotNode; quality: number }[] = [];
-
-    const simsDiff = maxSims - minSims;
-    const shortestWinDiff = longestWin - shortestWin;
-
-    for (const action of allActions) {
-      const childNode = node.childNode(action);
-      if (childNode) {
-        const simsMod = simsDiff > 0 ? (childNode.sims - minSims) / simsDiff : 1;
-        const shortestWinMod = shortestWinDiff > 0 ? 1 - (childNode.shortestWin - shortestWin) / shortestWinDiff : 1;
-        nodesQualities.push({
-          node: childNode,
-          quality: simsMod * shortestWinMod
-        });
-      }
-    }
-
-    if (nodesQualities.length) {
-      const maxQualityObj = _.maxBy(nodesQualities, 'quality');
-      if (maxQualityObj) {
-        bestNode = maxQualityObj.node;
+      if (childNode && childNode.sims > maxSims) {
+        bestNode = childNode;
+        maxSims = childNode.sims;
       }
     }
 

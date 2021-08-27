@@ -495,7 +495,6 @@ export class ReportService {
       hero: activeCharId,
       sims: parentNode.sims,
       wins: parentNode.wins,
-      shortestWin: parentNode.shortestWin,
       type: parentNode.action ? parentNode.action.type : 0,
       children: childrenArray
     };

@@ -25,7 +25,7 @@ export class AbilityService {
     isSimulation: boolean
   ): IEffect {
     if (!target || target.health < 1) {
-      return;
+      return undefined;
     }
 
     const effect: IEffect = { ...EffectsData[effectId] };
@@ -99,7 +99,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.primaryWeapon.physDamage + 1,
+      physDamage: caster.primaryWeapon.physDamage,
       abilityId: ability.id,
       isSimulation
     });
@@ -124,7 +124,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.secondaryWeapon.level + 1,
+      physDamage: caster.secondaryWeapon.level + 2,
       abilityId: ability.id,
       isSimulation
     });
@@ -558,7 +558,7 @@ export class AbilityService {
       heroes,
       target,
       physDamage: caster.primaryWeapon.physDamage + 1,
-      magicDamage: 3,
+      magicDamage: 2,
       abilityId: ability.id,
       isSimulation
     });
@@ -970,7 +970,7 @@ export class AbilityService {
         isSimulation
       });
 
-      if (!enemyChar || enemyChar.health < 0) {
+      if (!enemyChar || enemyChar.health < 1) {
         continue;
       }
       this.battleService.knockBack(battle, heroes, enemyChar, caster.position, isSimulation);
@@ -1423,7 +1423,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.primaryWeapon.physDamage + 2,
+      physDamage: caster.primaryWeapon.physDamage + 3,
       magicDamage: 1,
       abilityId: ability.id,
       isSimulation
@@ -1454,7 +1454,7 @@ export class AbilityService {
 
     this.heroService.takeEnergy(caster, 2);
 
-    caster.health += 1;
+    caster.health += 2;
 
     if (caster.health > caster.maxHealth) {
       caster.health = caster.maxHealth;
@@ -1478,7 +1478,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      magicDamage: 2,
+      magicDamage: 1,
       abilityId: ability.id,
       isSimulation
     });
@@ -1607,7 +1607,7 @@ export class AbilityService {
         caster,
         heroes,
         target: targetAlliesChar,
-        magicDamage: 2,
+        magicDamage: 1,
         abilityId: ability.id,
         isSimulation
       });
@@ -1815,7 +1815,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.primaryWeapon.physDamage,
+      physDamage: caster.primaryWeapon.physDamage + 1,
       abilityId: ability.id,
       isSimulation
     });
@@ -1888,7 +1888,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      magicDamage: 3,
+      magicDamage: 2,
       abilityId: ability.id,
       isSimulation
     });
@@ -1967,7 +1967,7 @@ export class AbilityService {
       heroes,
       target,
       physDamage: caster.primaryWeapon.physDamage + 2,
-      magicDamage: 3,
+      magicDamage: 2,
       abilityId: ability.id,
       isSimulation
     });
@@ -2464,7 +2464,7 @@ export class AbilityService {
       abilityId: ability.id
     });
 
-    this.heroService.takeEnergy(caster, 2);
+    this.heroService.takeEnergy(caster, 3);
     return battle;
   }
 
@@ -2593,6 +2593,11 @@ export class AbilityService {
     });
 
     const effect: IEffect = this.addEffect(battle, heroes, caster, ability.id, caster.id, isSimulation);
+    if (!effect) {
+      console.log(JSON.stringify(battle.log));
+      console.log(JSON.stringify(caster));
+      return battle;
+    }
     effect.position = {
       x: position.x,
       y: position.y

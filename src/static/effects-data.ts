@@ -4,7 +4,7 @@ export class EffectsData {
   // Paragon
   public static readonly '11-sunder-armor': IEffect = {
     id: '11-sunder-armor',
-    duration: 2,
+    duration: 1,
     isBuff: false,
     isRemovable: true
   };

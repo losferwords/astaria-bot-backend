@@ -9,7 +9,6 @@ export class BotNode implements IBotNode {
   action: IAction;
   sims: number = 0;
   wins: number = 0;
-  shortestWin: number = 10000;
   depth: number = 0;
   children: Map<string, IBotTreeBranch>;
   parent: BotNode;

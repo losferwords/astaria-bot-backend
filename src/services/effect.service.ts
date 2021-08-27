@@ -3,7 +3,6 @@ import { IBattle } from 'src/interfaces/IBattle';
 import { IChar } from 'src/interfaces/IChar';
 import { IEffect } from 'src/interfaces/IEffect';
 import { IHero } from 'src/interfaces/IHero';
-import { Const } from 'src/static/const';
 import { HeroService } from './hero.service';
 
 @Injectable()
@@ -30,8 +29,10 @@ export class EffectService {
 
   '13-shoulder-to-shoulder'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
-      (target as IHero).armor = (target as IHero).armor + 1;
-      (target as IHero).will = (target as IHero).will + 1;
+      (target as IHero).strength = (target as IHero).strength + 1;
+      (target as IHero).armor = (target as IHero).armor + 2;
+      (target as IHero).will = (target as IHero).will + 2;
+      (target as IHero).extraWeaponEnergyCost = (target as IHero).extraWeaponEnergyCost - 1;
     }
   }
 
@@ -52,10 +53,10 @@ export class EffectService {
 
   '43-rallying'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
-      (target as IHero).strength = (target as IHero).strength + 2;
-      (target as IHero).intellect = (target as IHero).intellect + 2;
-      (target as IHero).armor = (target as IHero).armor + 2;
-      (target as IHero).will = (target as IHero).will + 2;
+      (target as IHero).strength = (target as IHero).strength + 3;
+      (target as IHero).intellect = (target as IHero).intellect + 3;
+      (target as IHero).armor = (target as IHero).armor + 3;
+      (target as IHero).will = (target as IHero).will + 3;
     }
   }
 
@@ -91,7 +92,7 @@ export class EffectService {
     if (!target.isPet) {
       (target as IHero).strength = (target as IHero).strength + 3;
       (target as IHero).intellect = (target as IHero).intellect + 3;
-      (target as IHero).extraWeaponEnergyCost = -1;
+      (target as IHero).extraWeaponEnergyCost = (target as IHero).extraWeaponEnergyCost - 1;
     }
   }
 
@@ -130,9 +131,9 @@ export class EffectService {
 
   '33-power-of-the-pack'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
-      (target as IHero).armor = (target as IHero).armor + 2;
-      (target as IHero).will = (target as IHero).will + 2;
-      (target as IHero).mind = (target as IHero).mind + 2;
+      (target as IHero).armor = (target as IHero).armor + 3;
+      (target as IHero).will = (target as IHero).will + 3;
+      (target as IHero).mind = (target as IHero).mind + 3;
     }
   }
 
@@ -156,8 +157,8 @@ export class EffectService {
   // Oracle
   '23-paranoia'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
-      (target as IHero).will = (target as IHero).will - 2;
-      (target as IHero).mind = (target as IHero).mind - 2;
+      (target as IHero).will = (target as IHero).will - 1;
+      (target as IHero).mind = (target as IHero).mind - 1;
     }
   }
 

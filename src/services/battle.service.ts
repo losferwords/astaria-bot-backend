@@ -538,7 +538,7 @@ export class BattleService {
                     caster: fireCaster,
                     heroes,
                     target: fireEnemies[j],
-                    magicDamage: 4,
+                    magicDamage: 5,
                     effectId: effect.id,
                     isSimulation
                   });
@@ -929,7 +929,12 @@ export class BattleService {
 
     const { physDamage, magicDamage } = this.calculateWeaponDamage(weapon, activeHero);
 
-    activeHero.energy -= weapon.energyCost + activeHero.extraWeaponEnergyCost;
+    let energyCost = weapon.energyCost + activeHero.extraWeaponEnergyCost;
+    if (energyCost < 0) {
+      energyCost = 0;
+    }
+
+    activeHero.energy -= energyCost;
     if (!this.heroService.getCharEffectById(activeHero, '41-excellence')) {
       weapon.isUsed = true;
     }
@@ -1264,7 +1269,7 @@ export class BattleService {
     }
     target.health -= healthDamage;
 
-    if (target.health <= 0) {
+    if (target.health < 1) {
       if (target.isPet) {
         for (let i = 0; i < heroes.length; i++) {
           for (let j = heroes[i].pets.length - 1; j >= 0; j--) {
@@ -1351,7 +1356,7 @@ export class BattleService {
     let magicDamage = weapon.magicDamage || 0;
 
     if (activeHero.id === 'highlander' && this.heroService.getHeroAbilityById(activeHero, '13-lightning-rod')) {
-      magicDamage = magicDamage + 2;
+      magicDamage = magicDamage + 3;
     }
 
     if (activeHero.id === 'druid' && this.heroService.getHeroAbilityById(activeHero, '32-war-tree')) {
@@ -1444,7 +1449,7 @@ export class BattleService {
   getAvailableActions(battle: IBattle, previousMoves: IPosition[]): IAction[] {
     const heroes = this.getHeroesInBattle(battle);
     const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
-    if(!activeHero) {
+    if (!activeHero) {
       console.log(battle);
     }
     const team = this.heroService.getTeamByHeroId(activeHero.id, battle.teams);
