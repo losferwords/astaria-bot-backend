@@ -19,7 +19,7 @@ export class EquipData {
         cost: 1,
         energyCost: 3,
         physDamage: 3,
-        strength: 1,
+        strength: 2,
         isPassive: false,
         isUsed: false
       },
@@ -30,7 +30,7 @@ export class EquipData {
         cost: 1,
         energyCost: 3,
         physDamage: 4,
-        strength: 3,
+        strength: 2,
         isPassive: false,
         isUsed: false
       }
@@ -46,9 +46,8 @@ export class EquipData {
         id: 'shield-2',
         level: 2,
         cost: 1,
-        armor: 1,
+        armor: 2,
         will: 1,
-        regeneration: 1,
         mind: 1,
         isPassive: true
       },
@@ -78,7 +77,7 @@ export class EquipData {
         cost: 1,
         strength: 1,
         armor: 3,
-        will: 2,
+        will: 3,
         isPassive: true
       },
       {
@@ -86,8 +85,8 @@ export class EquipData {
         level: 3,
         cost: 1,
         strength: 1,
-        armor: 3,
-        will: 2,
+        armor: 4,
+        will: 3,
         regeneration: 1,
         isPassive: true
       }
@@ -109,12 +108,11 @@ export class EquipData {
         id: 'sword-2',
         level: 2,
         range: 1,
-        cost: 2,
+        cost: 1,
         energyCost: 4,
         physDamage: 5,
         strength: 1,
-        intellect: 2,
-        will: 1,
+        intellect: 1,
         mind: 1,
         isPassive: false,
         isUsed: false
@@ -123,13 +121,11 @@ export class EquipData {
         id: 'sword-3',
         level: 3,
         range: 1,
-        cost: 2,
+        cost: 1,
         energyCost: 4,
         physDamage: 6,
         strength: 3,
-        intellect: 3,
-        will: 1,
-        regeneration: 1,
+        intellect: 2,
         mind: 1,
         isPassive: false,
         isUsed: false
@@ -150,7 +146,7 @@ export class EquipData {
         cost: 1,
         strength: 2,
         armor: 3,
-        will: 1,
+        will: 2,
         isPassive: true
       },
       {
@@ -158,8 +154,8 @@ export class EquipData {
         level: 3,
         cost: 1,
         strength: 2,
-        armor: 4,
-        will: 2,
+        armor: 5,
+        will: 3,
         isPassive: true
       }
     ]
@@ -182,13 +178,12 @@ export class EquipData {
         id: 'staff-2',
         level: 2,
         range: 1,
-        cost: 2,
+        cost: 1,
         energyCost: 3,
-        physDamage: 4,
+        physDamage: 3,
         strength: 2,
         intellect: 2,
         will: 1,
-        mind: 1,
         isPassive: false,
         isUsed: false
       },
@@ -196,15 +191,13 @@ export class EquipData {
         id: 'staff-3',
         level: 3,
         range: 1,
-        cost: 2,
+        cost: 1,
         energyCost: 3,
-        physDamage: 5,
+        physDamage: 4,
         strength: 2,
         intellect: 3,
-        armor: 1,
-        will: 2,
+        will: 1,
         regeneration: 1,
-        mind: 1,
         isPassive: false,
         isUsed: false
       }
@@ -223,7 +216,7 @@ export class EquipData {
         level: 2,
         cost: 1,
         intellect: 1,
-        armor: 2,
+        armor: 3,
         will: 2,
         mind: 1,
         isPassive: true
@@ -234,8 +227,8 @@ export class EquipData {
         cost: 1,
         strength: 1,
         intellect: 1,
-        armor: 3,
-        will: 2,
+        armor: 4,
+        will: 3,
         mind: 1,
         isPassive: true
       }
@@ -258,13 +251,12 @@ export class EquipData {
         id: 'book-2',
         level: 2,
         range: 3,
-        cost: 2,
+        cost: 1,
         energyCost: 3,
         magicDamage: 2,
         intellect: 2,
-        armor: 1,
         will: 1,
-        mind: 2,
+        mind: 1,
         isPassive: false,
         isUsed: false
       },
@@ -272,14 +264,12 @@ export class EquipData {
         id: 'book-3',
         level: 3,
         range: 3,
-        cost: 2,
+        cost: 1,
         energyCost: 3,
         magicDamage: 3,
         intellect: 3,
-        armor: 1,
         will: 2,
-        regeneration: 1,
-        mind: 3,
+        mind: 2,
         isPassive: false,
         isUsed: false
       }
@@ -298,7 +288,7 @@ export class EquipData {
         id: 'armor-2',
         level: 2,
         cost: 1,
-        intellect: 1,
+        intellect: 2,
         armor: 2,
         will: 3,
         isPassive: true
@@ -307,9 +297,9 @@ export class EquipData {
         id: 'armor-3',
         level: 3,
         cost: 1,
-        intellect: 2,
+        intellect: 3,
         armor: 3,
-        will: 3,
+        will: 4,
         isPassive: true
       }
     ]
@@ -332,13 +322,12 @@ export class EquipData {
         id: 'bracers-2',
         level: 2,
         range: 1,
-        cost: 2,
+        cost: 1,
         energyCost: 2,
         physDamage: 2,
         strength: 2,
         intellect: 3,
-        will: 1,
-        mind: 2,
+        mind: 1,
         isPassive: false,
         isUsed: false
       },
@@ -346,14 +335,13 @@ export class EquipData {
         id: 'bracers-3',
         level: 3,
         range: 1,
-        cost: 2,
+        cost: 1,
         energyCost: 2,
         physDamage: 3,
         strength: 3,
         intellect: 3,
-        will: 2,
-        regeneration: 1,
-        mind: 3,
+        will: 1,
+        mind: 2,
         isPassive: false,
         isUsed: false
       }
@@ -374,7 +362,7 @@ export class EquipData {
         strength: 1,
         intellect: 1,
         armor: 2,
-        will: 2,
+        will: 3,
         isPassive: true
       },
       {
@@ -382,9 +370,9 @@ export class EquipData {
         level: 3,
         cost: 1,
         strength: 1,
-        intellect: 1,
+        intellect: 2,
         armor: 3,
-        will: 3,
+        will: 4,
         mind: 0,
         isPassive: true
       }
@@ -406,12 +394,11 @@ export class EquipData {
         id: 'bow-2',
         level: 2,
         range: 3,
-        cost: 2,
+        cost: 1,
         energyCost: 4,
         physDamage: 3,
         strength: 1,
-        intellect: 2,
-        armor: 1,
+        intellect: 1,
         will: 1,
         isPassive: false,
         isUsed: false
@@ -420,12 +407,11 @@ export class EquipData {
         id: 'bow-3',
         level: 3,
         range: 3,
-        cost: 2,
+        cost: 1,
         energyCost: 4,
-        physDamage: 6,
-        strength: 3,
-        intellect: 3,
-        armor: 1,
+        physDamage: 5,
+        strength: 2,
+        intellect: 2,
         will: 1,
         isPassive: false,
         isUsed: false
@@ -445,7 +431,7 @@ export class EquipData {
         level: 2,
         cost: 1,
         strength: 1,
-        armor: 2,
+        armor: 3,
         will: 2,
         mind: 1,
         isPassive: true
@@ -456,7 +442,7 @@ export class EquipData {
         cost: 1,
         strength: 1,
         intellect: 1,
-        armor: 2,
+        armor: 4,
         will: 3,
         mind: 1,
         isPassive: true
@@ -480,12 +466,11 @@ export class EquipData {
         id: 'hammer-2',
         level: 2,
         range: 1,
-        cost: 2,
+        cost: 1,
         energyCost: 4,
         physDamage: 4,
-        strength: 3,
+        strength: 2,
         intellect: 2,
-        will: 1,
         isPassive: false,
         isUsed: false
       },
@@ -493,14 +478,12 @@ export class EquipData {
         id: 'hammer-3',
         level: 3,
         range: 1,
-        cost: 2,
+        cost: 1,
         energyCost: 4,
         physDamage: 5,
-        strength: 4,
+        strength: 3,
         intellect: 3,
         will: 1,
-        regeneration: 1,
-        mind: 1,
         isPassive: false,
         isUsed: false
       }
@@ -520,7 +503,7 @@ export class EquipData {
         cost: 1,
         intellect: 1,
         armor: 3,
-        will: 1,
+        will: 2,
         mind: 1,
         isPassive: true
       },
@@ -528,9 +511,10 @@ export class EquipData {
         id: 'armor-3',
         level: 3,
         cost: 1,
+        strength: 1,
         intellect: 1,
         armor: 4,
-        will: 2,
+        will: 3,
         mind: 1,
         isPassive: true
       }
@@ -556,6 +540,7 @@ export class EquipData {
         energyCost: 3,
         physDamage: 3,
         strength: 1,
+        armor: 1,
         isPassive: false,
         isUsed: false
       },
@@ -565,7 +550,7 @@ export class EquipData {
         range: 1,
         cost: 1,
         energyCost: 3,
-        physDamage: 4,
+        physDamage: 5,
         strength: 2,
         armor: 1,
         isPassive: false,
@@ -588,9 +573,8 @@ export class EquipData {
         range: 1,
         cost: 1,
         energyCost: 2,
-        physDamage: 2,
-        intellect: 2,
-        will: 1,
+        physDamage: 3,
+        intellect: 1,
         mind: 1,
         isPassive: false,
         isUsed: false
@@ -602,10 +586,8 @@ export class EquipData {
         cost: 1,
         energyCost: 2,
         physDamage: 4,
-        strength: 1,
         intellect: 2,
-        will: 1,
-        mind: 1,
+        mind: 2,
         isPassive: false,
         isUsed: false
       }
@@ -625,7 +607,7 @@ export class EquipData {
         cost: 1,
         strength: 2,
         armor: 3,
-        will: 1,
+        will: 2,
         isPassive: true
       },
       {
@@ -634,8 +616,8 @@ export class EquipData {
         cost: 1,
         strength: 2,
         intellect: 1,
-        armor: 3,
-        will: 2,
+        armor: 4,
+        will: 3,
         isPassive: true
       }
     ]

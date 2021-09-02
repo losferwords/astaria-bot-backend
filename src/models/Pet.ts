@@ -22,6 +22,7 @@ export class Pet implements IPet {
   isBlind = false;
   isMoved = false;
   isImmuneToDebuffs = false;
+  isImmuneToDisarm = false;
 
   position = { x: 0, y: 0 };
 

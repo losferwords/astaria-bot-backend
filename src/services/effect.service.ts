@@ -42,6 +42,10 @@ export class EffectService {
     }
   }
 
+  '23-defender'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    target.isImmuneToDisarm = true;
+  }
+
   '32-no-step-back'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     (target as IHero).strength = (target as IHero).strength + 2;
     target.isImmuneToDebuffs = true;
@@ -69,8 +73,8 @@ export class EffectService {
 
   '12-strong-grip'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
-      (target as IHero).strength = (target as IHero).strength + 2;
-      (target as IHero).isImmuneToDisarm = true;
+      (target as IHero).strength = (target as IHero).strength + 3;
+      target.isImmuneToDisarm = true;
     }
   }
 
@@ -275,7 +279,7 @@ export class EffectService {
 
   '42-sand-form'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     (target as IHero).isInvisible = true;
-    (target as IHero).regeneration = (target as IHero).regeneration + 2;
-    (target as IHero).mind = (target as IHero).mind + 2;
+    (target as IHero).regeneration = (target as IHero).regeneration + 1;
+    (target as IHero).mind = (target as IHero).mind + 1;
   }
 }

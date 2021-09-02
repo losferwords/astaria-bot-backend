@@ -248,6 +248,8 @@ export class HeroService {
     pet.isImmobilized = false;
     pet.isSilenced = false;
     pet.isBlind = false;
+    pet.isImmuneToDebuffs = false;
+    pet.isImmuneToDisarm = false;
   }
 
   normalizeCharStats(char: IChar) {

@@ -233,7 +233,6 @@ export class BattleService {
     isSimulation: boolean
   ) {
     switch (effect.id) {
-      case '23-defender':
       case '41-void-vortex':
       case '43-symbiosis':
       case '41-harmony':
@@ -589,7 +588,7 @@ export class BattleService {
                     caster: sandStormCaster,
                     heroes,
                     target: sandStormEnemies[j],
-                    directDamage: 1,
+                    directDamage: 2,
                     effectId: effect.id,
                     isSimulation
                   });
@@ -1024,7 +1023,7 @@ export class BattleService {
       return false;
     }
 
-    if (ability.needWeapon && !(caster as IHero).isImmuneToDisarm && caster.isDisarmed) {
+    if (ability.needWeapon && !caster.isImmuneToDisarm && caster.isDisarmed) {
       return false;
     }
 
@@ -1316,7 +1315,7 @@ export class BattleService {
       id: hero.id
     });
 
-    const queueIndex = battle.queue.findIndex((heroId: string) => {
+    let queueIndex = battle.queue.findIndex((heroId: string) => {
       return hero.id === heroId;
     });
 
@@ -1324,10 +1323,12 @@ export class BattleService {
       if (battle.queue.length > 1) {
         this.endTurn(battle, isSimulation);
       }
-      battle.queue.splice(battle.queue.length - 1, 1);
-    } else {
-      battle.queue.splice(queueIndex, 1);
+      queueIndex = battle.queue.findIndex((heroId: string) => {
+        return hero.id === heroId;
+      });
     }
+
+    battle.queue.splice(queueIndex, 1);
   }
 
   afterDamageTaken(
@@ -1365,7 +1366,7 @@ export class BattleService {
     }
 
     if (activeHero.id === 'avatar' && this.heroService.getHeroAbilityById(activeHero, '21-flame-claws')) {
-      magicDamage = magicDamage + 2;
+      magicDamage = magicDamage + 1;
     }
 
     if (activeHero.id === 'lightbringer' && this.heroService.getCharEffectById(activeHero, '32-sun-aegis')) {
@@ -1429,14 +1430,13 @@ export class BattleService {
           for (let i = 0; i < enemies.length; i++) {
             const enemyChar = this.heroService.getCharById(enemies[i], heroes);
             if (enemyChar) {
-              const magicDamage = damageValue;
               this.charTakesDamage({
                 battle,
                 caster: target,
                 heroes,
                 target: enemyChar,
                 abilityId: passiveAbility,
-                magicDamage,
+                magicDamage: 2,
                 isSimulation
               });
             }
@@ -1449,6 +1449,7 @@ export class BattleService {
   getAvailableActions(battle: IBattle, previousMoves: IPosition[]): IAction[] {
     const heroes = this.getHeroesInBattle(battle);
     const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
+
     if (!activeHero) {
       console.log(battle);
     }

@@ -74,6 +74,7 @@ export class BotService {
             isSilenced: state.teams[i].heroes[j].pets[k].isSilenced,
             isBlind: state.teams[i].heroes[j].pets[k].isBlind,
             isMoved: state.teams[i].heroes[j].pets[k].isMoved,
+            isImmuneToDisarm: state.teams[i].heroes[j].pets[k].isImmuneToDisarm,
             isImmuneToDebuffs: state.teams[i].heroes[j].pets[k].isImmuneToDebuffs,
 
             position: { x: state.teams[i].heroes[j].pets[k].position.x, y: state.teams[i].heroes[j].pets[k].position.y }

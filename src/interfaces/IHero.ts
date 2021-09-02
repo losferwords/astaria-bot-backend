@@ -25,8 +25,7 @@ export interface IHero extends IChar {
   mana: number;
 
   isDead: boolean;
-  isInvisible: boolean;
-  isImmuneToDisarm: boolean;
+  isInvisible: boolean;  
   maxAllowedAbilityLevel: number;
 
   moveEnergyCost: number;

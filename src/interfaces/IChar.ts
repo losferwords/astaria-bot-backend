@@ -15,6 +15,7 @@ export interface IChar {
   isSilenced: boolean;
   isDisarmed: boolean;
   isBlind: boolean;
+  isImmuneToDisarm: boolean;
   isImmuneToDebuffs: boolean;
 
   effects: IEffect[];
