@@ -261,14 +261,14 @@ export class BotService {
     const currentTeamId = this.heroService.getTeamByHeroId(state.queue[0], state.teams).id;
 
     let end = Date.now() + Const.botThinkTime;
-    const simulationTime = [];
+    const simulationTime: number[] = [];
 
     while (Date.now() < end) {
       const startTime = Date.now();
       let node = this.select(nodes, state);
       let winner = node.state.scenario.checkForWin(node.state.teams);
 
-      if (node.isLeaf() === false && winner === null) {
+      if (node.isLeaf() === false && winner === null && node.state.queue.length > 0) {
         node = this.expand(nodes, node);
         winner = this.simulate(node, currentTeamId);
       }
