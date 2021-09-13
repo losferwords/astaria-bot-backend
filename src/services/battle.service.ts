@@ -747,7 +747,7 @@ export class BattleService {
     this.beforeTurn(battle, heroes, activeHero, isSimulation);
     battle.scenario.beforeTurn(battle);
 
-    if (battle.queue[0]) {
+    if (battle.queue[0] && battle.queue.length > 1) {
       const newActiveHero = this.heroService.getHeroById(battle.queue[0], heroes);
       if (newActiveHero.isStunned) {
         battle.log.push({
