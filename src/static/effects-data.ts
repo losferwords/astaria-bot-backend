@@ -126,7 +126,7 @@ export class EffectsData {
 
   public static readonly '13-wound-healing': IEffect = {
     id: '13-wound-healing',
-    duration: 3,
+    duration: 2,
     isBuff: true,
     isRemovable: true
   };
@@ -186,7 +186,7 @@ export class EffectsData {
     duration: 2,
     isBuff: true,
     isRemovable: false,
-    range: 1
+    range: 2
   };
 
   public static readonly '43-amnesia': IEffect = {

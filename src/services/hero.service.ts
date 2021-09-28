@@ -187,6 +187,9 @@ export class HeroService {
       (hero.primaryWeapon.intellect ? hero.primaryWeapon.intellect : 0) +
       (hero.secondaryWeapon?.intellect ? hero.secondaryWeapon.intellect : 0) +
       (hero.chestpiece.intellect ? hero.chestpiece.intellect : 0);
+    if (hero.id === 'highlander' && this.getHeroAbilityById(hero, '13-lightning-rod')) {
+      hero.intellect += 1;
+    }
 
     hero.armor =
       (hero.primaryWeapon.armor ? hero.primaryWeapon.armor : 0) +

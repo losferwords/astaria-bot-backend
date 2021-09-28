@@ -302,13 +302,7 @@ export class BotService {
         }
       });
       for (let i = 0; i < stats.children.length; i++) {
-        let actionStr =
-          'Action ' +
-          i +
-          '\tsims: ' +
-          stats.children[i].sims +
-          '\twins: ' +
-          stats.children[i].wins;
+        let actionStr = 'Action ' + i + '\tsims: ' + stats.children[i].sims + '\twins: ' + stats.children[i].wins;
         for (const key in stats.children[i].action) {
           if (key === 'positionX') {
             actionStr +=

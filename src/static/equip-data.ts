@@ -314,7 +314,8 @@ export class EquipData {
         energyCost: 2,
         physDamage: 1,
         strength: 1,
-        intellect: 2,
+        intellect: 1,
+        mind: 1,
         isPassive: false,
         isUsed: false
       },
@@ -326,8 +327,8 @@ export class EquipData {
         energyCost: 2,
         physDamage: 2,
         strength: 2,
-        intellect: 3,
-        mind: 1,
+        intellect: 2,
+        mind: 2,
         isPassive: false,
         isUsed: false
       },
@@ -563,7 +564,8 @@ export class EquipData {
         level: 1,
         range: 1,
         energyCost: 2,
-        physDamage: 2,
+        physDamage: 1,
+        intellect: 1,
         isPassive: false,
         isUsed: false
       },
@@ -573,8 +575,8 @@ export class EquipData {
         range: 1,
         cost: 1,
         energyCost: 2,
-        physDamage: 3,
-        intellect: 1,
+        physDamage: 2,
+        intellect: 2,
         mind: 1,
         isPassive: false,
         isUsed: false
@@ -585,8 +587,9 @@ export class EquipData {
         range: 1,
         cost: 1,
         energyCost: 2,
-        physDamage: 4,
+        physDamage: 3,
         intellect: 2,
+        will: 1,
         mind: 2,
         isPassive: false,
         isUsed: false

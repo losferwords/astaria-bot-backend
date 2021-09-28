@@ -108,9 +108,15 @@ export class EffectService {
   }
 
   '13-wound-healing'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
-    target.regeneration = target.regeneration + 1;
     if (!target.isPet) {
-      (target as IHero).mind = (target as IHero).mind + 1;
+      (target as IHero).armor = (target as IHero).armor + 2;
+    }
+    if (!target.isPet) {
+      (target as IHero).will = (target as IHero).will + 2;
+    }
+    target.regeneration = target.regeneration + 2;
+    if (!target.isPet) {
+      (target as IHero).mind = (target as IHero).mind + 2;
     }
   }
 
@@ -177,6 +183,12 @@ export class EffectService {
   }
 
   // Avatar
+  '22-cauterization'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    if (!target.isPet) {
+      (target as IHero).will = (target as IHero).will + 2;
+    }
+  }
+
   '23-scorch'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     target.isDisarmed = true;
   }
@@ -225,7 +237,7 @@ export class EffectService {
       let extraStat = 1;
       const caster: IHero = this.heroService.getHeroById(effect.casterId, heroes);
       if (this.heroService.getCharEffectById(caster, '42-divine-radiance')) {
-        extraStat = 2;
+        extraStat = 3;
       }
       (target as IHero).strength = (target as IHero).strength + extraStat;
       (target as IHero).intellect = (target as IHero).intellect + extraStat;
@@ -237,7 +249,7 @@ export class EffectService {
       let extraStat = 1;
       const caster: IHero = this.heroService.getHeroById(effect.casterId, heroes);
       if (this.heroService.getCharEffectById(caster, '42-divine-radiance')) {
-        extraStat = 2;
+        extraStat = 3;
       }
       (target as IHero).armor = (target as IHero).armor + extraStat;
       (target as IHero).will = (target as IHero).will + extraStat;
@@ -248,7 +260,7 @@ export class EffectService {
     let extraStat = 1;
     const caster: IHero = this.heroService.getHeroById(effect.casterId, heroes);
     if (this.heroService.getCharEffectById(caster, '42-divine-radiance')) {
-      extraStat = 2;
+      extraStat = 3;
     }
     if (!target.isPet) {
       (target as IHero).mind = (target as IHero).mind + extraStat;

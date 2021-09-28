@@ -219,6 +219,11 @@ export class BattleService {
     this.afterMoveChar(battle, heroes, target, isSimulation);
   }
 
+  attraction(battle: IBattle, heroes: IHero[], target: IChar, charPosition: IPosition, isSimulation: boolean) {
+    this.mapService.attraction(target, charPosition, battle.scenario.tiles, heroes);
+    this.afterMoveChar(battle, heroes, target, isSimulation);
+  }
+
   charge(battle: IBattle, heroes: IHero[], targetPosition: IPosition, char: IChar, isSimulation: boolean) {
     this.mapService.charge(targetPosition, char, battle.scenario.tiles, heroes);
     this.afterMoveChar(battle, heroes, char, isSimulation);
@@ -250,7 +255,7 @@ export class BattleService {
             caster: this.heroService.getHeroById(effect.casterId, heroes),
             heroes,
             target: char,
-            directDamage: 2,
+            directDamage: 1,
             effectId: effect.id,
             isSimulation
           });
@@ -308,6 +313,7 @@ export class BattleService {
             isSimulation
           });
         }
+        this.effectService.apply(battle, heroes, effect, char, isBeforeTurn);
         break;
       case '43-oblivion':
         if (isBeforeTurn && !char.isPet) {
@@ -484,21 +490,17 @@ export class BattleService {
 
           // Map effects
           case '41-void-vortex':
-            if (isBeforeTurn) {
+            if (isBeforeTurn && battle.queue[0] === effect.casterId) {
               const vortexCaster = this.heroService.getHeroById(effect.casterId, heroes);
-              const vortexBuff = this.heroService.getCharEffectById(vortexCaster, effect.id);
-              effect.range = vortexBuff.left === 2 ? 1 : 2;
               const vortexPoints = this.mapService.findNearestPoints(
                 effect.position,
                 battle.scenario.tiles,
                 effect.range
               );
               const vortexEnemies = this.getPossibleEnemies(battle, effect.casterId);
-              const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
               for (let j = 0; j < vortexEnemies.length; j++) {
+                this.attraction(battle, heroes, vortexEnemies[j], effect.position, isSimulation);
                 if (
-                  ((vortexEnemies[j].isPet && activeHero.pets.find((p) => p.id === vortexEnemies[j].id)) ||
-                    (!vortexEnemies[j].isPet && activeHero.id === vortexEnemies[j].id)) &&
                   vortexPoints.find(
                     (vp) => vp.x === vortexEnemies[j].position.x && vp.y === vortexEnemies[j].position.y
                   )
@@ -508,7 +510,7 @@ export class BattleService {
                     caster: vortexCaster,
                     heroes,
                     target: vortexEnemies[j],
-                    magicDamage: 5,
+                    magicDamage: 4,
                     effectId: effect.id,
                     isSimulation
                   });
@@ -517,27 +519,24 @@ export class BattleService {
             }
             break;
           case '43-fire':
-            if (isBeforeTurn) {
+            if (isBeforeTurn && battle.queue[0] === effect.casterId) {
               const fireCaster = this.heroService.getHeroById(effect.casterId, heroes);
+              const fireBuff = this.heroService.getCharEffectById(fireCaster, effect.id);
+              effect.range = fireBuff.left === 2 ? 2 : 3;
               const firePoints = this.mapService.findNearestPoints(
                 effect.position,
                 battle.scenario.tiles,
                 effect.range
               );
               const fireEnemies = this.getPossibleEnemies(battle, effect.casterId);
-              const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
               for (let j = 0; j < fireEnemies.length; j++) {
-                if (
-                  ((fireEnemies[j].isPet && activeHero.pets.find((p) => p.id === fireEnemies[j].id)) ||
-                    (!fireEnemies[j].isPet && activeHero.id === fireEnemies[j].id)) &&
-                  firePoints.find((vp) => vp.x === fireEnemies[j].position.x && vp.y === fireEnemies[j].position.y)
-                ) {
+                if (firePoints.find((fp) => fp.x === fireEnemies[j].position.x && fp.y === fireEnemies[j].position.y)) {
                   this.charTakesDamage({
                     battle,
                     caster: fireCaster,
                     heroes,
                     target: fireEnemies[j],
-                    magicDamage: 5,
+                    magicDamage: 4,
                     effectId: effect.id,
                     isSimulation
                   });
@@ -553,7 +552,6 @@ export class BattleService {
               effect.range
             );
             const sandStormEnemies = this.getPossibleEnemies(battle, effect.casterId);
-            const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
 
             const sandStormPossibleChars: IChar[] = [];
 
@@ -576,13 +574,11 @@ export class BattleService {
             // Apply sand storm
             for (let j = 0; j < sandStormEnemies.length; j++) {
               if (
-                ((sandStormEnemies[j].isPet && activeHero.pets.find((p) => p.id === sandStormEnemies[j].id)) ||
-                  (!sandStormEnemies[j].isPet && activeHero.id === sandStormEnemies[j].id)) &&
                 sandStormPoints.find(
-                  (vp) => vp.x === sandStormEnemies[j].position.x && vp.y === sandStormEnemies[j].position.y
+                  (ssp) => ssp.x === sandStormEnemies[j].position.x && ssp.y === sandStormEnemies[j].position.y
                 )
               ) {
-                if (isBeforeTurn) {
+                if (isBeforeTurn && battle.queue[0] === effect.casterId) {
                   this.charTakesDamage({
                     battle,
                     caster: sandStormCaster,
@@ -991,6 +987,7 @@ export class BattleService {
     const heroes = this.getHeroesInBattle(battle);
     battle = this.heroService.learnAbility(battle, heroes, abilityId);
     switch (abilityId) {
+      case '13-lightning-rod':
       case '32-war-tree':
       case '21-flame-claws':
         activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
@@ -1126,9 +1123,6 @@ export class BattleService {
         return !target.isPet && !target.isImmuneToDebuffs && (target as IHero).abilities.length > 1;
 
       // Avatar
-      case '22-cauterization':
-        target = this.heroService.getCharById(targetId, heroes);
-        return target.health < target.maxHealth;
 
       // Shadow
       case '21-rapid-fire':
@@ -1173,7 +1167,11 @@ export class BattleService {
 
       // Avenger
       case '13-fit-of-energy':
-        return (caster as IHero).energy < (caster as IHero).maxEnergy;
+        return (
+          (caster as IHero).energy < (caster as IHero).maxEnergy ||
+          (caster as IHero).health < (caster as IHero).maxHealth ||
+          (caster as IHero).mana < (caster as IHero).maxMana
+        );
       case '31-blade-storm':
         const bladeStormEnemies = this.findEnemies(battle, caster.id, 1, true, '31-blade-storm', false, false);
         return bladeStormEnemies.length > 0;
@@ -1357,7 +1355,7 @@ export class BattleService {
     let magicDamage = weapon.magicDamage || 0;
 
     if (activeHero.id === 'highlander' && this.heroService.getHeroAbilityById(activeHero, '13-lightning-rod')) {
-      magicDamage = magicDamage + 3;
+      magicDamage = magicDamage + 2;
     }
 
     if (activeHero.id === 'druid' && this.heroService.getHeroAbilityById(activeHero, '32-war-tree')) {
@@ -1370,7 +1368,7 @@ export class BattleService {
     }
 
     if (activeHero.id === 'lightbringer' && this.heroService.getCharEffectById(activeHero, '32-sun-aegis')) {
-      magicDamage = magicDamage + 2;
+      magicDamage = magicDamage + 3;
     }
 
     return { physDamage, magicDamage };
@@ -1397,7 +1395,7 @@ export class BattleService {
                 !paragon.isDisarmed &&
                 this.heroService.getHeroAbilityById(paragon, passiveAbility)
               ) {
-                let counterDamage = paragon.primaryWeapon.physDamage + 1;
+                let counterDamage = paragon.primaryWeapon.physDamage;
                 this.charTakesDamage({
                   battle,
                   caster: paragon,

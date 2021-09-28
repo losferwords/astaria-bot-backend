@@ -157,6 +157,35 @@ export class MapService {
     }
   }
 
+  attraction(target: IChar, charPosition: IPosition, tiles: ITile[][], heroes: IHero[]) {
+    const direction: IPosition = { x: 0, y: 0 };
+
+    if (charPosition.x < target.position.x) {
+      direction.x = -1;
+    } else if (charPosition.x > target.position.x) {
+      direction.x = 1;
+    }
+
+    if (charPosition.y < target.position.y) {
+      direction.y = -1;
+    } else if (charPosition.y > target.position.y) {
+      direction.y = 1;
+    }
+
+    const newPosition = { x: target.position.x + direction.x, y: target.position.y + direction.y };
+
+    if (
+      !this.checkTileForObstacle(newPosition, tiles, heroes) &&
+      newPosition.x >= 0 &&
+      newPosition.x < tiles[0].length &&
+      newPosition.y >= 0 &&
+      newPosition.y < tiles.length
+    ) {
+      target.position.x = newPosition.x;
+      target.position.y = newPosition.y;
+    }
+  }
+
   charge(targetPosition: IPosition, char: IChar, tiles: ITile[][], heroes: IHero[]) {
     const direction: IPosition = { x: 0, y: 0 };
 
