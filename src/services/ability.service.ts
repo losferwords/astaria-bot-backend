@@ -690,7 +690,7 @@ export class AbilityService {
         caster,
         heroes,
         target: targetAlliesChar,
-        magicDamage: 3,
+        magicDamage: 4,
         abilityId: ability.id,
         isSimulation
       });
@@ -906,7 +906,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      magicDamage: 4,
+      magicDamage: 3,
       abilityId: ability.id,
       isSimulation
     });
@@ -2110,7 +2110,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      magicDamage: 4,
+      magicDamage: 5,
       abilityId: ability.id,
       isSimulation
     });
@@ -2137,7 +2137,6 @@ export class AbilityService {
       heroes,
       target,
       physDamage: caster.primaryWeapon.physDamage,
-      magicDamage: 1,
       abilityId: ability.id,
       isSimulation
     });
@@ -2181,7 +2180,7 @@ export class AbilityService {
         heroes,
         target: enemyChar,
         abilityId: ability.id,
-        physDamage: caster.primaryWeapon.physDamage,
+        physDamage: caster.primaryWeapon.physDamage + 1,
         isSimulation
       });
     }
@@ -2204,7 +2203,7 @@ export class AbilityService {
     const targetTeam = this.heroService.getTeamByCharId(target.id, battle.teams);
 
     if (casterTeam.id === targetTeam.id) {
-      target.health += 2;
+      target.health += 3;
 
       if (target.health > target.maxHealth) {
         target.health = target.maxHealth;
@@ -2215,7 +2214,7 @@ export class AbilityService {
         casterId: caster.id,
         targetId: target.id,
         abilityId: ability.id,
-        value: '2'
+        value: '3'
       });
     } else {
       this.battleService.charTakesDamage({
@@ -2521,7 +2520,7 @@ export class AbilityService {
     if (target.health > target.maxHealth) {
       target.health = target.maxHealth;
     }
-    
+
     return battle;
   }
 

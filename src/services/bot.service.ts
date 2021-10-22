@@ -147,8 +147,8 @@ export class BotService {
     }
 
     const mapEffects: IEffect[] = [];
-    for (let i = 0; i < mapEffects.length; i++) {
-      mapEffects.push(Object.assign({}, mapEffects[i]));
+    for (let i = 0; i < state.mapEffects.length; i++) {
+      mapEffects.push(Object.assign({}, state.mapEffects[i]));
     }
 
     return {

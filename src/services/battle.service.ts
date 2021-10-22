@@ -499,21 +499,23 @@ export class BattleService {
               );
               const vortexEnemies = this.getPossibleEnemies(battle, effect.casterId);
               for (let j = 0; j < vortexEnemies.length; j++) {
-                this.attraction(battle, heroes, vortexEnemies[j], effect.position, isSimulation);
-                if (
-                  vortexPoints.find(
-                    (vp) => vp.x === vortexEnemies[j].position.x && vp.y === vortexEnemies[j].position.y
-                  )
-                ) {
-                  this.charTakesDamage({
-                    battle,
-                    caster: vortexCaster,
-                    heroes,
-                    target: vortexEnemies[j],
-                    magicDamage: 4,
-                    effectId: effect.id,
-                    isSimulation
-                  });
+                if (vortexEnemies[j] && vortexEnemies[j].health > 0) {
+                  this.attraction(battle, heroes, vortexEnemies[j], effect.position, isSimulation);
+                  if (
+                    vortexPoints.find(
+                      (vp) => vp.x === vortexEnemies[j].position.x && vp.y === vortexEnemies[j].position.y
+                    )
+                  ) {
+                    this.charTakesDamage({
+                      battle,
+                      caster: vortexCaster,
+                      heroes,
+                      target: vortexEnemies[j],
+                      magicDamage: 4,
+                      effectId: effect.id,
+                      isSimulation
+                    });
+                  }
                 }
               }
             }
@@ -522,7 +524,17 @@ export class BattleService {
             if (isBeforeTurn && battle.queue[0] === effect.casterId) {
               const fireCaster = this.heroService.getHeroById(effect.casterId, heroes);
               const fireBuff = this.heroService.getCharEffectById(fireCaster, effect.id);
-              effect.range = fireBuff.left === 2 ? 2 : 3;
+              switch (fireBuff.left) {
+                case 2:
+                  effect.range = 2;
+                  break;
+                case 1:
+                  effect.range = 3;
+                  break;
+                case 0:
+                  effect.range = 4;
+                  break;
+              }
               const firePoints = this.mapService.findNearestPoints(
                 effect.position,
                 battle.scenario.tiles,
@@ -530,13 +542,17 @@ export class BattleService {
               );
               const fireEnemies = this.getPossibleEnemies(battle, effect.casterId);
               for (let j = 0; j < fireEnemies.length; j++) {
-                if (firePoints.find((fp) => fp.x === fireEnemies[j].position.x && fp.y === fireEnemies[j].position.y)) {
+                if (
+                  fireEnemies[j] &&
+                  fireEnemies[j].health > 0 &&
+                  firePoints.find((fp) => fp.x === fireEnemies[j].position.x && fp.y === fireEnemies[j].position.y)
+                ) {
                   this.charTakesDamage({
                     battle,
                     caster: fireCaster,
                     heroes,
                     target: fireEnemies[j],
-                    magicDamage: 4,
+                    magicDamage: 3,
                     effectId: effect.id,
                     isSimulation
                   });
@@ -574,6 +590,8 @@ export class BattleService {
             // Apply sand storm
             for (let j = 0; j < sandStormEnemies.length; j++) {
               if (
+                sandStormEnemies[j] &&
+                sandStormEnemies[j].health > 0 &&
                 sandStormPoints.find(
                   (ssp) => ssp.x === sandStormEnemies[j].position.x && ssp.y === sandStormEnemies[j].position.y
                 )
@@ -1299,8 +1317,13 @@ export class BattleService {
     hero.energy = 0;
     hero.mana = 0;
     hero.effects = [];
-    hero.pets = [];
     hero.isDead = true;
+
+    for (let i = 0; i < hero.pets.length; i++) {
+      hero.pets[i].health = 0;
+    }
+
+    hero.pets = [];
 
     for (let i = battle.mapEffects.length - 1; i >= 0; i--) {
       if (battle.mapEffects[i].casterId === hero.id) {

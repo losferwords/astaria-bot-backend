@@ -68,7 +68,7 @@ export class EquipData {
         id: 'armor-1',
         level: 1,
         armor: 2,
-        will: 2,
+        will: 1,
         isPassive: true
       },
       {
@@ -77,7 +77,7 @@ export class EquipData {
         cost: 1,
         strength: 1,
         armor: 3,
-        will: 3,
+        will: 2,
         isPassive: true
       },
       {
@@ -86,7 +86,7 @@ export class EquipData {
         cost: 1,
         strength: 1,
         armor: 4,
-        will: 3,
+        will: 2,
         regeneration: 1,
         isPassive: true
       }
@@ -600,7 +600,7 @@ export class EquipData {
         id: 'armor-1',
         level: 1,
         strength: 1,
-        armor: 2,
+        armor: 1,
         will: 1,
         isPassive: true
       },
@@ -609,7 +609,7 @@ export class EquipData {
         level: 2,
         cost: 1,
         strength: 2,
-        armor: 3,
+        armor: 2,
         will: 2,
         isPassive: true
       },
@@ -619,7 +619,7 @@ export class EquipData {
         cost: 1,
         strength: 2,
         intellect: 1,
-        armor: 4,
+        armor: 3,
         will: 3,
         isPassive: true
       }

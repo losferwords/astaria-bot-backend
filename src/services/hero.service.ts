@@ -71,6 +71,9 @@ export class HeroService {
   }
 
   canMove(char: IChar, isPet?: boolean): boolean {
+    if (!char) {
+      return false;
+    }
     if (isPet) {
       return !(char as IPet).isMoved && !char.isImmobilized;
     } else {

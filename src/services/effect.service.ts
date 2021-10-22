@@ -43,7 +43,7 @@ export class EffectService {
   }
 
   '23-defender'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
-    target.isImmuneToDisarm = true;
+    target.isImmuneToDebuffs = true;
   }
 
   '32-no-step-back'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
@@ -57,10 +57,10 @@ export class EffectService {
 
   '43-rallying'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
-      (target as IHero).strength = (target as IHero).strength + 3;
-      (target as IHero).intellect = (target as IHero).intellect + 3;
-      (target as IHero).armor = (target as IHero).armor + 3;
-      (target as IHero).will = (target as IHero).will + 3;
+      (target as IHero).strength = (target as IHero).strength + 4;
+      (target as IHero).intellect = (target as IHero).intellect + 4;
+      (target as IHero).armor = (target as IHero).armor + 4;
+      (target as IHero).will = (target as IHero).will + 4;
     }
   }
 
@@ -74,6 +74,7 @@ export class EffectService {
   '12-strong-grip'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
       (target as IHero).strength = (target as IHero).strength + 3;
+      (target as IHero).will = (target as IHero).will + 1;
       target.isImmuneToDisarm = true;
     }
   }
@@ -81,6 +82,7 @@ export class EffectService {
   '22-freedom-spirit'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
       (target as IHero).moveEnergyCost = (target as IHero).moveEnergyCost - 1;
+      (target as IHero).extraWeaponEnergyCost = (target as IHero).extraWeaponEnergyCost - 1;
     }
   }
 
@@ -103,16 +105,16 @@ export class EffectService {
   // Druid
   '11-crown-of-thorns'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (isBeforeTurn && !target.isPet) {
-      this.heroService.spendMana(target as IHero, 1);
+      this.heroService.spendMana(target as IHero, 2);
     }
   }
 
   '13-wound-healing'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
-      (target as IHero).armor = (target as IHero).armor + 2;
+      (target as IHero).armor = (target as IHero).armor + 1;
     }
     if (!target.isPet) {
-      (target as IHero).will = (target as IHero).will + 2;
+      (target as IHero).will = (target as IHero).will + 1;
     }
     target.regeneration = target.regeneration + 2;
     if (!target.isPet) {
@@ -121,11 +123,6 @@ export class EffectService {
   }
 
   '21-entangling-roots'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
-    if (!target.isPet) {
-      (target as IHero).strength = (target as IHero).strength - 1;
-      (target as IHero).intellect = (target as IHero).intellect - 1;
-    }
-
     target.isImmobilized = true;
   }
 
@@ -198,6 +195,7 @@ export class EffectService {
   }
 
   '32-elements-control'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    (target as IHero).will = (target as IHero).will + 2;
     (target as IHero).mind = (target as IHero).mind + 2;
   }
 

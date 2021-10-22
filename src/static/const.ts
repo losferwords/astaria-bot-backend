@@ -21,5 +21,14 @@ export class Const {
   public static simulationInfo = false;
   public static memoryInfo = false;
   public static maxChainInfo = false;
-  public static reportSortingArray = ['paragon', 'highlander', 'druid', 'oracle', 'avatar', 'shadow', 'lightbringer', 'avenger'];
+  public static reportSortingArray = [
+    'paragon',
+    'highlander',
+    'druid',
+    'oracle',
+    'avatar',
+    'shadow',
+    'lightbringer',
+    'avenger'
+  ];
 }
