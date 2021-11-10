@@ -511,7 +511,7 @@ export class BattleService {
                       caster: vortexCaster,
                       heroes,
                       target: vortexEnemies[j],
-                      magicDamage: 4,
+                      magicDamage: 2,
                       effectId: effect.id,
                       isSimulation
                     });
@@ -552,7 +552,7 @@ export class BattleService {
                     caster: fireCaster,
                     heroes,
                     target: fireEnemies[j],
-                    magicDamage: 3,
+                    magicDamage: 2,
                     effectId: effect.id,
                     isSimulation
                   });
@@ -1409,7 +1409,7 @@ export class BattleService {
     switch (passiveAbility) {
       case '22-counterattack':
         if (activeChar && activeChar.id !== 'paragon' && activeChar.health > 0) {
-          const enemies = this.findEnemies(battle, activeChar.id, 2, false, '22-counterattack', false, false);
+          const enemies = this.findEnemies(battle, activeChar.id, 1, false, '22-counterattack', false, false);
           for (let i = 0; i < enemies.length; i++) {
             if (enemies[i] === 'paragon') {
               const paragon = this.heroService.getHeroById(enemies[i], heroes);

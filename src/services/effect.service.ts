@@ -29,7 +29,6 @@ export class EffectService {
 
   '13-shoulder-to-shoulder'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
-      (target as IHero).strength = (target as IHero).strength + 1;
       (target as IHero).armor = (target as IHero).armor + 2;
       (target as IHero).will = (target as IHero).will + 2;
       (target as IHero).extraWeaponEnergyCost = (target as IHero).extraWeaponEnergyCost - 1;
@@ -47,7 +46,7 @@ export class EffectService {
   }
 
   '32-no-step-back'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
-    (target as IHero).strength = (target as IHero).strength + 2;
+    (target as IHero).strength = (target as IHero).strength + 3;
     target.isImmuneToDebuffs = true;
   }
 
