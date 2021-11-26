@@ -163,7 +163,7 @@ export class EffectsData {
     id: '43-symbiosis',
     duration: 2,
     isBuff: true,
-    isRemovable: true
+    isRemovable: false
   };
 
   // Oracle
