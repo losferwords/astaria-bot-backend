@@ -643,6 +643,10 @@ export class BattleService {
     }
 
     for (let i = hero.effects.length - 1; i > -1; i--) {
+      if (!hero.effects[i]) {
+        console.log('1');
+        continue;
+      }
       if (hero.effects[i].left > 0 && hero.effects[i].left < 100) {
         hero.effects[i].left--;
       } else {
@@ -688,11 +692,20 @@ export class BattleService {
         hero.pets[i].health = hero.pets[i].maxHealth;
       }
 
+      if (!hero.pets[i].ability) {
+        console.log('2');
+        continue;
+      }
+
       if (hero.pets[i].ability.left > 0) {
         hero.pets[i].ability.left--;
       }
 
       for (let j = hero.pets[i].effects.length - 1; j > -1; j--) {
+        if (!hero.pets[i].effects[j]) {
+          console.log('3');
+          continue;
+        }
         if (hero.pets[i].effects[j].left > 0) {
           hero.pets[i].effects[j].left--;
         } else {
@@ -1470,10 +1483,6 @@ export class BattleService {
   getAvailableActions(battle: IBattle, previousMoves: IPosition[]): IAction[] {
     const heroes = this.getHeroesInBattle(battle);
     const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
-
-    if (!activeHero) {
-      console.log(battle);
-    }
     const team = this.heroService.getTeamByHeroId(activeHero.id, battle.teams);
     const actions: IAction[] = [];
 

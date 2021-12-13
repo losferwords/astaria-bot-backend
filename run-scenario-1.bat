@@ -1,2 +1,2 @@
-set PORT=3001
+set PORT=3002
 npm run start:prod

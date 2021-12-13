@@ -43,6 +43,7 @@ export class EffectService {
 
   '23-defender'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     target.isImmuneToDebuffs = true;
+    target.regeneration = target.regeneration + 1;
   }
 
   '32-no-step-back'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
@@ -196,6 +197,7 @@ export class EffectService {
   }
 
   '32-elements-control'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    (target as IHero).will = (target as IHero).armor + 2;
     (target as IHero).will = (target as IHero).will + 2;
     (target as IHero).mind = (target as IHero).mind + 2;
   }
