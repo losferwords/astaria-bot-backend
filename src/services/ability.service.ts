@@ -329,7 +329,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.primaryWeapon.physDamage + 3,
+      physDamage: caster.secondaryWeapon.level + 4,
       abilityId: ability.id,
       isSimulation
     });
@@ -1048,37 +1048,32 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
-    const maxHealth = Math.max(caster.health, target.health);
+    target.health += 4;
 
-    target.health = maxHealth;
     if (target.health > target.maxHealth) {
       target.health = target.maxHealth;
     }
 
-    caster.health = maxHealth;
+    caster.health += 4;
+
     if (caster.health > caster.maxHealth) {
       caster.health = caster.maxHealth;
     }
 
-    if (!target.isPet) {
-      const maxMana = Math.max(caster.mana, (target as IHero).mana);
-
-      (target as IHero).mana = maxMana;
-      if ((target as IHero).mana > (target as IHero).maxMana) {
-        (target as IHero).mana = (target as IHero).maxMana;
-      }
-
-      (caster as IHero).mana = maxMana;
-      if ((caster as IHero).mana > (caster as IHero).maxMana) {
-        (caster as IHero).mana = (caster as IHero).maxMana;
-      }
-    }
-
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
+      type: LogMessageType.ABILITY_HEAL,
       casterId: caster.id,
       targetId: target.id,
-      abilityId: ability.id
+      abilityId: ability.id,
+      value: '4'
+    });
+
+    battle.log.push({
+      type: LogMessageType.ABILITY_HEAL,
+      casterId: caster.id,
+      targetId: caster.id,
+      abilityId: ability.id,
+      value: '4'
     });
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -1416,11 +1411,14 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
-    battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
+    this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      magicDamage: 1,
       abilityId: ability.id,
-      targetId: target.id
+      isSimulation
     });
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -2172,7 +2170,7 @@ export class AbilityService {
     for (let i = 0; i < allies.length; i++) {
       const allyChar = this.heroService.getCharById(allies[i], heroes);
       if (allyChar.health < allyChar.maxHealth) {
-        allyChar.health += 1;
+        allyChar.health += 2;
 
         if (allyChar.health > allyChar.maxHealth) {
           allyChar.health = allyChar.maxHealth;
@@ -2183,7 +2181,7 @@ export class AbilityService {
           casterId: caster.id,
           targetId: allyChar.id,
           abilityId: ability.id,
-          value: '1'
+          value: '2'
         });
       }
     }
@@ -2515,7 +2513,7 @@ export class AbilityService {
     });
 
     this.heroService.takeEnergy(caster, 4);
-    this.heroService.takeMana(caster, 1);
+    this.heroService.takeMana(caster, 2);
 
     return battle;
   }

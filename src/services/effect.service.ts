@@ -21,9 +21,6 @@ export class EffectService {
   }
 
   '12-shield-bash'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
-    if (!target.isPet) {
-      (target as IHero).will = (target as IHero).will - 1;
-    }
     target.isSilenced = true;
   }
 
@@ -57,10 +54,10 @@ export class EffectService {
 
   '43-rallying'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
-      (target as IHero).strength = (target as IHero).strength + 4;
-      (target as IHero).intellect = (target as IHero).intellect + 4;
-      (target as IHero).armor = (target as IHero).armor + 4;
-      (target as IHero).will = (target as IHero).will + 4;
+      (target as IHero).strength = (target as IHero).strength + 5;
+      (target as IHero).intellect = (target as IHero).intellect + 5;
+      (target as IHero).armor = (target as IHero).armor + 5;
+      (target as IHero).will = (target as IHero).will + 5;
     }
   }
 
@@ -197,9 +194,9 @@ export class EffectService {
   }
 
   '32-elements-control'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
-    (target as IHero).will = (target as IHero).armor + 2;
-    (target as IHero).will = (target as IHero).will + 2;
-    (target as IHero).mind = (target as IHero).mind + 2;
+    (target as IHero).will = (target as IHero).armor + 3;
+    (target as IHero).will = (target as IHero).will + 3;
+    (target as IHero).mind = (target as IHero).mind + 3;
   }
 
   '41-harmony'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {

@@ -116,6 +116,7 @@ export class BattleService {
   }
 
   startBattle(battleSetup: IBattleSetupDto): IBattle {
+    console.log(`Start battle, scenario: ${battleSetup.scenarioId}, setup: ${battleSetup.setupIndex > -1 ? battleSetup.setupIndex : 'manual'}`)
     let battle: IBattle;
     this.heroService.setRandomHeroes(battleSetup.teamSetup);
     switch (battleSetup.scenarioId) {

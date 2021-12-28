@@ -410,10 +410,10 @@ export class EquipData {
         range: 3,
         cost: 1,
         energyCost: 4,
-        physDamage: 5,
+        physDamage: 4,
         strength: 2,
         intellect: 2,
-        will: 1,
+        will: 2,
         isPassive: false,
         isUsed: false
       }

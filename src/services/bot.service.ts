@@ -289,8 +289,9 @@ export class BotService {
         simulationTimeMax = simulationTime[i];
       }
     }
-    console.log('----------------------------------------');
+
     if (Const.simulationInfo) {
+      console.log('----------------------------------------');
       console.log('Sims: ' + stats.sims + ', Wins: ' + stats.wins);
       stats.children = stats.children.sort((a, b) => {
         if (a.sims > b.sims) {
