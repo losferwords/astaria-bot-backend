@@ -117,7 +117,11 @@ export class BattleService {
   }
 
   startBattle(battleSetup: IBattleSetupDto): IBattle {
-    console.log(`Start battle, scenario: ${battleSetup.scenarioId}, setup: ${battleSetup.setupIndex > -1 ? battleSetup.setupIndex : 'manual'}`)
+    console.log(
+      `Start battle, scenario: ${battleSetup.scenarioId}, setup: ${
+        battleSetup.setupIndex > -1 ? battleSetup.setupIndex : 'manual'
+      }`
+    );
     let battle: IBattle;
     this.heroService.setRandomHeroes(battleSetup.teamSetup);
     switch (battleSetup.scenarioId) {
@@ -1382,7 +1386,7 @@ export class BattleService {
     if (winner) {
       this.battleEnd(battle, winner);
       if (!isSimulation) {
-        this.battle = null;        
+        this.battle = null;
         this.reportService.saveBattleResults(battle, this.setupIndex);
         this.reportService.addToStatistics(battle, winner, this.setupIndex);
         this.setupIndex = -1;
@@ -1487,6 +1491,10 @@ export class BattleService {
   getAvailableActions(battle: IBattle, previousMoves: IPosition[]): IAction[] {
     const heroes = this.getHeroesInBattle(battle);
     const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
+    if (!activeHero) {
+      console.log(battle);
+      return [];
+    }
     const team = this.heroService.getTeamByHeroId(activeHero.id, battle.teams);
     const actions: IAction[] = [];
 

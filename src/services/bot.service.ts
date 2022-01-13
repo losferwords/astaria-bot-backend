@@ -497,7 +497,7 @@ export class BotService {
       }
     }
 
-    if (!bestNode) {
+    if (!bestNode && Const.bestNodesInfo) {
       console.log('No best nodes for state depth: ' + JSON.parse(stateHash).length);
     }
 

@@ -361,7 +361,7 @@ export class ReportService {
     }
 
     if (!fs.existsSync(targetFile)) {
-      let headers = 'SEP=,\nbattle,';
+      let headers = 'SEP=,\nbattle,setup,';
       switch (battle.scenario.id) {
         case '0':
           headers +=
