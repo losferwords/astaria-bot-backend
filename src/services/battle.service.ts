@@ -31,6 +31,7 @@ import { ArchaeanTemple } from 'src/models/scenarios/archaean-temple';
 @Injectable()
 export class BattleService {
   battle: IBattle = null;
+  setupIndex: number = -1;
 
   constructor(
     private mapService: MapService,
@@ -157,6 +158,7 @@ export class BattleService {
     }
     battle.scenario.beforeTurn(battle);
     this.battle = battle;
+    this.setupIndex = battleSetup.setupIndex;
     return battle;
   }
 
@@ -1380,9 +1382,10 @@ export class BattleService {
     if (winner) {
       this.battleEnd(battle, winner);
       if (!isSimulation) {
-        this.battle = null;
-        this.reportService.saveBattleResults(battle);
-        this.reportService.addToStatistics(battle, winner);
+        this.battle = null;        
+        this.reportService.saveBattleResults(battle, this.setupIndex);
+        this.reportService.addToStatistics(battle, winner, this.setupIndex);
+        this.setupIndex = -1;
       }
     }
   }

@@ -124,7 +124,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.secondaryWeapon.level + 2,
+      physDamage: caster.secondaryWeapon.level + 1,
       abilityId: ability.id,
       isSimulation
     });
@@ -1048,13 +1048,13 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
-    target.health += 4;
+    target.health += 5;
 
     if (target.health > target.maxHealth) {
       target.health = target.maxHealth;
     }
 
-    caster.health += 4;
+    caster.health += 5;
 
     if (caster.health > caster.maxHealth) {
       caster.health = caster.maxHealth;
@@ -1065,7 +1065,7 @@ export class AbilityService {
       casterId: caster.id,
       targetId: target.id,
       abilityId: ability.id,
-      value: '4'
+      value: '5'
     });
 
     battle.log.push({
@@ -1073,7 +1073,7 @@ export class AbilityService {
       casterId: caster.id,
       targetId: caster.id,
       abilityId: ability.id,
-      value: '4'
+      value: '5'
     });
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -1389,11 +1389,19 @@ export class AbilityService {
     caster.position.x = targetPositionX;
     caster.position.y = targetPositionY;
 
+    this.heroService.takeMana(caster, 3);
+
     battle.log.push({
       type: LogMessageType.ABILITY_CAST,
       casterId: caster.id,
       abilityId: ability.id,
       targetId: target.id
+    });
+
+    battle.log.push({
+      id: caster.id,
+      type: LogMessageType.TAKE_MANA,
+      value: '3'
     });
 
     this.battleService.applyMapEffects(battle, heroes, false, isSimulation);
@@ -2513,7 +2521,7 @@ export class AbilityService {
     });
 
     this.heroService.takeEnergy(caster, 4);
-    this.heroService.takeMana(caster, 2);
+    this.heroService.takeMana(caster, 3);
 
     return battle;
   }

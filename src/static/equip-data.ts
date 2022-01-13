@@ -19,7 +19,7 @@ export class EquipData {
         cost: 1,
         energyCost: 3,
         physDamage: 3,
-        strength: 2,
+        strength: 1,
         isPassive: false,
         isUsed: false
       },
@@ -30,7 +30,7 @@ export class EquipData {
         cost: 1,
         energyCost: 3,
         physDamage: 4,
-        strength: 2,
+        strength: 3,
         isPassive: false,
         isUsed: false
       }
@@ -46,7 +46,7 @@ export class EquipData {
         id: 'shield-2',
         level: 2,
         cost: 1,
-        armor: 2,
+        armor: 1,
         will: 1,
         mind: 1,
         isPassive: true
@@ -58,7 +58,6 @@ export class EquipData {
         strength: 1,
         armor: 2,
         will: 2,
-        regeneration: 1,
         mind: 1,
         isPassive: true
       }
@@ -540,7 +539,6 @@ export class EquipData {
         cost: 1,
         energyCost: 3,
         physDamage: 3,
-        strength: 1,
         armor: 1,
         isPassive: false,
         isUsed: false
@@ -551,7 +549,7 @@ export class EquipData {
         range: 1,
         cost: 1,
         energyCost: 3,
-        physDamage: 5,
+        physDamage: 4,
         strength: 2,
         armor: 1,
         isPassive: false,
@@ -577,7 +575,6 @@ export class EquipData {
         energyCost: 2,
         physDamage: 2,
         intellect: 2,
-        mind: 1,
         isPassive: false,
         isUsed: false
       },
@@ -590,7 +587,7 @@ export class EquipData {
         physDamage: 3,
         intellect: 2,
         will: 1,
-        mind: 2,
+        mind: 1,
         isPassive: false,
         isUsed: false
       }

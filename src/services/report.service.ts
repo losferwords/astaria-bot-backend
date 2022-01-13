@@ -17,13 +17,15 @@ export class ReportService {
   totalNodes: number = 0;
   unexpandedNodes: number = 0;
 
-  saveBattleResults(battle: IBattle) {
-    let battleLogData = 'SEP=,\ncount,turn,hero,action,position,weapon/ability,target,value\n';
+  saveBattleResults(battle: IBattle, setupIndex: number) {
+    let battleLogData = 'SEP=,\nsetup,count,turn,hero,action,position,weapon/ability,target,value\n';
     let turn = 1;
     for (let i = 0; i < battle.log.length; i++) {
       switch (battle.log[i].type) {
         case LogMessageType.MOVE:
           battleLogData +=
+            setupIndex +
+            ',' +
             i +
             ',' +
             turn +
@@ -36,11 +38,13 @@ export class ReportService {
             '\n';
           break;
         case LogMessageType.TURN_END:
-          battleLogData += i + ',' + turn + ',' + battle.log[i].id + ',TURN_END\n';
+          battleLogData += setupIndex + ',' +i + ',' + turn + ',' + battle.log[i].id + ',TURN_END\n';
           turn++;
           break;
         case LogMessageType.WEAPON_DAMAGE:
           battleLogData +=
+          setupIndex +
+            ',' +
             i +
             ',' +
             turn +
@@ -56,6 +60,8 @@ export class ReportService {
           break;
         case LogMessageType.ABILITY_DAMAGE:
           battleLogData +=
+          setupIndex +
+            ',' +
             i +
             ',' +
             turn +
@@ -71,6 +77,8 @@ export class ReportService {
           break;
         case LogMessageType.EFFECT_DAMAGE:
           battleLogData +=
+          setupIndex +
+            ',' +
             i +
             ',' +
             turn +
@@ -86,6 +94,8 @@ export class ReportService {
           break;
         case LogMessageType.ABILITY_HEAL:
           battleLogData +=
+          setupIndex +
+            ',' +
             i +
             ',' +
             turn +
@@ -101,6 +111,8 @@ export class ReportService {
           break;
         case LogMessageType.ABILITY_CAST:
           battleLogData +=
+          setupIndex +
+            ',' +
             i +
             ',' +
             turn +
@@ -113,29 +125,29 @@ export class ReportService {
             '\n';
           break;
         case LogMessageType.UPGRADE_EQUIP:
-          battleLogData += i + ',' + turn + ',' + battle.log[i].id + ',UPGRADE_EQUIP,,' + battle.log[i].equipId + '\n';
+          battleLogData += setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',UPGRADE_EQUIP,,' + battle.log[i].equipId + '\n';
           break;
         case LogMessageType.LEARN_ABILITY:
           battleLogData +=
-            i + ',' + turn + ',' + battle.log[i].id + ',LEARN_ABILITY,,' + battle.log[i].abilityId + '\n';
+          setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',LEARN_ABILITY,,' + battle.log[i].abilityId + '\n';
           break;
         case LogMessageType.TAKE_CRYSTAL:
-          battleLogData += i + ',' + turn + ',' + battle.log[i].id + ',TAKE_CRYSTAL\n';
+          battleLogData += setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',TAKE_CRYSTAL\n';
           break;
         case LogMessageType.TAKE_MANA:
-          battleLogData += i + ',' + turn + ',' + battle.log[i].id + ',TAKE_MANA,,,' + battle.log[i].value + '\n';
+          battleLogData += setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',TAKE_MANA,,,' + battle.log[i].value + '\n';
           break;
         case LogMessageType.TAKE_ENERGY:
-          battleLogData += i + ',' + turn + ',' + battle.log[i].id + ',TAKE_ENERGY,,,' + battle.log[i].value + '\n';
+          battleLogData += setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',TAKE_ENERGY,,,' + battle.log[i].value + '\n';
           break;
         case LogMessageType.TURN_SKIP:
-          battleLogData += i + ',' + turn + ',' + battle.log[i].id + ',TURN_SKIP\n';
+          battleLogData += setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',TURN_SKIP\n';
           break;
         case LogMessageType.DEATH:
-          battleLogData += i + ',' + turn + ',' + battle.log[i].id + ',DEATH\n';
+          battleLogData += setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',DEATH\n';
           break;
         case LogMessageType.WIN:
-          battleLogData += i + ',' + turn + ',' + battle.log[i].id + ',WIN\n';
+          battleLogData += setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',WIN\n';
           break;
       }
     }
@@ -145,7 +157,7 @@ export class ReportService {
     fs.writeFileSync(Const.reportsPath + '/' + battle.id + '.csv', battleLogData);
   }
 
-  addToStatistics(battle: IBattle, winner: ITeam) {
+  addToStatistics(battle: IBattle, winner: ITeam, setupIndex: number) {
     const targetFile = Const.statisticsFilePath + '_' + battle.scenario.id + '.csv';
     let statisticsData = '';
     if (!fs.existsSync(Const.reportsPath)) {
@@ -157,8 +169,10 @@ export class ReportService {
     if (battle.scenario.id === '0') {
       const loserTeam = battle.teams[0].id === winner.id ? battle.teams[1] : battle.teams[0];
       loserTeam.heroes = this.sortHeroes(loserTeam);
-      statisticsData +=
+      statisticsData +=        
         battle.id +
+        ',' +
+        setupIndex +
         ',' +
         winner.heroes[0].id +
         ',' +
@@ -237,6 +251,8 @@ export class ReportService {
       loserTeam.heroes = this.sortHeroes(loserTeam);
       statisticsData +=
         battle.id +
+        ',' +
+        setupIndex +
         ',' +
         winner.heroes[0].id +
         ',' +
