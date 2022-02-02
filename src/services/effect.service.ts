@@ -194,9 +194,9 @@ export class EffectService {
   }
 
   '32-elements-control'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
+    (target as IHero).intellect = (target as IHero).intellect + 3;
     (target as IHero).will = (target as IHero).armor + 3;
     (target as IHero).will = (target as IHero).will + 3;
-    (target as IHero).mind = (target as IHero).mind + 3;
   }
 
   '41-harmony'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {

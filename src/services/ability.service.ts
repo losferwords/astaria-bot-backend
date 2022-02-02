@@ -447,7 +447,7 @@ export class AbilityService {
         heroes,
         target: enemyChar,
         abilityId: ability.id,
-        physDamage: caster.primaryWeapon.physDamage + 1,
+        physDamage: caster.primaryWeapon.physDamage,
         isSimulation
       });
     }
@@ -1389,7 +1389,7 @@ export class AbilityService {
     caster.position.x = targetPositionX;
     caster.position.y = targetPositionY;
 
-    this.heroService.takeMana(caster, 3);
+    this.heroService.takeMana(caster, 4);
 
     battle.log.push({
       type: LogMessageType.ABILITY_CAST,
@@ -1401,7 +1401,7 @@ export class AbilityService {
     battle.log.push({
       id: caster.id,
       type: LogMessageType.TAKE_MANA,
-      value: '3'
+      value: '4'
     });
 
     this.battleService.applyMapEffects(battle, heroes, false, isSimulation);
@@ -1424,7 +1424,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      magicDamage: 1,
+      magicDamage: 2,
       abilityId: ability.id,
       isSimulation
     });
