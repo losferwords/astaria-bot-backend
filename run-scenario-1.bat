@@ -1,3 +1,1 @@
-set PORT=3002
-npm run start:prod
-cmd /k
+cmd /k scenario-1.bat

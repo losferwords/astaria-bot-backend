@@ -1385,7 +1385,7 @@ export class BattleService {
     const winner = battle.scenario.checkForWin(battle.teams);
     if (winner) {
       this.battleEnd(battle, winner);
-      if (!isSimulation) {
+      if (!isSimulation && this.setupIndex > -1) {
         this.battle = null;
         this.reportService.saveBattleResults(battle, this.setupIndex);
         this.reportService.addToStatistics(battle, winner, this.setupIndex);
