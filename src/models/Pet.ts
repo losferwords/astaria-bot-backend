@@ -7,7 +7,7 @@ import { IPosition } from 'src/interfaces/IPosition';
 
 export class Pet implements IPet {
   id: string;
-  isPet: boolean = true;
+  isPet = true;
   maxHealth: number;
   effects: IEffect[] = [];
   ability: IAbility;

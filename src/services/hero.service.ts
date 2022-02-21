@@ -15,8 +15,6 @@ import { HeroesData } from 'src/static/heroes-data';
 
 @Injectable()
 export class HeroService {
-  constructor() {}
-
   spendEnergy(hero: IHero, value: number) {
     if (hero.energy - value > 0) {
       hero.energy -= value;

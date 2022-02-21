@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
 import { IBattle } from 'src/interfaces/IBattle';
 import { IChar } from 'src/interfaces/IChar';

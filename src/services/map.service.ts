@@ -8,8 +8,6 @@ import { Const } from 'src/static/const';
 
 @Injectable()
 export class MapService {
-  constructor() {}
-
   findNearestPoints(position: IPosition, tiles: ITile[][], radius: number): IPosition[] {
     const points = [];
     for (let i = -radius; i <= radius; i++) {
@@ -104,7 +102,7 @@ export class MapService {
 
   getMovePoints(
     activeHeroPosition: IPosition,
-    radius: number = 1,
+    radius = 1,
     tiles: ITile[][],
     heroes: IHero[],
     ignoreRaytrace?: boolean,

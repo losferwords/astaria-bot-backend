@@ -7,9 +7,9 @@ import { Const } from 'src/static/const';
 export class BotNode implements IBotNode {
   state: IBattle;
   action: IAction;
-  sims: number = 0;
-  wins: number = 0;
-  depth: number = 0;
+  sims = 0;
+  wins = 0;
+  depth = 0;
   children: Map<string, IBotTreeBranch>;
   parent: BotNode;
 
@@ -20,7 +20,7 @@ export class BotNode implements IBotNode {
     this.parent = parent;
     this.depth = this.parent ? this.parent.depth + 1 : 0;
     this.children = new Map();
-    for(let i = 0; i < unexpandedActions.length; i++) {
+    for (let i = 0; i < unexpandedActions.length; i++) {
       this.children.set(this.getActionHash(unexpandedActions[i]), { action: unexpandedActions[i], node: null });
     }
   }
@@ -38,7 +38,7 @@ export class BotNode implements IBotNode {
   }
 
   isFullyExpanded(): boolean {
-    for (let child of this.children.values()) {
+    for (const child of this.children.values()) {
       if (child.node === null) {
         return false;
       }
@@ -48,7 +48,7 @@ export class BotNode implements IBotNode {
 
   allActions(): IAction[] {
     const actions = [];
-    for (let child of this.children.values()) {
+    for (const child of this.children.values()) {
       actions.push(child.action);
     }
     return actions;
@@ -58,7 +58,7 @@ export class BotNode implements IBotNode {
     const child = this.children.get(this.getActionHash(action));
     if (child === undefined) {
       throw new Error('No child action!');
-    } 
+    }
     // else if (child.node === null) {
     //   throw new Error('Child node is not expanded!');
     // }

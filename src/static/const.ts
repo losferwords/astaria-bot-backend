@@ -13,10 +13,10 @@ export class Const {
   public static statisticsFilePath = './reports/statistics';
   public static mctsTreeReportPath = './tree-observer/mcts-trees';
   public static explorationParameter = 2;
-  public static botThinkTime = 120000;
-  public static maxChainLength = 1200;
+  public static botThinkTime = 300000;
+  public static maxChainLength = 500;
 
-  //Logs
+  // Logs
   public static treeBuild = false;
   public static simulationInfo = false;
   public static memoryInfo = false;

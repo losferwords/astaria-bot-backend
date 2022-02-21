@@ -1,6 +1,6 @@
 export enum LogMessageType {
   TURN_START,
-  MOVE,  
+  MOVE,
   TURN_END,
   WEAPON_DAMAGE,
   ABILITY_DAMAGE,

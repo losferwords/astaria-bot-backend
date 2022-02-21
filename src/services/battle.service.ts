@@ -31,7 +31,7 @@ import { ArchaeanTemple } from 'src/models/scenarios/archaean-temple';
 @Injectable()
 export class BattleService {
   battle: IBattle = null;
-  setupIndex: number = -1;
+  setupIndex = -1;
 
   constructor(
     private mapService: MapService,
@@ -700,7 +700,6 @@ export class BattleService {
       }
 
       if (!hero.pets[i].ability) {
-        console.log('2');
         continue;
       }
 
@@ -710,7 +709,6 @@ export class BattleService {
 
       for (let j = hero.pets[i].effects.length - 1; j > -1; j--) {
         if (!hero.pets[i].effects[j]) {
-          console.log('3');
           continue;
         }
         if (hero.pets[i].effects[j].left > 0) {
@@ -1113,6 +1111,8 @@ export class BattleService {
     position?: IPosition
   ): boolean {
     let target: IChar;
+    position; //not used for current abilities set
+
     switch (ability.id) {
       // Paragon
       case '13-shoulder-to-shoulder':
@@ -1439,14 +1439,13 @@ export class BattleService {
                 !paragon.isDisarmed &&
                 this.heroService.getHeroAbilityById(paragon, passiveAbility)
               ) {
-                let counterDamage = paragon.primaryWeapon.physDamage;
                 this.charTakesDamage({
                   battle,
                   caster: paragon,
                   heroes,
                   target: activeChar,
                   abilityId: passiveAbility,
-                  physDamage: counterDamage,
+                  physDamage: paragon.primaryWeapon.physDamage,
                   isSimulation
                 });
               }
@@ -1492,6 +1491,7 @@ export class BattleService {
     const heroes = this.getHeroesInBattle(battle);
     const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
     if (!activeHero) {
+      console.log('No active hero!');
       console.log(battle);
       return [];
     }

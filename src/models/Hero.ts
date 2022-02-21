@@ -11,7 +11,7 @@ import { IHeroData } from 'src/interfaces/IHeroData';
 
 export class Hero implements IHero {
   id: string;
-  isPet: boolean = false;
+  isPet = false;
   gender: string;
   maxEnergy: number;
   maxHealth: number;

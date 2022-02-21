@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import { Injectable } from '@nestjs/common';
 import { BotNode } from 'src/models/BotNode';
 import { Const } from 'src/static/const';
@@ -20,9 +19,17 @@ import { IEffect } from 'src/interfaces/IEffect';
 import { IPet } from 'src/interfaces/IPet';
 import { IEquip } from 'src/interfaces/IEquip';
 
+interface Statistic {
+  sims: number;
+  wins: number;
+  children: Statistic[];
+  action?: IAction;
+}
+
 @Injectable()
 export class BotService {
   nodes: Map<string, BotNode>;
+  private actionChain: IAction[] = [];
 
   constructor(
     private battleService: BattleService,
@@ -30,139 +37,8 @@ export class BotService {
     private reportService: ReportService,
     private abilityService: AbilityService
   ) {}
-  private actionChain: IAction[] = [];
 
-  private getStateHash(state: IBattle): string {
-    return JSON.stringify(state.log);
-  }
-
-  private cloneState(state: IBattle): IBattle {
-    const newTeams: ITeam[] = [];
-    for (let i = 0; i < state.teams.length; i++) {
-      const newHeroes: IHero[] = [];
-      for (let j = 0; j < state.teams[i].heroes.length; j++) {
-        const effects: IEffect[] = [];
-        for (let k = 0; k < state.teams[i].heroes[j].effects.length; k++) {
-          effects.push(Object.assign({}, state.teams[i].heroes[j].effects[k]));
-        }
-
-        const abilities: IAbility[] = [];
-        for (let k = 0; k < state.teams[i].heroes[j].abilities.length; k++) {
-          abilities.push(Object.assign({}, state.teams[i].heroes[j].abilities[k]));
-        }
-
-        const pets: IPet[] = [];
-        for (let k = 0; k < state.teams[i].heroes[j].pets.length; k++) {
-          const petEffects: IEffect[] = [];
-          for (let l = 0; l < state.teams[i].heroes[j].pets[k].effects.length; l++) {
-            petEffects.push(Object.assign({}, state.teams[i].heroes[j].pets[k].effects[l]));
-          }
-
-          pets.push({
-            id: state.teams[i].heroes[j].pets[k].id,
-            isPet: true,
-            maxHealth: state.teams[i].heroes[j].pets[k].maxHealth,
-            effects: petEffects,
-            ability: Object.assign({}, state.teams[i].heroes[j].pets[k].ability),
-
-            health: state.teams[i].heroes[j].pets[k].health,
-            regeneration: state.teams[i].heroes[j].pets[k].regeneration,
-
-            isStunned: state.teams[i].heroes[j].pets[k].isStunned,
-            isImmobilized: state.teams[i].heroes[j].pets[k].isImmobilized,
-            isDisarmed: state.teams[i].heroes[j].pets[k].isDisarmed,
-            isSilenced: state.teams[i].heroes[j].pets[k].isSilenced,
-            isBlind: state.teams[i].heroes[j].pets[k].isBlind,
-            isMoved: state.teams[i].heroes[j].pets[k].isMoved,
-            isImmuneToDisarm: state.teams[i].heroes[j].pets[k].isImmuneToDisarm,
-            isImmuneToDebuffs: state.teams[i].heroes[j].pets[k].isImmuneToDebuffs,
-
-            position: { x: state.teams[i].heroes[j].pets[k].position.x, y: state.teams[i].heroes[j].pets[k].position.y }
-          });
-        }
-
-        const primaryWeapon: IEquip = Object.assign({}, state.teams[i].heroes[j].primaryWeapon);
-        const chestpiece: IEquip = Object.assign({}, state.teams[i].heroes[j].chestpiece);
-
-        const newHero: IHero = {
-          id: state.teams[i].heroes[j].id,
-          isPet: false,
-          maxEnergy: state.teams[i].heroes[j].maxEnergy,
-          maxHealth: state.teams[i].heroes[j].maxHealth,
-          maxMana: state.teams[i].heroes[j].maxMana,
-          effects: effects,
-          abilities: abilities,
-          pets: pets,
-          primaryWeapon: primaryWeapon,
-          chestpiece: chestpiece,
-
-          strength: state.teams[i].heroes[j].strength,
-          intellect: state.teams[i].heroes[j].intellect,
-          armor: state.teams[i].heroes[j].armor,
-          will: state.teams[i].heroes[j].will,
-          regeneration: state.teams[i].heroes[j].regeneration,
-          mind: state.teams[i].heroes[j].mind,
-
-          energy: state.teams[i].heroes[j].energy,
-          health: state.teams[i].heroes[j].health,
-          mana: state.teams[i].heroes[j].mana,
-
-          isDead: state.teams[i].heroes[j].isDead,
-          isInvisible: state.teams[i].heroes[j].isInvisible,
-          isSilenced: state.teams[i].heroes[j].isSilenced,
-          isDisarmed: state.teams[i].heroes[j].isDisarmed,
-          isStunned: state.teams[i].heroes[j].isStunned,
-          isImmobilized: state.teams[i].heroes[j].isImmobilized,
-          isBlind: state.teams[i].heroes[j].isBlind,
-          isImmuneToDisarm: state.teams[i].heroes[j].isImmuneToDisarm,
-          isImmuneToDebuffs: state.teams[i].heroes[j].isImmuneToDebuffs,
-          maxAllowedAbilityLevel: state.teams[i].heroes[j].maxAllowedAbilityLevel,
-
-          moveEnergyCost: state.teams[i].heroes[j].moveEnergyCost,
-          extraWeaponEnergyCost: state.teams[i].heroes[j].extraWeaponEnergyCost,
-          position: { x: state.teams[i].heroes[j].position.x, y: state.teams[i].heroes[j].position.y },
-          crystals: state.teams[i].heroes[j].crystals
-        };
-
-        if (state.teams[i].heroes[j].secondaryWeapon) {
-          newHero.secondaryWeapon = Object.assign({}, state.teams[i].heroes[j].secondaryWeapon);
-        }
-
-        newHeroes.push(newHero);
-      }
-
-      newTeams.push({
-        id: state.teams[i].id,
-        crystals: state.teams[i].crystals,
-        heroes: newHeroes
-      });
-    }
-
-    const crystalPositions: IPosition[] = [];
-    for (let i = 0; i < state.crystalPositions.length; i++) {
-      crystalPositions.push({
-        x: state.crystalPositions[i].x,
-        y: state.crystalPositions[i].y
-      });
-    }
-
-    const mapEffects: IEffect[] = [];
-    for (let i = 0; i < state.mapEffects.length; i++) {
-      mapEffects.push(Object.assign({}, state.mapEffects[i]));
-    }
-
-    return {
-      id: state.id,
-      scenario: state.scenario,
-      crystalPositions: crystalPositions,
-      mapEffects: mapEffects,
-      teams: newTeams,
-      queue: state.queue.slice(0),
-      log: state.log.slice(0)
-    };
-  }
-
-  botAction(battleId: string): IBattle {
+  botAction(): IBattle {
     const battle = this.battleService.battle;
     const chosenAction = this.chooseAction(battle);
     return this.doAction(battle, chosenAction, false);
@@ -193,7 +69,7 @@ export class BotService {
           activeChar.id === action.targetId ? activeChar : this.heroService.getCharById(action.targetId, heroes);
         let ability: IAbility = this.heroService.getHeroAbilityById(activeHero, action.abilityId);
 
-        //Maybe it is a pet ability
+        // Maybe it is a pet ability
         if (!ability) {
           for (let i = 0; i < activeHero.pets.length; i++) {
             if (activeHero.pets[i].ability.id === action.abilityId) {
@@ -232,9 +108,9 @@ export class BotService {
 
   chooseAction(state: IBattle): IAction {
     if (this.actionChain.length > 0) {
-      const actionFromChain = this.actionChain[0];
+      const firstActionFromChain = this.actionChain[0];
       this.actionChain.shift();
-      return actionFromChain;
+      return firstActionFromChain;
     }
     const nodes = new Map<string, BotNode>();
 
@@ -260,7 +136,7 @@ export class BotService {
     nodes.set(stateHash, rootNode);
     const currentTeamId = this.heroService.getTeamByHeroId(state.queue[0], state.teams).id;
 
-    let end = Date.now() + Const.botThinkTime;
+    const end = Date.now() + Const.botThinkTime;
     const simulationTime: number[] = [];
 
     while (Date.now() < end) {
@@ -356,7 +232,7 @@ export class BotService {
     let node = nodes.get(this.getStateHash(state));
     while (node.isFullyExpanded() && !node.isLeaf()) {
       const actions = node.allActions();
-      let bestAction;
+      let bestAction: IAction;
       let bestUCB1 = -Infinity;
       for (const action of actions) {
         const childUCB1 = node.childNode(action).getUCB1();
@@ -400,14 +276,12 @@ export class BotService {
       this.doAction(state, randomAction, true);
       winner = state.scenario.checkForWin(state.teams);
 
-      //If actionChain is too long, let's assume, that this is a lose
+      // If actionChain is too long, let's assume, that this is a lose
       if (chainLength >= Const.maxChainLength) {
         if (Const.maxChainInfo) {
           console.log('chainLength: ' + chainLength + ', logLength: ' + state.log.length + ' <- MAX');
         }
-        winner = state.teams.find((team: ITeam) => {
-          return team.id !== currentTeamId;
-        });
+        winner = state.teams.find((team: ITeam) => team.id !== currentTeamId);
       }
     }
 
@@ -415,7 +289,7 @@ export class BotService {
   }
 
   backpropagate(node: BotNode, winner: ITeam, currentTeamId: string) {
-    let winNum = winner.id === currentTeamId ? 1 : 0;
+    const winNum = winner.id === currentTeamId ? 1 : 0;
     while (node !== null) {
       node.sims += 1;
       node.wins += winNum;
@@ -445,7 +319,7 @@ export class BotService {
     return previousMoves;
   }
 
-  getStats(nodes: Map<string, BotNode>, state: IBattle) {
+  getStats(nodes: Map<string, BotNode>, state: IBattle): Statistic {
     const node = nodes.get(this.getStateHash(state));
     const stats = {
       sims: node.sims,
@@ -474,9 +348,9 @@ export class BotService {
 
     const node = nodes.get(stateHash);
     const allActions = node.allActions();
-    let bestNode = null;
+    let bestNode: BotNode = null;
 
-    //Highest winrate
+    // Highest winrate
     // let maxWinRatio = 0;
     // for (const action of allActions) {
     //   const childNode = node.childNode(action);
@@ -498,7 +372,7 @@ export class BotService {
     }
 
     if (!bestNode && Const.bestNodesInfo) {
-      console.log('No best nodes for state depth: ' + JSON.parse(stateHash).length);
+      console.log('No best nodes for state depth: ' + stateHash.length.toString());
     }
 
     return bestNode;
@@ -517,5 +391,135 @@ export class BotService {
       }
     }
     return actionChain;
+  }
+
+  private getStateHash(state: IBattle): string {
+    return JSON.stringify(state.log);
+  }
+
+  private cloneState(state: IBattle): IBattle {
+    const newTeams: ITeam[] = [];
+    for (let i = 0; i < state.teams.length; i++) {
+      const newHeroes: IHero[] = [];
+      for (let j = 0; j < state.teams[i].heroes.length; j++) {
+        const effects: IEffect[] = [];
+        for (let k = 0; k < state.teams[i].heroes[j].effects.length; k++) {
+          effects.push(Object.assign({}, state.teams[i].heroes[j].effects[k]));
+        }
+
+        const abilities: IAbility[] = [];
+        for (let k = 0; k < state.teams[i].heroes[j].abilities.length; k++) {
+          abilities.push(Object.assign({}, state.teams[i].heroes[j].abilities[k]));
+        }
+
+        const pets: IPet[] = [];
+        for (let k = 0; k < state.teams[i].heroes[j].pets.length; k++) {
+          const petEffects: IEffect[] = [];
+          for (let l = 0; l < state.teams[i].heroes[j].pets[k].effects.length; l++) {
+            petEffects.push(Object.assign({}, state.teams[i].heroes[j].pets[k].effects[l]));
+          }
+
+          pets.push({
+            id: state.teams[i].heroes[j].pets[k].id,
+            isPet: true,
+            maxHealth: state.teams[i].heroes[j].pets[k].maxHealth,
+            effects: petEffects,
+            ability: Object.assign({}, state.teams[i].heroes[j].pets[k].ability),
+
+            health: state.teams[i].heroes[j].pets[k].health,
+            regeneration: state.teams[i].heroes[j].pets[k].regeneration,
+
+            isStunned: state.teams[i].heroes[j].pets[k].isStunned,
+            isImmobilized: state.teams[i].heroes[j].pets[k].isImmobilized,
+            isDisarmed: state.teams[i].heroes[j].pets[k].isDisarmed,
+            isSilenced: state.teams[i].heroes[j].pets[k].isSilenced,
+            isBlind: state.teams[i].heroes[j].pets[k].isBlind,
+            isMoved: state.teams[i].heroes[j].pets[k].isMoved,
+            isImmuneToDisarm: state.teams[i].heroes[j].pets[k].isImmuneToDisarm,
+            isImmuneToDebuffs: state.teams[i].heroes[j].pets[k].isImmuneToDebuffs,
+
+            position: { x: state.teams[i].heroes[j].pets[k].position.x, y: state.teams[i].heroes[j].pets[k].position.y }
+          });
+        }
+
+        const primaryWeapon: IEquip = Object.assign({}, state.teams[i].heroes[j].primaryWeapon);
+        const chestpiece: IEquip = Object.assign({}, state.teams[i].heroes[j].chestpiece);
+
+        const newHero: IHero = {
+          id: state.teams[i].heroes[j].id,
+          isPet: false,
+          maxEnergy: state.teams[i].heroes[j].maxEnergy,
+          maxHealth: state.teams[i].heroes[j].maxHealth,
+          maxMana: state.teams[i].heroes[j].maxMana,
+          effects,
+          abilities,
+          pets,
+          primaryWeapon,
+          chestpiece,
+
+          strength: state.teams[i].heroes[j].strength,
+          intellect: state.teams[i].heroes[j].intellect,
+          armor: state.teams[i].heroes[j].armor,
+          will: state.teams[i].heroes[j].will,
+          regeneration: state.teams[i].heroes[j].regeneration,
+          mind: state.teams[i].heroes[j].mind,
+
+          energy: state.teams[i].heroes[j].energy,
+          health: state.teams[i].heroes[j].health,
+          mana: state.teams[i].heroes[j].mana,
+
+          isDead: state.teams[i].heroes[j].isDead,
+          isInvisible: state.teams[i].heroes[j].isInvisible,
+          isSilenced: state.teams[i].heroes[j].isSilenced,
+          isDisarmed: state.teams[i].heroes[j].isDisarmed,
+          isStunned: state.teams[i].heroes[j].isStunned,
+          isImmobilized: state.teams[i].heroes[j].isImmobilized,
+          isBlind: state.teams[i].heroes[j].isBlind,
+          isImmuneToDisarm: state.teams[i].heroes[j].isImmuneToDisarm,
+          isImmuneToDebuffs: state.teams[i].heroes[j].isImmuneToDebuffs,
+          maxAllowedAbilityLevel: state.teams[i].heroes[j].maxAllowedAbilityLevel,
+
+          moveEnergyCost: state.teams[i].heroes[j].moveEnergyCost,
+          extraWeaponEnergyCost: state.teams[i].heroes[j].extraWeaponEnergyCost,
+          position: { x: state.teams[i].heroes[j].position.x, y: state.teams[i].heroes[j].position.y },
+          crystals: state.teams[i].heroes[j].crystals
+        };
+
+        if (state.teams[i].heroes[j].secondaryWeapon) {
+          newHero.secondaryWeapon = Object.assign({}, state.teams[i].heroes[j].secondaryWeapon);
+        }
+
+        newHeroes.push(newHero);
+      }
+
+      newTeams.push({
+        id: state.teams[i].id,
+        crystals: state.teams[i].crystals,
+        heroes: newHeroes
+      });
+    }
+
+    const crystalPositions: IPosition[] = [];
+    for (let i = 0; i < state.crystalPositions.length; i++) {
+      crystalPositions.push({
+        x: state.crystalPositions[i].x,
+        y: state.crystalPositions[i].y
+      });
+    }
+
+    const mapEffects: IEffect[] = [];
+    for (let i = 0; i < state.mapEffects.length; i++) {
+      mapEffects.push(Object.assign({}, state.mapEffects[i]));
+    }
+
+    return {
+      id: state.id,
+      scenario: state.scenario,
+      crystalPositions,
+      mapEffects,
+      teams: newTeams,
+      queue: state.queue.slice(0),
+      log: state.log.slice(0)
+    };
   }
 }

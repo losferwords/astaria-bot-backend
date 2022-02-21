@@ -7,15 +7,12 @@ import { ITeam } from '../interfaces/ITeam';
 import { ILogMessage } from '../interfaces/ILogMessage';
 import { BotNode } from 'src/models/BotNode';
 import { ActionType } from 'src/enums/action-type.enum';
-import { IAction } from 'src/interfaces/IAction';
 import { IHero } from 'src/interfaces/IHero';
 
 @Injectable()
 export class ReportService {
-  constructor() {}
-
-  totalNodes: number = 0;
-  unexpandedNodes: number = 0;
+  totalNodes = 0;
+  unexpandedNodes = 0;
 
   saveBattleResults(battle: IBattle, setupIndex: number) {
     let battleLogData = 'SEP=,\nsetup,count,turn,hero,action,position,weapon/ability,target,value\n';
@@ -38,12 +35,12 @@ export class ReportService {
             '\n';
           break;
         case LogMessageType.TURN_END:
-          battleLogData += setupIndex + ',' +i + ',' + turn + ',' + battle.log[i].id + ',TURN_END\n';
+          battleLogData += setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',TURN_END\n';
           turn++;
           break;
         case LogMessageType.WEAPON_DAMAGE:
           battleLogData +=
-          setupIndex +
+            setupIndex +
             ',' +
             i +
             ',' +
@@ -60,7 +57,7 @@ export class ReportService {
           break;
         case LogMessageType.ABILITY_DAMAGE:
           battleLogData +=
-          setupIndex +
+            setupIndex +
             ',' +
             i +
             ',' +
@@ -77,7 +74,7 @@ export class ReportService {
           break;
         case LogMessageType.EFFECT_DAMAGE:
           battleLogData +=
-          setupIndex +
+            setupIndex +
             ',' +
             i +
             ',' +
@@ -94,7 +91,7 @@ export class ReportService {
           break;
         case LogMessageType.ABILITY_HEAL:
           battleLogData +=
-          setupIndex +
+            setupIndex +
             ',' +
             i +
             ',' +
@@ -111,7 +108,7 @@ export class ReportService {
           break;
         case LogMessageType.ABILITY_CAST:
           battleLogData +=
-          setupIndex +
+            setupIndex +
             ',' +
             i +
             ',' +
@@ -125,20 +122,41 @@ export class ReportService {
             '\n';
           break;
         case LogMessageType.UPGRADE_EQUIP:
-          battleLogData += setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',UPGRADE_EQUIP,,' + battle.log[i].equipId + '\n';
+          battleLogData +=
+            setupIndex +
+            ',' +
+            i +
+            ',' +
+            turn +
+            ',' +
+            battle.log[i].id +
+            ',UPGRADE_EQUIP,,' +
+            battle.log[i].equipId +
+            '\n';
           break;
         case LogMessageType.LEARN_ABILITY:
           battleLogData +=
-          setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',LEARN_ABILITY,,' + battle.log[i].abilityId + '\n';
+            setupIndex +
+            ',' +
+            i +
+            ',' +
+            turn +
+            ',' +
+            battle.log[i].id +
+            ',LEARN_ABILITY,,' +
+            battle.log[i].abilityId +
+            '\n';
           break;
         case LogMessageType.TAKE_CRYSTAL:
           battleLogData += setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',TAKE_CRYSTAL\n';
           break;
         case LogMessageType.TAKE_MANA:
-          battleLogData += setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',TAKE_MANA,,,' + battle.log[i].value + '\n';
+          battleLogData +=
+            setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',TAKE_MANA,,,' + battle.log[i].value + '\n';
           break;
         case LogMessageType.TAKE_ENERGY:
-          battleLogData += setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',TAKE_ENERGY,,,' + battle.log[i].value + '\n';
+          battleLogData +=
+            setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',TAKE_ENERGY,,,' + battle.log[i].value + '\n';
           break;
         case LogMessageType.TURN_SKIP:
           battleLogData += setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',TURN_SKIP\n';
@@ -169,7 +187,7 @@ export class ReportService {
     if (battle.scenario.id === '0') {
       const loserTeam = battle.teams[0].id === winner.id ? battle.teams[1] : battle.teams[0];
       loserTeam.heroes = this.sortHeroes(loserTeam);
-      statisticsData +=        
+      statisticsData +=
         battle.id +
         ',' +
         setupIndex +
