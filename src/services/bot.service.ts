@@ -138,9 +138,12 @@ export class BotService {
 
     const end = Date.now() + Const.botThinkTime;
     const simulationTime: number[] = [];
+    let startTime = Date.now();
 
-    while (Date.now() < end) {
-      const startTime = Date.now();
+    while (Date.now() < end && this.checkObviousAction()) {
+      if (Const.simulationInfo) {
+        startTime = Date.now();
+      }
       let node = this.select(nodes, state);
       let winner = node.state.scenario.checkForWin(node.state.teams);
 
@@ -149,24 +152,27 @@ export class BotService {
         winner = this.simulate(node, currentTeamId);
       }
       this.backpropagate(node, winner, currentTeamId);
-      simulationTime.push(Date.now() - startTime);
-    }
 
-    const stats = this.getStats(nodes, state);
-    let simulationTimeSum = 0;
-    let simulationTimeMin = Infinity;
-    let simulationTimeMax = 0;
-    for (let i = 0; i < simulationTime.length; i++) {
-      simulationTimeSum += simulationTime[i];
-      if (simulationTime[i] < simulationTimeMin) {
-        simulationTimeMin = simulationTime[i];
-      }
-      if (simulationTime[i] > simulationTimeMax) {
-        simulationTimeMax = simulationTime[i];
+      if (Const.simulationInfo) {
+        simulationTime.push(Date.now() - startTime);
       }
     }
 
     if (Const.simulationInfo) {
+      const stats = this.getStats(nodes, state);
+      let simulationTimeSum = 0;
+      let simulationTimeMin = Infinity;
+      let simulationTimeMax = 0;
+      for (let i = 0; i < simulationTime.length; i++) {
+        simulationTimeSum += simulationTime[i];
+        if (simulationTime[i] < simulationTimeMin) {
+          simulationTimeMin = simulationTime[i];
+        }
+        if (simulationTime[i] > simulationTimeMax) {
+          simulationTimeMax = simulationTime[i];
+        }
+      }
+
       console.log('----------------------------------------');
       console.log('Sims: ' + stats.sims + ', Wins: ' + stats.wins);
       stats.children = stats.children.sort((a, b) => {
@@ -209,9 +215,9 @@ export class BotService {
     const actionFromChain = this.actionChain[0];
     this.actionChain.shift();
 
-    if (global.gc) {
-      global.gc();
-    }
+    //if (global.gc) {
+    global.gc();
+    //}
 
     if (Const.memoryInfo) {
       const used = process.memoryUsage();
@@ -338,6 +344,10 @@ export class BotService {
       }
     }
     return stats;
+  }
+
+  checkObviousAction(): boolean {
+    return true;
   }
 
   bestNode(nodes: Map<string, BotNode>, state: IBattle): BotNode {
