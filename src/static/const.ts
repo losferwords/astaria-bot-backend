@@ -13,7 +13,7 @@ export class Const {
   public static statisticsFilePath = './reports/statistics';
   public static mctsTreeReportPath = './tree-observer/mcts-trees';
   public static explorationParameter = 2;
-  public static botThinkTime = 300000;
+  public static botThinkTime = 120000;
   public static maxChainLength = 500;
   public static reportSortingArray = [
     'paragon',
@@ -28,8 +28,8 @@ export class Const {
 
   // Logs
   public static treeBuild = false;
-  public static simulationInfo = true;
-  public static memoryInfo = true;
+  public static simulationInfo = false;
+  public static memoryInfo = false;
   public static maxChainInfo = false;
-  public static bestNodesInfo = true;
+  public static bestNodesInfo = false;
 }

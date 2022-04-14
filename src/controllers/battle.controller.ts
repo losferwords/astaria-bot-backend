@@ -1,8 +1,10 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { IBattleSetupDto } from 'src/dto/battle-setup.dto';
 import { CastAbilityDto } from 'src/dto/cast-ability.dto';
+import { LearnAbilityDto } from 'src/dto/learn-ability.dto';
 import { MoveCharDto } from 'src/dto/move-char.dto';
 import { IScenarioSetupDto } from 'src/dto/scenario-setup.dto';
+import { UpgradeEquipDto } from 'src/dto/upgrade-equip.dto';
 import { UseWeaponDto } from 'src/dto/use-weapon.dto';
 import { IAbility } from 'src/interfaces/IAbility';
 import { IBattle } from 'src/interfaces/IBattle';
@@ -183,12 +185,12 @@ export class BattleController {
   }
 
   @Post('/upgrade-equip')
-  upgradeEquip(@Body() equipId: string): IBattle {
-    return this.battleService.upgradeEquip(this.battleService.battle, equipId, false);
+  upgradeEquip(@Body() upgradeEquipDto: UpgradeEquipDto): IBattle {
+    return this.battleService.upgradeEquip(this.battleService.battle, upgradeEquipDto.equipId, false);
   }
 
   @Post('/learn-ability')
-  learnAbility(@Body() abilityId: string): IBattle {
-    return this.battleService.learnAbility(this.battleService.battle, abilityId, false);
+  learnAbility(@Body() learnAbilityDto: LearnAbilityDto): IBattle {
+    return this.battleService.learnAbility(this.battleService.battle, learnAbilityDto.abilityId, false);
   }
 }
