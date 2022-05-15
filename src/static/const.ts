@@ -15,6 +15,8 @@ export class Const {
   public static explorationParameter = 2;
   public static botThinkTime = 120000;
   public static maxChainLength = 500;
+  public static obviousMoveMinSims = 10000;
+  public static obviousMoveRatio = 0.95;
   public static reportSortingArray = [
     'paragon',
     'highlander',
@@ -27,9 +29,10 @@ export class Const {
   ];
 
   // Logs
-  public static treeBuild = false;
-  public static simulationInfo = false;
+  public static treeBuild = true;
+  public static simulationInfo = true;
   public static memoryInfo = false;
   public static maxChainInfo = false;
   public static bestNodesInfo = false;
+  public static obviousMoveInfo = true;
 }

@@ -140,7 +140,7 @@ export class BotService {
     const simulationTime: number[] = [];
     let startTime = Date.now();
 
-    while (Date.now() < end && this.checkObviousAction()) {
+    while (Date.now() < end && !this.checkObviousAction(rootNode)) {
       if (Const.simulationInfo) {
         startTime = Date.now();
       }
@@ -215,9 +215,9 @@ export class BotService {
     const actionFromChain = this.actionChain[0];
     this.actionChain.shift();
 
-    //if (global.gc) {
-    global.gc();
-    //}
+    if (global.gc) {
+      global.gc();
+    }
 
     if (Const.memoryInfo) {
       const used = process.memoryUsage();
@@ -303,6 +303,26 @@ export class BotService {
     }
   }
 
+  checkObviousAction(rootNode: BotNode): boolean {
+    if (rootNode.sims < Const.obviousMoveMinSims) {
+      return false;
+    }
+
+    for (const child of rootNode.children.values()) {
+      if (child.node?.sims >= Const.obviousMoveMinSims && child.node.wins / child.node.sims >= Const.obviousMoveRatio) {
+        if (Const.obviousMoveInfo) {
+          console.log('----------------------------------------');
+          console.log(
+            `${rootNode.state.queue[0]} found obvious move, sims: ${child.node.sims}, wins: ${child.node.wins}`
+          );
+        }
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   getPreviousMoves(state: IBattle): IPosition[] {
     const previousMoves: IPosition[] = [];
     const activeHeroId = state.log[state.log.length - 1].id
@@ -346,10 +366,6 @@ export class BotService {
     return stats;
   }
 
-  checkObviousAction(): boolean {
-    return true;
-  }
-
   bestNode(nodes: Map<string, BotNode>, state: IBattle): BotNode {
     const stateHash = this.getStateHash(state);
     if (!nodes.has(stateHash)) {
@@ -382,7 +398,7 @@ export class BotService {
     }
 
     if (!bestNode && Const.bestNodesInfo) {
-      console.log('No best nodes for state depth: ' + stateHash.length.toString());
+      console.log('No best nodes for state depth: ' + JSON.parse(stateHash).length.toString());
     }
 
     return bestNode;
@@ -394,7 +410,11 @@ export class BotService {
       return [];
     }
     const actionChain = [bestNode.action];
-    while (bestNode && bestNode.action.type !== ActionType.TURN_END) {
+    while (
+      bestNode &&
+      bestNode.action.type !== ActionType.TURN_END &&
+      !bestNode.state.log.find((l) => l.type === LogMessageType.WIN)
+    ) {
       bestNode = this.bestNode(nodes, bestNode.state);
       if (bestNode) {
         actionChain.push(bestNode.action);
