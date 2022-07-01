@@ -1,3 +1,4 @@
+import { IChar } from 'src/interfaces/IChar';
 import { IPosition } from 'src/interfaces/IPosition';
 import { TileType } from '../../enums/tile-type.enum';
 import { IBattle } from '../../interfaces/IBattle';
@@ -6,151 +7,97 @@ import { ITeam } from '../../interfaces/ITeam';
 
 const teamPositions: IPosition[][] = [
   [
-    { x: 4, y: 0 },
-    { x: 5, y: 0 },
-    { x: 6, y: 0 }
+    { x: 0, y: 7 },
+    { x: 1, y: 8 }
   ],
   [
-    { x: 4, y: 10 },
-    { x: 5, y: 10 },
-    { x: 6, y: 10 }
+    { x: 7, y: 0 },
+    { x: 8, y: 1 }
   ]
 ];
 
 const crystalPositions: IPosition[] = [
-  { x: 5, y: 0 },
-  { x: 0, y: 5 },
-  { x: 5, y: 5 },
-  { x: 10, y: 5 },
-  { x: 5, y: 10 }
+  { x: 0, y: 0 },
+  { x: 8, y: 0 },
+  { x: 0, y: 8 },
+  { x: 8, y: 8 }
 ];
 
 const rooms: IPosition[][] = [
   [
-    { x: 4, y: 0 },
+    { x: 0, y: 0 },
+    { x: 1, y: 0 },
+    { x: 2, y: 0 },
+    { x: 3, y: 0 },
+    { x: 0, y: 1 },
+    { x: 1, y: 1 },
+    { x: 2, y: 1 },
+    { x: 3, y: 1 },
+    { x: 0, y: 2 },
+    { x: 1, y: 2 },
+    { x: 0, y: 3 },
+    { x: 1, y: 3 }
+  ],
+  [
     { x: 5, y: 0 },
     { x: 6, y: 0 },
-    { x: 4, y: 1 },
+    { x: 7, y: 0 },
+    { x: 8, y: 0 },
     { x: 5, y: 1 },
     { x: 6, y: 1 },
-    { x: 4, y: 2 },
-    { x: 5, y: 2 },
-    { x: 6, y: 2 }
+    { x: 7, y: 1 },
+    { x: 8, y: 1 },
+    { x: 7, y: 2 },
+    { x: 8, y: 2 },
+    { x: 7, y: 3 },
+    { x: 8, y: 3 }
   ],
   [
-    { x: 0, y: 4 },
-    { x: 1, y: 4 },
-    { x: 2, y: 4 },
     { x: 0, y: 5 },
     { x: 1, y: 5 },
-    { x: 2, y: 5 },
     { x: 0, y: 6 },
     { x: 1, y: 6 },
-    { x: 2, y: 6 }
+    { x: 0, y: 7 },
+    { x: 1, y: 7 },
+    { x: 2, y: 7 },
+    { x: 3, y: 7 },
+    { x: 0, y: 8 },
+    { x: 1, y: 8 },
+    { x: 2, y: 8 },
+    { x: 3, y: 8 }
   ],
   [
-    { x: 4, y: 4 },
-    { x: 5, y: 4 },
-    { x: 6, y: 4 },
-    { x: 4, y: 5 },
-    { x: 5, y: 5 },
-    { x: 6, y: 5 },
-    { x: 4, y: 6 },
-    { x: 5, y: 6 },
-    { x: 6, y: 6 }
-  ],
-  [
-    { x: 8, y: 4 },
-    { x: 9, y: 4 },
-    { x: 10, y: 4 },
+    { x: 7, y: 5 },
     { x: 8, y: 5 },
-    { x: 9, y: 5 },
-    { x: 10, y: 5 },
+    { x: 7, y: 6 },
     { x: 8, y: 6 },
-    { x: 9, y: 6 },
-    { x: 10, y: 6 }
-  ],
-  [
-    { x: 4, y: 8 },
+    { x: 5, y: 7 },
+    { x: 6, y: 7 },
+    { x: 7, y: 7 },
+    { x: 8, y: 7 },
     { x: 5, y: 8 },
     { x: 6, y: 8 },
-    { x: 4, y: 9 },
-    { x: 5, y: 9 },
-    { x: 6, y: 9 },
-    { x: 4, y: 10 },
-    { x: 5, y: 10 },
-    { x: 6, y: 10 }
+    { x: 7, y: 8 },
+    { x: 8, y: 8 }
   ]
 ];
 
+const teleportSpot: IPosition = { x: 4, y: 4 };
+
 export class ArchaeanTemple implements IScenario {
   static id = '1';
-  static teamSize = [2, 3];
+  static teamSize = [2, 2];
   id;
   teamSize;
   tileSize = 40;
   tiles = [
     [
-      { type: TileType.BLANK },
-      { type: TileType.BLANK },
-      { type: TileType.BLANK },
-      { type: TileType.BLANK },
       { type: TileType.ROOM },
-      { type: TileType.ROOM },
-      { type: TileType.ROOM },
-      { type: TileType.BLANK },
-      { type: TileType.BLANK },
-      { type: TileType.BLANK },
-      { type: TileType.BLANK }
-    ],
-    [
-      { type: TileType.BLANK },
-      { type: TileType.BLANK },
-      { type: TileType.BLANK },
-      { type: TileType.FLOOR },
       { type: TileType.ROOM },
       { type: TileType.ROOM },
       { type: TileType.ROOM },
       { type: TileType.FLOOR },
-      { type: TileType.BLANK },
-      { type: TileType.BLANK },
-      { type: TileType.BLANK }
-    ],
-    [
-      { type: TileType.BLANK },
-      { type: TileType.BLANK },
-      { type: TileType.FLOOR },
-      { type: TileType.FLOOR },
       { type: TileType.ROOM },
-      { type: TileType.ROOM },
-      { type: TileType.ROOM },
-      { type: TileType.FLOOR },
-      { type: TileType.FLOOR },
-      { type: TileType.BLANK },
-      { type: TileType.BLANK }
-    ],
-    [
-      { type: TileType.BLANK },
-      { type: TileType.FLOOR },
-      { type: TileType.FLOOR },
-      { type: TileType.WALL },
-      { type: TileType.WALL },
-      { type: TileType.FLOOR },
-      { type: TileType.WALL },
-      { type: TileType.WALL },
-      { type: TileType.FLOOR },
-      { type: TileType.FLOOR },
-      { type: TileType.BLANK }
-    ],
-    [
-      { type: TileType.ROOM },
-      { type: TileType.ROOM },
-      { type: TileType.ROOM },
-      { type: TileType.WALL },
-      { type: TileType.ROOM },
-      { type: TileType.ROOM },
-      { type: TileType.ROOM },
-      { type: TileType.WALL },
       { type: TileType.ROOM },
       { type: TileType.ROOM },
       { type: TileType.ROOM }
@@ -159,11 +106,75 @@ export class ArchaeanTemple implements IScenario {
       { type: TileType.ROOM },
       { type: TileType.ROOM },
       { type: TileType.ROOM },
-      { type: TileType.FLOOR },
-      { type: TileType.ROOM },
-      { type: TileType.ROOM },
       { type: TileType.ROOM },
       { type: TileType.FLOOR },
+      { type: TileType.ROOM },
+      { type: TileType.ROOM },
+      { type: TileType.ROOM },
+      { type: TileType.ROOM }
+    ],
+    [
+      { type: TileType.ROOM },
+      { type: TileType.ROOM },
+      { type: TileType.WALL },
+      { type: TileType.WALL },
+      { type: TileType.FLOOR },
+      { type: TileType.WALL },
+      { type: TileType.WALL },
+      { type: TileType.ROOM },
+      { type: TileType.ROOM }
+    ],
+    [
+      { type: TileType.ROOM },
+      { type: TileType.ROOM },
+      { type: TileType.WALL },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.WALL },
+      { type: TileType.ROOM },
+      { type: TileType.ROOM }
+    ],
+    [
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR }
+    ],
+    [
+      { type: TileType.ROOM },
+      { type: TileType.ROOM },
+      { type: TileType.WALL },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.FLOOR },
+      { type: TileType.WALL },
+      { type: TileType.ROOM },
+      { type: TileType.ROOM }
+    ],
+    [
+      { type: TileType.ROOM },
+      { type: TileType.ROOM },
+      { type: TileType.WALL },
+      { type: TileType.WALL },
+      { type: TileType.FLOOR },
+      { type: TileType.WALL },
+      { type: TileType.WALL },
+      { type: TileType.ROOM },
+      { type: TileType.ROOM }
+    ],
+    [
+      { type: TileType.ROOM },
+      { type: TileType.ROOM },
+      { type: TileType.ROOM },
+      { type: TileType.ROOM },
+      { type: TileType.FLOOR },
+      { type: TileType.ROOM },
       { type: TileType.ROOM },
       { type: TileType.ROOM },
       { type: TileType.ROOM }
@@ -172,66 +183,12 @@ export class ArchaeanTemple implements IScenario {
       { type: TileType.ROOM },
       { type: TileType.ROOM },
       { type: TileType.ROOM },
-      { type: TileType.WALL },
       { type: TileType.ROOM },
+      { type: TileType.FLOOR },
       { type: TileType.ROOM },
-      { type: TileType.ROOM },
-      { type: TileType.WALL },
       { type: TileType.ROOM },
       { type: TileType.ROOM },
       { type: TileType.ROOM }
-    ],
-    [
-      { type: TileType.BLANK },
-      { type: TileType.FLOOR },
-      { type: TileType.FLOOR },
-      { type: TileType.WALL },
-      { type: TileType.WALL },
-      { type: TileType.FLOOR },
-      { type: TileType.WALL },
-      { type: TileType.WALL },
-      { type: TileType.FLOOR },
-      { type: TileType.FLOOR },
-      { type: TileType.BLANK }
-    ],
-    [
-      { type: TileType.BLANK },
-      { type: TileType.BLANK },
-      { type: TileType.FLOOR },
-      { type: TileType.FLOOR },
-      { type: TileType.ROOM },
-      { type: TileType.ROOM },
-      { type: TileType.ROOM },
-      { type: TileType.FLOOR },
-      { type: TileType.FLOOR },
-      { type: TileType.BLANK },
-      { type: TileType.BLANK }
-    ],
-    [
-      { type: TileType.BLANK },
-      { type: TileType.BLANK },
-      { type: TileType.BLANK },
-      { type: TileType.FLOOR },
-      { type: TileType.ROOM },
-      { type: TileType.ROOM },
-      { type: TileType.ROOM },
-      { type: TileType.FLOOR },
-      { type: TileType.BLANK },
-      { type: TileType.BLANK },
-      { type: TileType.BLANK }
-    ],
-    [
-      { type: TileType.BLANK },
-      { type: TileType.BLANK },
-      { type: TileType.BLANK },
-      { type: TileType.BLANK },
-      { type: TileType.ROOM },
-      { type: TileType.ROOM },
-      { type: TileType.ROOM },
-      { type: TileType.BLANK },
-      { type: TileType.BLANK },
-      { type: TileType.BLANK },
-      { type: TileType.BLANK }
     ]
   ];
 
@@ -286,10 +243,33 @@ export class ArchaeanTemple implements IScenario {
           teamDeathsCount++;
         }
       }
-      if (teamDeathsCount === 3) {
+      if (teamDeathsCount === 2) {
         return teams[i === 0 ? 1 : 0];
       }
     }
     return null;
+  }
+
+  afterTakeCrystal(char: IChar, state: IBattle) {
+    const teams = state.teams;
+    let teleportIsBusy = false;
+
+    for (let i = 0; i < teams.length; i++) {
+      const heroes = teams[i].heroes;
+      for (let j = 0; j < heroes.length; j++) {
+        for (let v = 0; v < heroes[j].pets.length; v++) {
+          if (heroes[j].pets[v].position.x === teleportSpot.x && heroes[j].pets[v].position.y === teleportSpot.y) {
+            teleportIsBusy = true;
+            break;
+          }
+        }
+        if (heroes[j].position.x === teleportSpot.x && heroes[j].position.y === teleportSpot.y && !heroes[j].isDead) {
+          teleportIsBusy = true;
+        }
+      }
+    }
+    if (!teleportIsBusy) {
+      char.position = { x: teleportSpot.x, y: teleportSpot.y };
+    }
   }
 }

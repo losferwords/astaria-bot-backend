@@ -218,6 +218,7 @@ export class BattleService {
         id: movedChar.id
       });
       battle.crystalPositions.splice(crystalPositionIndex, 1);
+      battle.scenario.afterTakeCrystal(movedChar, battle);
     }
   }
 

@@ -174,7 +174,15 @@ export class BotService {
       }
 
       console.log('----------------------------------------');
-      console.log('Sims: ' + stats.sims + ', Wins: ' + stats.wins);
+      console.log(
+        'Sims: ' +
+          stats.sims +
+          ', Wins: ' +
+          stats.wins +
+          ', Chances: ' +
+          ((stats.wins / stats.sims) * 100).toFixed(2) +
+          '%'
+      );
       stats.children = stats.children.sort((a, b) => {
         if (a.sims > b.sims) {
           return -1;

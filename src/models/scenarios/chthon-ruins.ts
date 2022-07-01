@@ -197,4 +197,8 @@ export class ChthonRuins implements IScenario {
     }
     return null;
   }
+
+  afterTakeCrystal() {
+    return;
+  }
 }

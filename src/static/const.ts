@@ -29,7 +29,7 @@ export class Const {
   ];
 
   // Logs
-  public static treeBuild = true;
+  public static treeBuild = false;
   public static simulationInfo = true;
   public static memoryInfo = false;
   public static maxChainInfo = false;
