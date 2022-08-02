@@ -72,23 +72,6 @@ export class ReportService {
             battle.log[i].value +
             '\n';
           break;
-        case LogMessageType.EFFECT_DAMAGE:
-          battleLogData +=
-            setupIndex +
-            ',' +
-            i +
-            ',' +
-            turn +
-            ',' +
-            battle.log[i].casterId +
-            ',AEFFECT_DAMAGE,,' +
-            battle.log[i].abilityId +
-            ',' +
-            battle.log[i].targetId +
-            ',' +
-            battle.log[i].value +
-            '\n';
-          break;
         case LogMessageType.ABILITY_HEAL:
           battleLogData +=
             setupIndex +
@@ -119,6 +102,23 @@ export class ReportService {
             battle.log[i].abilityId +
             ',' +
             battle.log[i].targetId +
+            '\n';
+          break;
+        case LogMessageType.EFFECT_DAMAGE:
+          battleLogData +=
+            setupIndex +
+            ',' +
+            i +
+            ',' +
+            turn +
+            ',' +
+            battle.log[i].casterId +
+            ',AEFFECT_DAMAGE,,' +
+            battle.log[i].abilityId +
+            ',' +
+            battle.log[i].targetId +
+            ',' +
+            battle.log[i].value +
             '\n';
           break;
         case LogMessageType.UPGRADE_EQUIP:
@@ -157,6 +157,36 @@ export class ReportService {
         case LogMessageType.TAKE_ENERGY:
           battleLogData +=
             setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',TAKE_ENERGY,,,' + battle.log[i].value + '\n';
+          break;
+        case LogMessageType.PET_SUMMON:
+          battleLogData +=
+            setupIndex +
+            ',' +
+            i +
+            ',' +
+            turn +
+            ',' +
+            battle.log[i].id +
+            ',PET_SUMMON,' +
+            battle.log[i].positionX +
+            ' ' +
+            battle.log[i].positionY +
+            '\n';
+          break;
+        case LogMessageType.PET_MOVE:
+          battleLogData +=
+            setupIndex +
+            ',' +
+            i +
+            ',' +
+            turn +
+            ',' +
+            battle.log[i].id +
+            ',PET_MOVE,' +
+            battle.log[i].positionX +
+            ' ' +
+            battle.log[i].positionY +
+            '\n';
           break;
         case LogMessageType.TURN_SKIP:
           battleLogData += setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',TURN_SKIP\n';
@@ -344,6 +374,139 @@ export class ReportService {
         ',' +
         Const.explorationParameter +
         '\n';
+    } else if (battle.scenario.id === '2') {
+      const loserTeam = battle.teams[0].id === winner.id ? battle.teams[1] : battle.teams[0];
+      loserTeam.heroes = this.sortHeroes(loserTeam);
+      statisticsData +=
+        battle.id +
+        ',' +
+        setupIndex +
+        ',' +
+        winner.heroes[0].id +
+        ',' +
+        winner.heroes[0].primaryWeapon.level +
+        ',' +
+        (winner.heroes[0].secondaryWeapon ? winner.heroes[0].secondaryWeapon.level : '') +
+        ',' +
+        winner.heroes[0].chestpiece.level +
+        ',' +
+        (winner.heroes[0].abilities[0] ? winner.heroes[0].abilities[0].id : '') +
+        ',' +
+        (winner.heroes[0].abilities[1] ? winner.heroes[0].abilities[1].id : '') +
+        ',' +
+        (winner.heroes[0].abilities[2] ? winner.heroes[0].abilities[2].id : '') +
+        ',' +
+        (winner.heroes[0].abilities[3] ? winner.heroes[0].abilities[3].id : '') +
+        ',' +
+        loserTeam.heroes[0].id +
+        ',' +
+        loserTeam.heroes[0].primaryWeapon.level +
+        ',' +
+        (loserTeam.heroes[0].secondaryWeapon ? loserTeam.heroes[0].secondaryWeapon.level : '') +
+        ',' +
+        loserTeam.heroes[0].chestpiece.level +
+        ',' +
+        (loserTeam.heroes[0].abilities[0] ? loserTeam.heroes[0].abilities[0].id : '') +
+        ',' +
+        (loserTeam.heroes[0].abilities[1] ? loserTeam.heroes[0].abilities[1].id : '') +
+        ',' +
+        (loserTeam.heroes[0].abilities[2] ? loserTeam.heroes[0].abilities[2].id : '') +
+        ',' +
+        (loserTeam.heroes[0].abilities[3] ? loserTeam.heroes[0].abilities[3].id : '') +
+        ',' +
+        battle.log.filter((message: ILogMessage) => message.type === LogMessageType.TAKE_CRYSTAL).length +
+        ',' +
+        (battle.log.filter((message: ILogMessage) => message.type === LogMessageType.TURN_END).length + 1) +
+        ',' +
+        (Const.botThinkTime / 1000).toFixed(0) +
+        ',' +
+        Const.explorationParameter +
+        '\n';
+    } else if (battle.scenario.id === '3') {
+      const loserTeams = [];
+      for (let i = 0; i < battle.teams.length; i++) {
+        if (battle.teams[i].id !== winner.id) {
+          battle.teams[i].heroes = this.sortHeroes(battle.teams[i]);
+          loserTeams.push(battle.teams[i]);
+        }
+      }
+      statisticsData +=
+        battle.id +
+        ',' +
+        setupIndex +
+        ',' +
+        winner.heroes[0].id +
+        ',' +
+        winner.heroes[0].primaryWeapon.level +
+        ',' +
+        (winner.heroes[0].secondaryWeapon ? winner.heroes[0].secondaryWeapon.level : '') +
+        ',' +
+        winner.heroes[0].chestpiece.level +
+        ',' +
+        (winner.heroes[0].abilities[0] ? winner.heroes[0].abilities[0].id : '') +
+        ',' +
+        (winner.heroes[0].abilities[1] ? winner.heroes[0].abilities[1].id : '') +
+        ',' +
+        (winner.heroes[0].abilities[2] ? winner.heroes[0].abilities[2].id : '') +
+        ',' +
+        (winner.heroes[0].abilities[3] ? winner.heroes[0].abilities[3].id : '') +
+        ',' +
+        winner.heroes[1].id +
+        ',' +
+        winner.heroes[1].primaryWeapon.level +
+        ',' +
+        (winner.heroes[1].secondaryWeapon ? winner.heroes[1].secondaryWeapon.level : '') +
+        ',' +
+        winner.heroes[1].chestpiece.level +
+        ',' +
+        (winner.heroes[1].abilities[0] ? winner.heroes[1].abilities[0].id : '') +
+        ',' +
+        (winner.heroes[1].abilities[1] ? winner.heroes[1].abilities[1].id : '') +
+        ',' +
+        (winner.heroes[1].abilities[2] ? winner.heroes[1].abilities[2].id : '') +
+        ',' +
+        (winner.heroes[1].abilities[3] ? winner.heroes[1].abilities[3].id : '') +
+        ',' +
+        loserTeams[0].heroes[0].id +
+        ',' +
+        loserTeams[0].heroes[0].primaryWeapon.level +
+        ',' +
+        (loserTeams[0].heroes[0].secondaryWeapon ? loserTeams[0].heroes[0].secondaryWeapon.level : '') +
+        ',' +
+        loserTeams[0].heroes[0].chestpiece.level +
+        ',' +
+        (loserTeams[0].heroes[0].abilities[0] ? loserTeams[0].heroes[0].abilities[0].id : '') +
+        ',' +
+        (loserTeams[0].heroes[0].abilities[1] ? loserTeams[0].heroes[0].abilities[1].id : '') +
+        ',' +
+        (loserTeams[0].heroes[0].abilities[2] ? loserTeams[0].heroes[0].abilities[2].id : '') +
+        ',' +
+        (loserTeams[0].heroes[0].abilities[3] ? loserTeams[0].heroes[0].abilities[3].id : '') +
+        ',' +
+        loserTeams[1].heroes[0].id +
+        ',' +
+        loserTeams[1].heroes[0].primaryWeapon.level +
+        ',' +
+        (loserTeams[1].heroes[0].secondaryWeapon ? loserTeams[1].heroes[0].secondaryWeapon.level : '') +
+        ',' +
+        loserTeams[1].heroes[0].chestpiece.level +
+        ',' +
+        (loserTeams[1].heroes[0].abilities[0] ? loserTeams[1].heroes[0].abilities[0].id : '') +
+        ',' +
+        (loserTeams[1].heroes[0].abilities[1] ? loserTeams[1].heroes[0].abilities[1].id : '') +
+        ',' +
+        (loserTeams[1].heroes[0].abilities[2] ? loserTeams[1].heroes[0].abilities[2].id : '') +
+        ',' +
+        (loserTeams[1].heroes[0].abilities[3] ? loserTeams[1].heroes[0].abilities[3].id : '') +
+        ',' +
+        battle.log.filter((message: ILogMessage) => message.type === LogMessageType.TAKE_CRYSTAL).length +
+        ',' +
+        (battle.log.filter((message: ILogMessage) => message.type === LogMessageType.TURN_END).length + 1) +
+        ',' +
+        (Const.botThinkTime / 1000).toFixed(0) +
+        ',' +
+        Const.explorationParameter +
+        '\n';
     }
 
     if (!fs.existsSync(targetFile)) {
@@ -356,6 +519,14 @@ export class ReportService {
         case '1':
           headers +=
             'winner1,winner1-pw,winner1-sw,winner1-cp,winner1-ability1,winner1-ability2,winner1-ability3,winner1-ability4,winner2,winner2-pw,winner2-sw,winner2-cp,winner2-ability1,winner2-ability2,winner2-ability3,winner2-ability4,loser1,loser1-pw,loser1-sw,loser1-cp,loser1-ability1,loser1-ability2,loser1-ability3,loser1-ability4,loser2,loser2-pw,loser2-sw,loser2-cp,loser2-ability1,loser2-ability2,loser2-ability3,loser2-ability4,crystals,turns,think-time,expl-p\n';
+          break;
+        case '2':
+          headers +=
+            'winner1,winner1-pw,winner1-sw,winner1-cp,winner1-ability1,winner1-ability2,winner1-ability3,winner1-ability4,loser1,loser1-pw,loser1-sw,loser1-cp,loser1-ability1,loser1-ability2,loser1-ability3,loser1-ability4,crystals,turns,think-time,expl-p\n';
+          break;
+        case '3':
+          headers +=
+            'winner1,winner1-pw,winner1-sw,winner1-cp,winner1-ability1,winner1-ability2,winner1-ability3,winner1-ability4,loser1,loser1-pw,loser1-sw,loser1-cp,loser1-ability1,loser1-ability2,loser1-ability3,loser1-ability4,loser2,loser2-pw,loser2-sw,loser2-cp,loser2-ability1,loser2-ability2,loser2-ability3,loser2-ability4,crystals,turns,think-time,expl-p\n';
           break;
       }
       fs.writeFileSync(targetFile, headers + statisticsData);
@@ -372,17 +543,15 @@ export class ReportService {
 
   saveTreeVisualization(rootNode: BotNode) {
     const tree = this.expandChildren(rootNode);
-    if (Const.simulationInfo) {
-      console.log(
-        'Total Nodes: ' +
-          this.totalNodes +
-          ', Unexpanded Nodes: ' +
-          this.unexpandedNodes +
-          ', Coverage: ' +
-          ((1 - this.unexpandedNodes / this.totalNodes) * 100).toFixed(2) +
-          '%'
-      );
-    }
+    console.log(
+      'Total Nodes: ' +
+        this.totalNodes +
+        ', Unexpanded Nodes: ' +
+        this.unexpandedNodes +
+        ', Coverage: ' +
+        ((1 - this.unexpandedNodes / this.totalNodes) * 100).toFixed(2) +
+        '%'
+    );
     this.totalNodes = 0;
     this.unexpandedNodes = 0;
     fs.writeFileSync(

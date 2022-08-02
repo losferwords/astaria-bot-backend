@@ -2035,7 +2035,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      directDamage: caster.primaryWeapon.physDamage + 1,
+      directDamage: caster.primaryWeapon.physDamage + 1 + caster.strength,
       abilityId: ability.id,
       isSimulation
     });

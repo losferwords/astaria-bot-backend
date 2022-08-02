@@ -1,3 +1,4 @@
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { BattleController } from './controllers/battle.controller';
@@ -11,7 +12,12 @@ import { MapService } from './services/map.service';
 import { ReportService } from './services/report.service';
 
 @Module({
-  imports: [ConfigModule.forRoot()],
+  imports: [
+    ConfigModule.forRoot(),
+    HttpModule.register({
+      timeout: 3600000
+    })
+  ],
   controllers: [BattleController, BotController],
   providers: [HeroService, MapService, BattleService, AbilityService, EffectService, BotService, ReportService]
 })

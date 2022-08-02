@@ -18,6 +18,11 @@ import { Helper } from 'src/static/helper';
 import { IEffect } from 'src/interfaces/IEffect';
 import { IPet } from 'src/interfaces/IPet';
 import { IEquip } from 'src/interfaces/IEquip';
+import { ISimulationResult } from 'src/interfaces/backend-side-only/ISimulationResult';
+import { HttpService } from '@nestjs/axios';
+import { lastValueFrom } from 'rxjs';
+import { AxiosResponse } from 'axios';
+import { ISimplifiedBotNode } from 'src/interfaces/backend-side-only/ISimplifiedBotNode';
 
 interface Statistic {
   sims: number;
@@ -35,12 +40,13 @@ export class BotService {
     private battleService: BattleService,
     private heroService: HeroService,
     private reportService: ReportService,
-    private abilityService: AbilityService
+    private abilityService: AbilityService,
+    private readonly httpService: HttpService
   ) {}
 
-  botAction(): IBattle {
+  async botAction(): Promise<IBattle> {
     const battle = this.battleService.battle;
-    const chosenAction = this.chooseAction(battle);
+    const chosenAction = await this.chooseAction(battle);
     return this.doAction(battle, chosenAction, false);
   }
 
@@ -106,83 +112,83 @@ export class BotService {
     }
   }
 
-  chooseAction(state: IBattle): IAction {
+  async chooseAction(state: IBattle): Promise<IAction> {
     if (this.actionChain.length > 0) {
       const firstActionFromChain = this.actionChain[0];
       this.actionChain.shift();
       return firstActionFromChain;
     }
-    const nodes = new Map<string, BotNode>();
 
-    // Clone state and clean log to avoid long state chain copies
-    state = this.cloneState(state);
-    const heroes = this.battleService.getHeroesInBattle(state);
-    const activeHero = this.heroService.getHeroById(state.queue[0], heroes);
-    state.log = [
-      {
-        type: LogMessageType.TURN_START,
-        id: activeHero.id,
-        positionX: activeHero.position.x,
-        positionY: activeHero.position.y
-      }
-    ];
-
-    const stateHash = this.getStateHash(state);
     const unexpandedActions = this.battleService.getAvailableActions(state, []);
     if (unexpandedActions.length === 1) {
       return unexpandedActions[0];
     }
     const rootNode = new BotNode(null, null, state, unexpandedActions);
-    nodes.set(stateHash, rootNode);
-    const currentTeamId = this.heroService.getTeamByHeroId(state.queue[0], state.teams).id;
 
-    const end = Date.now() + Const.botThinkTime;
-    const simulationTime: number[] = [];
-    let startTime = Date.now();
+    // Clone state and clean log to avoid long state chain copies
+    state = this.cloneState(state);
 
-    while (Date.now() < end && !this.checkObviousAction(rootNode)) {
-      if (Const.simulationInfo) {
-        startTime = Date.now();
-      }
-      let node = this.select(nodes, state);
-      let winner = node.state.scenario.checkForWin(node.state.teams);
+    const simulations: Promise<AxiosResponse<ISimulationResult> | ISimulationResult>[] = [
+      new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(this.startSimulation(rootNode, state, false));
+        }, 1000);
+      })
+    ];
 
-      if (node.isLeaf() === false && winner === null && node.state.queue.length > 0) {
-        node = this.expand(nodes, node);
-        winner = this.simulate(node, currentTeamId);
-      }
-      this.backpropagate(node, winner, currentTeamId);
+    for (let i = 1; i < Const.numberOfServers; i++) {
+      simulations.push(
+        lastValueFrom(
+          this.httpService.post(`http://localhost:300${i}/start-simulation`, {
+            startSimulationData: {
+              unexpandedActions,
+              state
+            }
+          })
+        )
+      );
+    }
 
-      if (Const.simulationInfo) {
-        simulationTime.push(Date.now() - startTime);
+    const results = await Promise.all(simulations);
+
+    const { nodes, simulationTime } = results[0] as ISimulationResult;
+
+    console.log('----------------------------------------');
+
+    for (const result of results) {
+      if ((result as AxiosResponse<ISimulationResult>).data) {
+        const externalResult = (result as AxiosResponse<ISimulationResult>).data;
+        const externalNodes = new Map<string, BotNode>(externalResult.nodes);
+        let intersectedNodesCount = 0;
+        for (const node of nodes) {
+          const stateHash = this.getStateHash(node[1].state);
+          const duplicatedNode = externalNodes.get(stateHash);
+          if (duplicatedNode && node[1].depth === duplicatedNode.depth) {
+            node[1].sims += duplicatedNode.sims;
+            node[1].wins += duplicatedNode.wins;
+            intersectedNodesCount++;
+          }
+        }
+        if (Const.simulationInfo) {
+          console.log(
+            `Internal nodes: ${nodes.size}, External nodes: ${externalNodes.size}, Intersection: ${(
+              (intersectedNodesCount / nodes.size) *
+              100
+            ).toFixed(0)}%`
+          );
+
+          for (let i = 0; i < externalResult.simulationTime.length; i++) {
+            simulationTime.push(externalResult.simulationTime[i]);
+          }
+        }
       }
     }
 
     if (Const.simulationInfo) {
       const stats = this.getStats(nodes, state);
-      let simulationTimeSum = 0;
-      let simulationTimeMin = Infinity;
-      let simulationTimeMax = 0;
-      for (let i = 0; i < simulationTime.length; i++) {
-        simulationTimeSum += simulationTime[i];
-        if (simulationTime[i] < simulationTimeMin) {
-          simulationTimeMin = simulationTime[i];
-        }
-        if (simulationTime[i] > simulationTimeMax) {
-          simulationTimeMax = simulationTime[i];
-        }
-      }
 
-      console.log('----------------------------------------');
-      console.log(
-        'Sims: ' +
-          stats.sims +
-          ', Wins: ' +
-          stats.wins +
-          ', Chances: ' +
-          ((stats.wins / stats.sims) * 100).toFixed(2) +
-          '%'
-      );
+      console.log('Sims: ' + stats.sims + ', Wins: ' + stats.wins);
+
       stats.children = stats.children.sort((a, b) => {
         if (a.sims > b.sims) {
           return -1;
@@ -192,6 +198,9 @@ export class BotService {
           return 0;
         }
       });
+
+      console.log('Chances: ' + ((stats.children[0].wins / stats.children[0].sims) * 100).toFixed(2) + '%');
+
       for (let i = 0; i < stats.children.length; i++) {
         let actionStr = 'Action ' + i + '\tsims: ' + stats.children[i].sims + '\twins: ' + stats.children[i].wins;
         for (const key in stats.children[i].action) {
@@ -204,14 +213,29 @@ export class BotService {
         }
         console.log(actionStr);
       }
-      console.log(
-        'Simulation Time: Avg: ' +
-          (simulationTimeSum / simulationTime.length).toFixed(0) +
-          ', Min: ' +
-          simulationTimeMin.toFixed(0) +
-          ', Max: ' +
-          simulationTimeMax.toFixed(0)
-      );
+
+      if (Const.simulationTimeInfo) {
+        let simulationTimeSum = 0;
+        let simulationTimeMin = Infinity;
+        let simulationTimeMax = 0;
+        for (let i = 0; i < simulationTime.length; i++) {
+          simulationTimeSum += simulationTime[i];
+          if (simulationTime[i] < simulationTimeMin) {
+            simulationTimeMin = simulationTime[i];
+          }
+          if (simulationTime[i] > simulationTimeMax) {
+            simulationTimeMax = simulationTime[i];
+          }
+        }
+        console.log(
+          'Simulation Time: Avg: ' +
+            (simulationTimeSum / simulationTime.length).toFixed(0) +
+            ', Min: ' +
+            simulationTimeMin.toFixed(0) +
+            ', Max: ' +
+            simulationTimeMax.toFixed(0)
+        );
+      }
     }
 
     // Create mcts diagram
@@ -242,19 +266,103 @@ export class BotService {
     return actionFromChain;
   }
 
-  select(nodes: Map<string, BotNode>, state: IBattle): BotNode {
+  startSimulation(rootNode: BotNode, state: IBattle, isExternalServer: boolean): ISimulationResult {
+    const nodes = new Map<string, BotNode>();
+
+    if (!isExternalServer) {
+      const heroes = this.battleService.getHeroesInBattle(state);
+      const activeHero = this.heroService.getHeroById(state.queue[0], heroes);
+      state.log = [
+        {
+          type: LogMessageType.TURN_START,
+          id: activeHero.id,
+          positionX: activeHero.position.x,
+          positionY: activeHero.position.y
+        }
+      ];
+    }
+
+    const stateHash = this.getStateHash(state);
+
+    nodes.set(stateHash, rootNode);
+    const currentTeamId = this.heroService.getTeamByHeroId(state.queue[0], state.teams).id;
+
+    const end = Date.now() + Const.botThinkTime;
+    const simulationTime: number[] = [];
+    let startTime = Date.now();
+
+    while (
+      Date.now() < end &&
+      !this.checkObviousAction(rootNode) &&
+      !(isExternalServer && nodes.size >= Const.maxNumberOfNodesForExternalServer) &&
+      !(nodes.size >= Const.maxNumberOfNodesForInternalServer)
+    ) {
+      if (Const.simulationTimeInfo) {
+        startTime = Date.now();
+      }
+      let node = this.select(nodes, state, currentTeamId);
+      let winner = node.state.scenario.checkForWin(node.state.teams);
+
+      if (node.isLeaf() === false && winner === null && node.state.queue.length > 0) {
+        node = this.expand(nodes, node);
+        winner = this.simulate(node, currentTeamId);
+      }
+      this.backpropagate(node, winner, currentTeamId);
+
+      if (Const.simulationTimeInfo) {
+        simulationTime.push(Date.now() - startTime);
+      }
+    }
+
+    return {
+      nodes,
+      simulationTime
+    };
+  }
+
+  simplifySimulationResults(nodes: Map<string, BotNode>): [string, ISimplifiedBotNode][] {
+    return Array.from(nodes).map((node) => {
+      return [node[0], this.simplifyBotNode(node[1])];
+    });
+  }
+
+  simplifyBotNode(node: BotNode): ISimplifiedBotNode {
+    const children: ISimplifiedBotNode['children'] = [];
+    for (const child of node.children) {
+      if (child[1].node) {
+        children.push([child[0], { action: child[1].action, node: this.simplifyBotNode(child[1].node) }]);
+      }
+    }
+    return {
+      action: node.action,
+      sims: node.sims,
+      wins: node.wins,
+      depth: node.depth,
+      children
+    };
+  }
+
+  select(nodes: Map<string, BotNode>, state: IBattle, currentTeamId: string): BotNode {
     let node = nodes.get(this.getStateHash(state));
     while (node.isFullyExpanded() && !node.isLeaf()) {
       const actions = node.allActions();
       let bestAction: IAction;
       let bestUCB1 = -Infinity;
-      for (const action of actions) {
-        const childUCB1 = node.childNode(action).getUCB1();
-        if (childUCB1 > bestUCB1) {
-          bestAction = action;
-          bestUCB1 = childUCB1;
+      const isAllyTurn = this.heroService.getTeamByHeroId(node.state.queue[0], node.state.teams).id === currentTeamId;
+      // For ally moves we select action by UCB1 algorithm
+      // For enemy we just pick random action to check to avoid too optimistic decisions
+      if (isAllyTurn) {
+        for (const action of actions) {
+          const childUCB1 = node.childNode(action).getUCB1();
+          if (childUCB1 > bestUCB1) {
+            bestAction = action;
+            bestUCB1 = childUCB1;
+          }
         }
+      } else {
+        bestAction = actions[Math.floor(Math.random() * actions.length)];
       }
+
       node = node.childNode(bestAction);
     }
     return node;
@@ -316,17 +424,41 @@ export class BotService {
       return false;
     }
 
-    for (const child of rootNode.children.values()) {
-      if (child.node?.sims >= Const.obviousMoveMinSims && child.node.wins / child.node.sims >= Const.obviousMoveRatio) {
-        if (Const.obviousMoveInfo) {
-          console.log('----------------------------------------');
-          console.log(
-            `${rootNode.state.queue[0]} found obvious move, sims: ${child.node.sims}, wins: ${child.node.wins}`
-          );
-        }
-        return true;
+    const bestAction = [...rootNode.children].sort((a, b) => {
+      if (a[1].node?.sims > b[1].node?.sims) {
+        return -1;
+      } else if (a[1].node?.sims < b[1].node?.sims) {
+        return 1;
+      } else {
+        return 0;
       }
+    })[0][1];
+
+    if (
+      bestAction.node?.sims >= Const.obviousMoveMinSims &&
+      bestAction.node?.wins / bestAction.node?.sims >= Const.obviousMoveRatio
+    ) {
+      if (Const.obviousMoveInfo) {
+        console.log('----------------------------------------');
+        console.log(
+          `${rootNode.state.queue[0]} found obvious win, sims: ${bestAction.node?.sims}, wins: ${bestAction.node?.wins}`
+        );
+      }
+      return true;
     }
+
+    // if (
+    //   bestAction.node?.sims >= Const.obviousMoveMinSims &&
+    //   bestAction.node?.wins / bestAction.node?.sims < 1 - Const.obviousMoveRatio
+    // ) {
+    //   if (Const.obviousMoveInfo) {
+    //     console.log('----------------------------------------');
+    //     console.log(
+    //       `${rootNode.state.queue[0]} found obvious lose, sims: ${bestAction.node?.sims}, wins: ${bestAction.node?.wins}`
+    //     );
+    //   }
+    //   return true;
+    // }
 
     return false;
   }
@@ -355,9 +487,11 @@ export class BotService {
 
   getStats(nodes: Map<string, BotNode>, state: IBattle): Statistic {
     const node = nodes.get(this.getStateHash(state));
+    let totalSims = 0;
+    let totalWins = 0;
     const stats = {
-      sims: node.sims,
-      wins: node.wins,
+      sims: 0,
+      wins: 0,
       children: []
     };
     for (const child of node.children.values()) {
@@ -369,8 +503,12 @@ export class BotService {
           sims: child.node.sims,
           wins: child.node.wins
         });
+        totalSims += child.node.sims;
+        totalWins += child.node.wins;
       }
     }
+    stats.sims = totalSims;
+    stats.wins = totalWins;
     return stats;
   }
 

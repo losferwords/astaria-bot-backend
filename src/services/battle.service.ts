@@ -27,6 +27,8 @@ import { ILogMessage } from 'src/interfaces/ILogMessage';
 import { IPet } from 'src/interfaces/IPet';
 import { EffectsData } from 'src/static/effects-data';
 import { ArchaeanTemple } from 'src/models/scenarios/archaean-temple';
+import { ArenaOfAcheos1x1 } from 'src/models/scenarios/arena-of-acheos-1x1';
+import { ArenaOfAcheos1x1x1 } from 'src/models/scenarios/arena-of-acheos-1x1x1';
 
 @Injectable()
 export class BattleService {
@@ -146,6 +148,33 @@ export class BattleService {
           queue: [],
           log: []
         };
+        break;
+      case '2':
+        battle = {
+          id: uuid(),
+          scenario: new ArenaOfAcheos1x1(),
+          teams: [new Team(battleSetup.teamSetup[0]), new Team(battleSetup.teamSetup[1])],
+          crystalPositions: [],
+          mapEffects: [],
+          queue: [],
+          log: []
+        };
+        break;
+      case '3':
+        battle = {
+          id: uuid(),
+          scenario: new ArenaOfAcheos1x1x1(),
+          teams: [
+            new Team(battleSetup.teamSetup[0]),
+            new Team(battleSetup.teamSetup[1]),
+            new Team(battleSetup.teamSetup[2])
+          ],
+          crystalPositions: [],
+          mapEffects: [],
+          queue: [],
+          log: []
+        };
+        break;
     }
     battle.scenario.setHeroPositions(battle.teams);
     battle.queue = this.getQueue(battle.teams);
@@ -651,10 +680,6 @@ export class BattleService {
     }
 
     for (let i = hero.effects.length - 1; i > -1; i--) {
-      if (!hero.effects[i]) {
-        console.log('1');
-        continue;
-      }
       if (hero.effects[i].left > 0 && hero.effects[i].left < 100) {
         hero.effects[i].left--;
       } else {
@@ -1491,11 +1516,6 @@ export class BattleService {
   getAvailableActions(battle: IBattle, previousMoves: IPosition[]): IAction[] {
     const heroes = this.getHeroesInBattle(battle);
     const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
-    if (!activeHero) {
-      console.log('No active hero!');
-      console.log(battle);
-      return [];
-    }
     const team = this.heroService.getTeamByHeroId(activeHero.id, battle.teams);
     const actions: IAction[] = [];
 
@@ -1817,9 +1837,14 @@ export class BattleService {
       });
     }
 
-    if (actions.length === 0) {
+    if (
+      actions.length === 0 ||
+      activeHero.energy === 0 ||
+      (team.crystals > 0 && team.heroes.filter((h) => !h.isDead).length > 1)
+    ) {
       actions.push({ type: ActionType.TURN_END });
     }
+
     return actions;
   }
 }

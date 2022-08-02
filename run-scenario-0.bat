@@ -1,1 +1,0 @@
-cmd /k scenario-0.bat

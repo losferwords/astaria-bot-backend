@@ -11,5 +11,5 @@ export interface IScenario {
   setHeroPositions: (teams: ITeam[]) => void;
   beforeTurn: (state: IBattle) => void;
   checkForWin: (teams: ITeam[]) => ITeam;
-  afterTakeCrystal: (char: IChar, state: IBattle) => void;
+  afterTakeCrystal?: (char: IChar, state: IBattle) => void;
 }
