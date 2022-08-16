@@ -29,6 +29,8 @@ import { EffectsData } from 'src/static/effects-data';
 import { ArchaeanTemple } from 'src/models/scenarios/archaean-temple';
 import { ArenaOfAcheos1x1 } from 'src/models/scenarios/arena-of-acheos-1x1';
 import { ArenaOfAcheos1x1x1 } from 'src/models/scenarios/arena-of-acheos-1x1x1';
+import { ArenaOfAcheos1x1x1x1 } from 'src/models/scenarios/arena-of-acheos-1x1x1x1';
+import { ArenaOfAcheos2x2 } from 'src/models/scenarios/arena-of-acheos-2x2';
 
 @Injectable()
 export class BattleService {
@@ -54,17 +56,20 @@ export class BattleService {
 
   getPossibleEnemies(battle: IBattle, sourceCharId: string): IChar[] {
     const possibleEnemies: IChar[] = [];
-    let enemyHeroes: IHero[] = [];
-    enemyHeroes = battle.teams.find((team: ITeam) => {
+
+    const enemyTeams = battle.teams.filter((team: ITeam) => {
       return !team.heroes.find((hero: IHero) => {
         return hero.id === sourceCharId || hero.pets.find((p) => p.id === sourceCharId);
       });
-    }).heroes;
+    });
 
-    for (let i = 0; i < enemyHeroes.length; i++) {
-      possibleEnemies.push(enemyHeroes[i]);
-      possibleEnemies.push(...enemyHeroes[i].pets);
+    for (let i = 0; i < enemyTeams.length; i++) {
+      for (let j = 0; j < enemyTeams[i].heroes.length; j++) {
+        possibleEnemies.push(enemyTeams[i].heroes[j]);
+        possibleEnemies.push(...enemyTeams[i].heroes[j].pets);
+      }
     }
+
     return possibleEnemies;
   }
 
@@ -175,16 +180,43 @@ export class BattleService {
           log: []
         };
         break;
+      case '4':
+        battle = {
+          id: uuid(),
+          scenario: new ArenaOfAcheos1x1x1x1(),
+          teams: [
+            new Team(battleSetup.teamSetup[0]),
+            new Team(battleSetup.teamSetup[1]),
+            new Team(battleSetup.teamSetup[2]),
+            new Team(battleSetup.teamSetup[3])
+          ],
+          crystalPositions: [],
+          mapEffects: [],
+          queue: [],
+          log: []
+        };
+        break;
+      case '5':
+        battle = {
+          id: uuid(),
+          scenario: new ArenaOfAcheos2x2(),
+          teams: [new Team(battleSetup.teamSetup[0]), new Team(battleSetup.teamSetup[1])],
+          crystalPositions: [],
+          mapEffects: [],
+          queue: [],
+          log: []
+        };
+        break;
     }
     battle.scenario.setHeroPositions(battle.teams);
     battle.queue = this.getQueue(battle.teams);
     const heroes = this.getHeroesInBattle(battle);
     const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
     battle.log.push({
-      type: LogMessageType.TURN_START,
+      t: LogMessageType.TURN_START,
       id: activeHero.id,
-      positionX: activeHero.position.x,
-      positionY: activeHero.position.y
+      x: activeHero.position.x,
+      y: activeHero.position.y
     });
     for (let i = 0; i < heroes.length; i++) {
       this.beforeTurn(battle, heroes, heroes[i], false);
@@ -222,9 +254,9 @@ export class BattleService {
     if (this.heroService.canMove(activeChar, !!petId)) {
       this.heroService.moveChar(battle, activeChar, targetPosition, !!petId);
       battle.log.push({
-        type: LogMessageType.MOVE,
-        positionX: targetPosition.x,
-        positionY: targetPosition.y,
+        t: LogMessageType.MOVE,
+        x: targetPosition.x,
+        y: targetPosition.y,
         id: activeChar.id
       });
 
@@ -243,7 +275,7 @@ export class BattleService {
       const movedCharTeam = this.heroService.getTeamByCharId(movedChar.id, battle.teams);
       movedCharTeam.crystals += 1;
       battle.log.push({
-        type: LogMessageType.TAKE_CRYSTAL,
+        t: LogMessageType.TAKE_CRYSTAL,
         id: movedChar.id
       });
       battle.crystalPositions.splice(crystalPositionIndex, 1);
@@ -538,6 +570,9 @@ export class BattleService {
               for (let j = 0; j < vortexEnemies.length; j++) {
                 if (vortexEnemies[j] && vortexEnemies[j].health > 0) {
                   this.attraction(battle, heroes, vortexEnemies[j], effect.position, isSimulation);
+                  // Rest mapEffectsToApply could be ignored,
+                  // because after attraction map effects will be already applied
+                  mapEffectsToApply.length = 0;
                   if (
                     vortexPoints.find(
                       (vp) => vp.x === vortexEnemies[j].position.x && vp.y === vortexEnemies[j].position.y
@@ -680,6 +715,10 @@ export class BattleService {
     }
 
     for (let i = hero.effects.length - 1; i > -1; i--) {
+      if (!hero.effects[i]) {
+        console.log(hero.id, hero.effects, i);
+        continue;
+      }
       if (hero.effects[i].left > 0 && hero.effects[i].left < 100) {
         hero.effects[i].left--;
       } else {
@@ -789,17 +828,17 @@ export class BattleService {
 
   endTurn(battle: IBattle, isSimulation: boolean): IBattle {
     battle.log.push({
-      type: LogMessageType.TURN_END,
+      t: LogMessageType.TURN_END,
       id: battle.queue[0]
     });
     battle.queue.push(battle.queue.shift());
     const heroes = this.getHeroesInBattle(battle);
     const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
     battle.log.push({
-      type: LogMessageType.TURN_START,
+      t: LogMessageType.TURN_START,
       id: activeHero.id,
-      positionX: activeHero.position.x, //initial position at the new turn beginning (for previousMoves)
-      positionY: activeHero.position.y
+      x: activeHero.position.x, //initial position at the new turn beginning (for previousMoves)
+      y: activeHero.position.y
     });
 
     this.beforeTurn(battle, heroes, activeHero, isSimulation);
@@ -809,7 +848,7 @@ export class BattleService {
       const newActiveHero = this.heroService.getHeroById(battle.queue[0], heroes);
       if (newActiveHero.isStunned) {
         battle.log.push({
-          type: LogMessageType.TURN_SKIP,
+          t: LogMessageType.TURN_SKIP,
           id: newActiveHero.id
         });
         this.endTurn(battle, isSimulation);
@@ -825,16 +864,18 @@ export class BattleService {
     includeInvisible: boolean,
     abilityId: string,
     ignoreRaytrace: boolean,
-    blindCheck: boolean
+    blindCheck: boolean,
+    sourcePosition?: IPosition
   ): string[] {
     const heroes = this.getHeroesInBattle(battle);
     const sourceChar: IChar = this.heroService.getCharById(sourceCharId, heroes);
     if (!sourceChar) {
       return [];
     }
+    const sourcePositionPoint = sourcePosition || sourceChar.position;
 
     const points = this.mapService.findNearestPoints(
-      sourceChar.position,
+      sourcePositionPoint,
       battle.scenario.tiles,
       blindCheck && sourceChar.isBlind ? 1 : radius
     );
@@ -851,7 +892,7 @@ export class BattleService {
           !(possibleEnemies[j] as IHero).isDead &&
           (ignoreRaytrace ||
             !this.mapService.rayTrace(
-              { x: sourceChar.position.x, y: sourceChar.position.y },
+              { x: sourcePositionPoint.x, y: sourcePositionPoint.y },
               { x: points[i].x, y: points[i].y },
               battle.scenario.tiles,
               heroes
@@ -871,15 +912,19 @@ export class BattleService {
     includeSelf: boolean,
     includeInvisible: boolean,
     ignoreRaytrace: boolean,
-    blindCheck: boolean
+    blindCheck: boolean,
+    sourcePosition?: IPosition
   ): string[] {
     const heroes = this.getHeroesInBattle(battle);
     const sourceChar = this.heroService.getCharById(sourceCharId, heroes);
     if (!sourceChar) {
       return [];
     }
+
+    const sourcePositionPoint = sourcePosition || sourceChar.position;
+
     const points = this.mapService.findNearestPoints(
-      sourceChar.position,
+      sourcePositionPoint,
       battle.scenario.tiles,
       blindCheck && sourceChar.isBlind ? 1 : radius
     );
@@ -895,7 +940,7 @@ export class BattleService {
           !(possibleAllies[j] as IHero).isDead &&
           (ignoreRaytrace ||
             !this.mapService.rayTrace(
-              { x: sourceChar.position.x, y: sourceChar.position.y },
+              { x: sourcePositionPoint.x, y: sourcePositionPoint.y },
               { x: points[i].x, y: points[i].y },
               battle.scenario.tiles,
               heroes
@@ -915,15 +960,19 @@ export class BattleService {
     includeSelf: boolean,
     includeInvisible: boolean,
     ignoreRaytrace: boolean,
-    blindCheck: boolean
+    blindCheck: boolean,
+    sourcePosition?: IPosition
   ): string[] {
     const heroes = this.getHeroesInBattle(battle);
     const sourceChar = this.heroService.getCharById(sourceCharId, heroes);
     if (!sourceChar) {
       return [];
     }
+
+    const sourcePositionPoint = sourcePosition || sourceChar.position;
+
     const points = this.mapService.findNearestPoints(
-      sourceChar.position,
+      sourcePosition || sourceChar.position,
       battle.scenario.tiles,
       blindCheck && sourceChar.isBlind ? 1 : radius
     );
@@ -953,7 +1002,7 @@ export class BattleService {
           !(possibleChars[j] as IHero).isDead &&
           (ignoreRaytrace ||
             !this.mapService.rayTrace(
-              { x: sourceChar.position.x, y: sourceChar.position.y },
+              { x: sourcePositionPoint.x, y: sourcePositionPoint.y },
               { x: points[i].x, y: points[i].y },
               battle.scenario.tiles,
               heroes
@@ -1032,15 +1081,18 @@ export class BattleService {
       winnerHeroes += winner.heroes[i].id + ' ';
     }
     battle.log.push({
-      type: LogMessageType.WIN,
+      t: LogMessageType.WIN,
       id: winnerHeroes
     });
   }
 
   upgradeEquip(battle: IBattle, equipId: string, isSimulation: boolean): IBattle {
     const heroes = this.getHeroesInBattle(battle);
+    const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
+
     battle = this.heroService.upgradeEquip(battle, heroes, equipId);
-    this.applyMapEffects(battle, heroes, true, isSimulation);
+    this.applyCharEffects(battle, heroes, activeHero, false, isSimulation);
+    this.applyMapEffects(battle, heroes, false, isSimulation);
     return battle;
   }
 
@@ -1141,25 +1193,230 @@ export class BattleService {
 
     switch (ability.id) {
       // Paragon
+      case '11-sunder-armor':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const physDamageToHealth =
+            (caster as IHero).primaryWeapon.physDamage + (caster as IHero).strength - (target as IHero).armor;
+          return physDamageToHealth > 0 || !target.isImmuneToDebuffs;
+        }
+      case '12-shield-bash':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const physDamageToHealth =
+            (caster as IHero).secondaryWeapon.level + 1 + (caster as IHero).strength - (target as IHero).armor;
+          return physDamageToHealth > 0 || !target.isImmuneToDebuffs;
+        }
       case '13-shoulder-to-shoulder':
         target = this.heroService.getCharById(targetId, heroes);
         return !target.isPet;
+      case '21-spear-throw':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const physDamageToHealth =
+            (caster as IHero).primaryWeapon.physDamage + (caster as IHero).strength - (target as IHero).armor;
+          return physDamageToHealth > 0 || !target.isImmuneToDebuffs;
+        }
       case '33-bandaging':
         target = this.heroService.getCharById(targetId, heroes);
         return target.health < target.maxHealth;
+      case '41-piercing-strike':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const physDamageToHealth =
+            (caster as IHero).primaryWeapon.physDamage + 1 + (caster as IHero).strength - (target as IHero).armor;
+          return physDamageToHealth > 0 || !target.isImmuneToDebuffs;
+        }
+      case '42-breakthrough':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const physDamageToHealth =
+            (caster as IHero).secondaryWeapon.level + 4 + (caster as IHero).strength - (target as IHero).armor;
+          return physDamageToHealth > 0 || !target.isImmuneToDebuffs;
+        }
 
       // Highlander
       case '21-sweeping-strike':
         const sweepingStrikeEnemies = this.findEnemies(battle, caster.id, 2, true, '21-sweeping-strike', false, false);
-        return sweepingStrikeEnemies.length > 0;
+        for (let i = 0; i < sweepingStrikeEnemies.length; i++) {
+          const sweepingStrikeTarget = this.heroService.getCharById(sweepingStrikeEnemies[i], heroes);
+          if (sweepingStrikeTarget.isPet) {
+            return true;
+          } else {
+            const physDamageToHealth =
+              (caster as IHero).primaryWeapon.physDamage +
+              (caster as IHero).strength -
+              (sweepingStrikeTarget as IHero).armor;
+            if (physDamageToHealth > 0) {
+              return true;
+            }
+          }
+        }
+        return false;
+      case '31-halving':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const physDamageToHealth =
+            (caster as IHero).primaryWeapon.physDamage + 3 + (caster as IHero).strength - (target as IHero).armor;
+          return physDamageToHealth > 0 || !target.isImmuneToDebuffs;
+        }
+      case '32-thunderer':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const physDamageToHealth =
+            (caster as IHero).primaryWeapon.physDamage + 1 + (caster as IHero).strength - (target as IHero).armor;
+          const magicDamageToHealth = 2 + (caster as IHero).intellect - (target as IHero).will;
+          return physDamageToHealth > 0 || magicDamageToHealth > 0;
+        }
+      case '33-lightning-strike':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const magicDamageToHealth = 4 + (caster as IHero).intellect - (target as IHero).will;
+          return magicDamageToHealth > 0;
+        }
+      case '41-decapitation':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const physDamageToHealth =
+            (caster as IHero).primaryWeapon.physDamage + 3 + (caster as IHero).strength - (target as IHero).armor;
+          return physDamageToHealth > 0;
+        }
       case '42-ancestral-power':
         target = this.heroService.getCharById(targetId, heroes);
         return !target.isPet;
+      case '43-chain-lightning':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        }
+
+        const chainLightningAoeEnemies = this.findEnemies(
+          battle,
+          caster.id,
+          2,
+          true,
+          ability.id,
+          false,
+          false,
+          target.position
+        );
+        for (let i = 0; i < chainLightningAoeEnemies.length; i++) {
+          if (chainLightningAoeEnemies[i] !== targetId) {
+            const chainLightningAoeTarget = this.heroService.getCharById(chainLightningAoeEnemies[i], heroes);
+            if (chainLightningAoeTarget.isPet) {
+              return true;
+            } else {
+              const magicDamageToHealth = 4 + (caster as IHero).intellect - (chainLightningAoeTarget as IHero).will;
+              if (magicDamageToHealth > 0) {
+                return true;
+              }
+            }
+          }
+        }
+        const chainLightningDamageToHealth = 5 + (caster as IHero).intellect - (target as IHero).will;
+        if (chainLightningDamageToHealth > 0) {
+          return true;
+        }
+        return false;
 
       // Druid
+      case '11-crown-of-thorns':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const magicDamageToHealth = 2 + (caster as IHero).intellect - (target as IHero).will;
+          return magicDamageToHealth > 0 || !target.isImmuneToDebuffs;
+        }
+      case '12-poison-touch':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const physDamageToHealth =
+            (caster as IHero).primaryWeapon.physDamage + (caster as IHero).strength - (target as IHero).armor;
+          return physDamageToHealth > 0 || !target.isImmuneToDebuffs;
+        }
+      case '21-entangling-roots':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const physDamageToHealth =
+            (caster as IHero).primaryWeapon.physDamage + 1 + (caster as IHero).strength - (target as IHero).armor;
+          return physDamageToHealth > 0 || !target.isImmuneToDebuffs;
+        }
+      case '22-wolf-bite':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          let abilityDamage = 4;
+
+          if (this.heroService.getCharEffectById(caster, '33-power-of-the-pack')) {
+            abilityDamage += 3;
+          }
+          const physDamageToHealth = abilityDamage - (target as IHero).armor;
+          return physDamageToHealth > 0;
+        }
+      case '31-choking-vine':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const magicDamageToHealth = 3 + (caster as IHero).intellect - (target as IHero).will;
+          return magicDamageToHealth > 0 || !target.isImmuneToDebuffs;
+        }
       case '41-wrath-of-nature':
         const wrathOfNatureEnemies = this.findEnemies(battle, caster.id, 3, true, '41-wrath-of-nature', false, false);
         return wrathOfNatureEnemies.length > 0;
+      case '42-dryad-forest-wrath':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          let abilityDamage = 6;
+
+          if (this.heroService.getCharEffectById(caster, '33-power-of-the-pack')) {
+            abilityDamage += 3;
+          }
+          const magicDamageToHealth = abilityDamage - (target as IHero).will;
+          return magicDamageToHealth > 0 || (target as IHero).mana > 0;
+        }
 
       // Oracle
       case '13-dangerous-knowledge':
@@ -1175,30 +1432,249 @@ export class BattleService {
             leftCounter += (target as IHero).abilities[i].left;
           }
         }
-        return leftCounter > 0;
+        if (leftCounter > 0) {
+          const magicDamageToHealth = leftCounter + (caster as IHero).intellect - (target as IHero).will;
+          return magicDamageToHealth > 0;
+        } else {
+          return false;
+        }
       case '22-knowledge-steal':
         target = this.heroService.getCharById(targetId, heroes);
         return !!target.effects.find((e) => e.isBuff && e.isRemovable);
+      case '23-paranoia':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const magicDamageToHealth = 2 + (caster as IHero).intellect - (target as IHero).will;
+          return magicDamageToHealth > 0 || !target.isImmuneToDebuffs;
+        }
+      case '31-disruption':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const magicDamageToHealth =
+            Math.ceil((caster as IHero).mana / 2) + (caster as IHero).intellect - (target as IHero).will;
+          return magicDamageToHealth > 0;
+        }
       case '33-mind-control':
         target = this.heroService.getCharById(targetId, heroes);
         return !target.isStunned && !target.isImmuneToDebuffs;
       case '43-amnesia':
         target = this.heroService.getCharById(targetId, heroes);
-        return !target.isPet && !target.isImmuneToDebuffs && (target as IHero).abilities.length > 1;
+        if (target.isPet) {
+          return true;
+        } else {
+          const magicDamageToHealth = 2 + (caster as IHero).intellect - (target as IHero).will;
+          return magicDamageToHealth > 0 || !target.isImmuneToDebuffs;
+        }
 
       // Avatar
+      case '11-furious-strike':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const physDamageToHealth =
+            (caster as IHero).primaryWeapon.physDamage + 3 + (caster as IHero).strength - (target as IHero).armor;
+          const magicDamageToHealth = 2 + (caster as IHero).intellect - (target as IHero).will;
+          return physDamageToHealth > 0 || magicDamageToHealth > 0;
+        }
+      case '13-fireball':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const magicDamageToHealth = 1 + (caster as IHero).intellect - (target as IHero).will;
+          return magicDamageToHealth > 0 || !target.isImmuneToDebuffs;
+        }
+      case '23-scorch':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const magicDamageToHealth = 3 + (caster as IHero).intellect - (target as IHero).will;
+          return magicDamageToHealth > 0 || !target.isImmuneToDebuffs;
+        }
+      case '31-dragon-tail':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const physDamageToHealth =
+            (caster as IHero).primaryWeapon.physDamage + 3 + (caster as IHero).strength - (target as IHero).armor;
+          return physDamageToHealth > 0 || !target.isImmuneToDebuffs;
+        }
+      case '33-meteor':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        }
+
+        const meteorAoeEnemies = this.findEnemies(
+          battle,
+          caster.id,
+          1,
+          true,
+          ability.id,
+          false,
+          false,
+          target.position
+        );
+        for (let i = 0; i < meteorAoeEnemies.length; i++) {
+          if (meteorAoeEnemies[i] !== targetId) {
+            const meteorAoeTarget = this.heroService.getCharById(meteorAoeEnemies[i], heroes);
+            if (meteorAoeTarget.isPet) {
+              return true;
+            } else {
+              const magicDamageToHealth = 1 + (caster as IHero).intellect - (meteorAoeTarget as IHero).will;
+              if (magicDamageToHealth > 0) {
+                return true;
+              }
+            }
+          }
+        }
+        const meteorDamageToHealth = 4 + (caster as IHero).intellect - (target as IHero).will;
+        if (meteorDamageToHealth > 0) {
+          return true;
+        }
+        return false;
+      case '42-dragon-spirit-breath':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          let abilityDamage = 5;
+
+          if (this.heroService.getCharEffectById(caster, '33-power-of-the-pack')) {
+            abilityDamage += 3;
+          }
+
+          const aoeEnemies = this.findEnemies(battle, caster.id, 1, true, ability.id, false, false, target.position);
+
+          for (let i = 0; i < aoeEnemies.length; i++) {
+            if (aoeEnemies[i] !== target.id) {
+              const aoeTarget = this.heroService.getCharById(aoeEnemies[i], heroes);
+              if (aoeTarget.isPet) {
+                return true;
+              } else {
+                const magicDamageToHealth = abilityDamage - (aoeTarget as IHero).will;
+                if (magicDamageToHealth > 0) {
+                  return true;
+                }
+              }
+            }
+          }
+
+          const breathDamageToHealth = abilityDamage - (target as IHero).will;
+          if (breathDamageToHealth > 0) {
+            return true;
+          }
+          return false;
+        }
 
       // Shadow
+      case '11-aimed-shot':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const physDamageToHealth =
+            (caster as IHero).primaryWeapon.physDamage + 1 + (caster as IHero).strength - (target as IHero).armor;
+          return physDamageToHealth > 0;
+        }
+      case '13-debilitating-shot':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const physDamageToHealth =
+            (caster as IHero).primaryWeapon.physDamage + 1 + (caster as IHero).strength - (target as IHero).armor;
+          return physDamageToHealth > 0 || !target.isImmuneToDebuffs;
+        }
       case '21-rapid-fire':
         return (
           (caster as IHero).primaryWeapon.isUsed &&
           (caster as IHero).energy >= (caster as IHero).primaryWeapon.energyCost
         );
+      case '23-blind':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const magicDamageToHealth = 2 + (caster as IHero).intellect - (target as IHero).will;
+          return magicDamageToHealth > 0 || !target.isImmuneToDebuffs;
+        }
+      case '31-volley':
+        const volleyEnemies = this.findEnemies(battle, caster.id, 3, true, ability.id, false, false);
+        for (let i = 0; i < volleyEnemies.length; i++) {
+          const volleyTarget = this.heroService.getCharById(volleyEnemies[i], heroes);
+          if (volleyTarget.isPet) {
+            return true;
+          } else {
+            const physDamageToHealth =
+              (caster as IHero).primaryWeapon.physDamage +
+              2 +
+              (caster as IHero).strength -
+              (volleyTarget as IHero).armor;
+            if (physDamageToHealth > 0) {
+              return true;
+            }
+          }
+        }
+        return false;
       case '41-headshot':
         target = this.heroService.getCharById(targetId, heroes);
         return target.health < 10;
+      case '42-phantom-imitation-shot':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const shadow = this.heroService.getHeroById('shadow', heroes);
+
+          let abilityDamage = shadow.primaryWeapon.physDamage + shadow.strength;
+
+          if (this.heroService.getCharEffectById(caster, '33-power-of-the-pack')) {
+            abilityDamage += 3;
+          }
+          const physDamageToHealth = abilityDamage - (target as IHero).armor;
+          return physDamageToHealth > 0;
+        }
+      case '43-oblivion':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const magicDamageToHealth = 5 + (caster as IHero).intellect - (target as IHero).will;
+          return magicDamageToHealth > 0 || !target.isImmuneToDebuffs;
+        }
 
       // Lightbringer
+      case '11-sun-strike':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const physDamageToHealth =
+            (caster as IHero).primaryWeapon.physDamage + (caster as IHero).strength - (target as IHero).armor;
+          return physDamageToHealth > 0;
+        }
       case '13-sun-touch':
         target = this.heroService.getCharById(targetId, heroes);
         const casterTeamForSunTouch = this.heroService.getTeamByHeroId(caster.id, battle.teams);
@@ -1206,7 +1682,23 @@ export class BattleService {
         if (casterTeamForSunTouch.id === targetTeamForSunTouch.id) {
           return target.health < target.maxHealth;
         } else {
+          if (target.isPet) {
+            return true;
+          } else {
+            const magicDamageToHealth = 2 + (caster as IHero).intellect - (target as IHero).will;
+            return magicDamageToHealth > 0;
+          }
+        }
+      case '31-retribution':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
           return true;
+        } else {
+          const physDamageToHealth =
+            (caster as IHero).primaryWeapon.physDamage + 1 + (caster as IHero).strength - (target as IHero).armor;
+          const magicDamageToHealth = 1 + (caster as IHero).intellect - (target as IHero).will;
+          return physDamageToHealth > 0 || magicDamageToHealth > 0;
         }
       case '33-cleansing':
         target = this.heroService.getCharById(targetId, heroes);
@@ -1216,6 +1708,17 @@ export class BattleService {
           return !!target.effects.find((e) => !e.isBuff);
         } else {
           return !!target.effects.find((e) => e.isBuff);
+        }
+      case '41-hammer-of-wrath':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const physDamageToHealth =
+            (caster as IHero).primaryWeapon.physDamage + 2 + (caster as IHero).strength - (target as IHero).armor;
+          const magicDamageToHealth = 2 + (caster as IHero).intellect - (target as IHero).will;
+          return physDamageToHealth > 0 || magicDamageToHealth > 0 || !target.isImmuneToDebuffs;
         }
       case '43-sunrise':
         if ((caster as IHero).intellect > 0) {
@@ -1230,15 +1733,99 @@ export class BattleService {
         return false;
 
       // Avenger
+      case '11-double-strike':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const physDamageToHealth =
+            (caster as IHero).primaryWeapon.physDamage +
+            (caster as IHero).secondaryWeapon.physDamage +
+            (caster as IHero).strength -
+            (target as IHero).armor;
+          return physDamageToHealth > 0;
+        }
+      case '12-desert-revenge':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const magicDamageToHealth =
+            (caster as IHero).primaryWeapon.physDamage +
+            (caster as IHero).secondaryWeapon.physDamage +
+            (caster as IHero).intellect -
+            (target as IHero).will;
+          return magicDamageToHealth > 0;
+        }
       case '13-fit-of-energy':
         return (
-          (caster as IHero).energy < (caster as IHero).maxEnergy ||
-          (caster as IHero).health < (caster as IHero).maxHealth ||
-          (caster as IHero).mana < (caster as IHero).maxMana
+          (caster as IHero).energy <= (caster as IHero).maxEnergy - 4 ||
+          (caster as IHero).mana <= (caster as IHero).maxMana - 3
         );
+      case '21-precise-strike':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          let targetArmor = (target as IHero).armor - (caster as IHero).intellect;
+          if (targetArmor < 0) {
+            targetArmor = 0;
+          }
+          const physDamageToHealth =
+            (caster as IHero).primaryWeapon.physDamage +
+            (caster as IHero).secondaryWeapon.physDamage +
+            1 +
+            (caster as IHero).strength -
+            targetArmor;
+          return physDamageToHealth > 0;
+        }
+      case '22-quicksands':
+        target = this.heroService.getCharById(targetId, heroes);
+        return !target.isImmuneToDebuffs;
+      case '23-temporal-strike':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const physDamageToHealth =
+            (caster as IHero).primaryWeapon.physDamage +
+            (caster as IHero).secondaryWeapon.physDamage +
+            (caster as IHero).strength -
+            (target as IHero).armor;
+          return physDamageToHealth > 0 || !target.isImmuneToDebuffs;
+        }
       case '31-blade-storm':
-        const bladeStormEnemies = this.findEnemies(battle, caster.id, 1, true, '31-blade-storm', false, false);
-        return bladeStormEnemies.length > 0;
+        const bladeStormEnemies = this.findEnemies(battle, caster.id, 1, true, ability.id, false, false);
+        for (let i = 0; i < bladeStormEnemies.length; i++) {
+          const bladeStormTarget = this.heroService.getCharById(bladeStormEnemies[i], heroes);
+          if (bladeStormTarget.isPet) {
+            return true;
+          } else {
+            const physDamageToHealth =
+              (caster as IHero).primaryWeapon.physDamage +
+              (caster as IHero).secondaryWeapon.physDamage +
+              2 +
+              (caster as IHero).strength -
+              (bladeStormTarget as IHero).armor;
+            if (physDamageToHealth > 0) {
+              return true;
+            }
+          }
+        }
+        return false;
+      case '33-time-trap':
+        target = this.heroService.getCharById(targetId, heroes);
+
+        if (target.isPet) {
+          return true;
+        } else {
+          const magicDamageToHealth = 4 + (caster as IHero).intellect - (target as IHero).will;
+          return magicDamageToHealth > 0 || !target.isImmuneToDebuffs;
+        }
       case '43-sands-of-time':
         return (
           (caster as IHero).energy < (caster as IHero).maxEnergy ||
@@ -1307,10 +1894,10 @@ export class BattleService {
     }
 
     const battleLogMessage: ILogMessage = {
-      casterId: caster.id,
-      targetId: target.id,
-      value: healthDamage + '',
-      type: weaponId
+      c: caster.id,
+      tr: target.id,
+      v: healthDamage + '',
+      t: weaponId
         ? LogMessageType.WEAPON_DAMAGE
         : abilityId
         ? LogMessageType.ABILITY_DAMAGE
@@ -1318,9 +1905,9 @@ export class BattleService {
     };
 
     if (weaponId) {
-      battleLogMessage.equipId = weaponId;
+      battleLogMessage.e = weaponId;
     } else if (abilityId || effectId) {
-      battleLogMessage.abilityId = abilityId || effectId;
+      battleLogMessage.a = abilityId || effectId;
     }
 
     battle.log.push(battleLogMessage);
@@ -1336,7 +1923,7 @@ export class BattleService {
           for (let j = heroes[i].pets.length - 1; j >= 0; j--) {
             if (target && heroes[i].pets[j].id === target.id) {
               battle.log.push({
-                type: LogMessageType.DEATH,
+                t: LogMessageType.DEATH,
                 id: heroes[i].pets[j].id
               });
               target = undefined;
@@ -1378,7 +1965,7 @@ export class BattleService {
     }
 
     battle.log.push({
-      type: LogMessageType.DEATH,
+      t: LogMessageType.DEATH,
       id: hero.id
     });
 
@@ -1490,8 +2077,8 @@ export class BattleService {
           this.heroService.takeMana(target as IHero, damageValue);
           battle.log.push({
             id: target.id,
-            type: LogMessageType.TAKE_MANA,
-            value: damageValue + ''
+            t: LogMessageType.TAKE_MANA,
+            v: damageValue + ''
           });
           const enemies = this.findEnemies(battle, target.id, 1, true, '12-reflection', true, false);
           for (let i = 0; i < enemies.length; i++) {
@@ -1523,8 +2110,8 @@ export class BattleService {
       const heroData = this.heroService.getHeroData(activeHero.id);
       for (let i = 0; i < 3; i++) {
         actions.push({
-          type: ActionType.LEARN_ABILITY,
-          abilityId: heroData.abilities[i].id
+          t: ActionType.LEARN_ABILITY,
+          a: heroData.abilities[i].id
         });
       }
       return actions;
@@ -1537,8 +2124,8 @@ export class BattleService {
       for (let i = 3 * heroAbilityLevel; i < 3 * heroAbilityLevel + 3; i++) {
         if (heroData.abilities[i]) {
           actions.push({
-            type: ActionType.LEARN_ABILITY,
-            abilityId: heroData.abilities[i].id
+            t: ActionType.LEARN_ABILITY,
+            a: heroData.abilities[i].id
           });
         }
       }
@@ -1549,8 +2136,8 @@ export class BattleService {
           activeHero.crystals >= heroData.primaryWeapons[activeHero.primaryWeapon.level].cost)
       ) {
         actions.push({
-          type: ActionType.UPGRADE_EQUIP,
-          equipId: activeHero.primaryWeapon.id
+          t: ActionType.UPGRADE_EQUIP,
+          e: activeHero.primaryWeapon.id
         });
       }
       if (
@@ -1560,8 +2147,8 @@ export class BattleService {
           activeHero.crystals >= heroData.secondaryWeapons[activeHero.secondaryWeapon.level].cost)
       ) {
         actions.push({
-          type: ActionType.UPGRADE_EQUIP,
-          equipId: activeHero.secondaryWeapon.id
+          t: ActionType.UPGRADE_EQUIP,
+          e: activeHero.secondaryWeapon.id
         });
       }
       if (
@@ -1570,8 +2157,8 @@ export class BattleService {
           activeHero.crystals >= heroData.chestpieces[activeHero.chestpiece.level].cost)
       ) {
         actions.push({
-          type: ActionType.UPGRADE_EQUIP,
-          equipId: activeHero.chestpiece.id
+          t: ActionType.UPGRADE_EQUIP,
+          e: activeHero.chestpiece.id
         });
       }
     }
@@ -1593,10 +2180,10 @@ export class BattleService {
             for (let j = 0; j < enemies.length; j++) {
               if (this.checkAbilityAction(battle, heroes, ability, activeHero, enemies[j])) {
                 actions.push({
-                  type: ActionType.ABILITY,
-                  abilityId: ability.id,
-                  casterId: activeHero.id,
-                  targetId: enemies[j]
+                  t: ActionType.ABILITY,
+                  a: ability.id,
+                  c: activeHero.id,
+                  tr: enemies[j]
                 });
               }
             }
@@ -1614,10 +2201,10 @@ export class BattleService {
             for (let j = 0; j < allies.length; j++) {
               if (this.checkAbilityAction(battle, heroes, ability, activeHero, allies[j])) {
                 actions.push({
-                  type: ActionType.ABILITY,
-                  abilityId: ability.id,
-                  casterId: activeHero.id,
-                  targetId: allies[j]
+                  t: ActionType.ABILITY,
+                  a: ability.id,
+                  c: activeHero.id,
+                  tr: allies[j]
                 });
               }
             }
@@ -1635,10 +2222,10 @@ export class BattleService {
             for (let j = 0; j < alliesWithoutMe.length; j++) {
               if (this.checkAbilityAction(battle, heroes, ability, activeHero, alliesWithoutMe[j])) {
                 actions.push({
-                  type: ActionType.ABILITY,
-                  abilityId: ability.id,
-                  casterId: activeHero.id,
-                  targetId: alliesWithoutMe[j]
+                  t: ActionType.ABILITY,
+                  a: ability.id,
+                  c: activeHero.id,
+                  tr: alliesWithoutMe[j]
                 });
               }
             }
@@ -1656,10 +2243,10 @@ export class BattleService {
             for (let j = 0; j < allHeroes.length; j++) {
               if (this.checkAbilityAction(battle, heroes, ability, activeHero, allHeroes[j])) {
                 actions.push({
-                  type: ActionType.ABILITY,
-                  abilityId: ability.id,
-                  casterId: activeHero.id,
-                  targetId: allHeroes[j]
+                  t: ActionType.ABILITY,
+                  a: ability.id,
+                  c: activeHero.id,
+                  tr: allHeroes[j]
                 });
               }
             }
@@ -1677,10 +2264,10 @@ export class BattleService {
             for (let j = 0; j < allHeroesWithoutMe.length; j++) {
               if (this.checkAbilityAction(battle, heroes, ability, activeHero, allHeroesWithoutMe[j])) {
                 actions.push({
-                  type: ActionType.ABILITY,
-                  abilityId: ability.id,
-                  casterId: activeHero.id,
-                  targetId: allHeroesWithoutMe[j]
+                  t: ActionType.ABILITY,
+                  a: ability.id,
+                  c: activeHero.id,
+                  tr: allHeroesWithoutMe[j]
                 });
               }
             }
@@ -1688,10 +2275,10 @@ export class BattleService {
           case AbilityTargetType.SELF:
             if (this.checkAbilityAction(battle, heroes, ability, activeHero, activeHero.id)) {
               actions.push({
-                type: ActionType.ABILITY,
-                abilityId: ability.id,
-                casterId: activeHero.id,
-                targetId: activeHero.id
+                t: ActionType.ABILITY,
+                a: ability.id,
+                c: activeHero.id,
+                tr: activeHero.id
               });
             }
             break;
@@ -1713,11 +2300,11 @@ export class BattleService {
               }
               if (this.checkAbilityAction(battle, heroes, ability, activeHero, activeHero.id, movePoints[j])) {
                 actions.push({
-                  type: ActionType.ABILITY,
-                  abilityId: ability.id,
-                  casterId: activeHero.id,
-                  positionX: movePoints[j].x,
-                  positionY: movePoints[j].y
+                  t: ActionType.ABILITY,
+                  a: ability.id,
+                  c: activeHero.id,
+                  x: movePoints[j].x,
+                  y: movePoints[j].y
                 });
               }
             }
@@ -1734,11 +2321,11 @@ export class BattleService {
             for (let j = 0; j < mapPoints.length; j++) {
               if (this.checkAbilityAction(battle, heroes, ability, activeHero, activeHero.id, mapPoints[j])) {
                 actions.push({
-                  type: ActionType.ABILITY,
-                  abilityId: ability.id,
-                  casterId: activeHero.id,
-                  positionX: mapPoints[j].x,
-                  positionY: mapPoints[j].y
+                  t: ActionType.ABILITY,
+                  a: ability.id,
+                  c: activeHero.id,
+                  x: mapPoints[j].x,
+                  y: mapPoints[j].y
                 });
               }
             }
@@ -1766,10 +2353,10 @@ export class BattleService {
             for (let j = 0; j < enemies.length; j++) {
               if (this.checkAbilityAction(battle, heroes, activeHero.pets[i].ability, activeHero.pets[i], enemies[j])) {
                 actions.push({
-                  type: ActionType.PET_ABILITY,
-                  abilityId: activeHero.pets[i].ability.id,
-                  casterId: activeHero.pets[i].id,
-                  targetId: enemies[j]
+                  t: ActionType.PET_ABILITY,
+                  a: activeHero.pets[i].ability.id,
+                  c: activeHero.pets[i].id,
+                  tr: enemies[j]
                 });
               }
             }
@@ -1785,10 +2372,10 @@ export class BattleService {
         );
         for (let j = 0; j < petMovePoints.length; j++) {
           actions.push({
-            type: ActionType.PET_MOVE,
-            casterId: activeHero.pets[i].id,
-            positionX: petMovePoints[j].x,
-            positionY: petMovePoints[j].y
+            t: ActionType.PET_MOVE,
+            c: activeHero.pets[i].id,
+            x: petMovePoints[j].x,
+            y: petMovePoints[j].y
           });
         }
       }
@@ -1798,13 +2385,23 @@ export class BattleService {
       const enemies = this.findEnemies(battle, activeHero.id, activeHero.primaryWeapon.range, false, '', false, true);
       for (let i = 0; i < enemies.length; i++) {
         const target = this.heroService.getCharById(enemies[i], heroes);
-        const { physDamage, magicDamage } = this.calculateWeaponDamage(activeHero.primaryWeapon, activeHero);
-        if (target.isPet || physDamage - (target as IHero).armor > 0 || magicDamage - (target as IHero).will > 0) {
+        let shouldBeAdded = false;
+
+        if (target.isPet) {
+          shouldBeAdded = true;
+        } else {
+          const { physDamage, magicDamage } = this.calculateWeaponDamage(activeHero.primaryWeapon, activeHero);
+          const physDamageToHealth = physDamage + activeHero.strength - (target as IHero).armor;
+          const magicDamageToHealth = magicDamage + activeHero.intellect - (target as IHero).will;
+          shouldBeAdded = physDamageToHealth > 0 || magicDamageToHealth > 0;
+        }
+
+        if (shouldBeAdded) {
           actions.push({
-            type: ActionType.WEAPON_DAMAGE,
-            equipId: activeHero.primaryWeapon.id,
-            casterId: activeHero.id,
-            targetId: enemies[i]
+            t: ActionType.WEAPON_DAMAGE,
+            e: activeHero.primaryWeapon.id,
+            c: activeHero.id,
+            tr: enemies[i]
           });
         }
       }
@@ -1813,13 +2410,23 @@ export class BattleService {
       const enemies = this.findEnemies(battle, activeHero.id, activeHero.secondaryWeapon.range, false, '', false, true);
       for (let i = 0; i < enemies.length; i++) {
         const target = this.heroService.getCharById(enemies[i], heroes);
-        const { physDamage, magicDamage } = this.calculateWeaponDamage(activeHero.secondaryWeapon, activeHero);
-        if (target.isPet || physDamage - (target as IHero).armor > 0 || magicDamage - (target as IHero).will > 0) {
+        let shouldBeAdded = false;
+
+        if (target.isPet) {
+          shouldBeAdded = true;
+        } else {
+          const { physDamage, magicDamage } = this.calculateWeaponDamage(activeHero.secondaryWeapon, activeHero);
+          const physDamageToHealth = physDamage + activeHero.strength - (target as IHero).armor;
+          const magicDamageToHealth = magicDamage + activeHero.intellect - (target as IHero).will;
+          shouldBeAdded = physDamageToHealth > 0 || magicDamageToHealth > 0;
+        }
+
+        if (shouldBeAdded) {
           actions.push({
-            type: ActionType.WEAPON_DAMAGE,
-            equipId: activeHero.secondaryWeapon.id,
-            casterId: activeHero.id,
-            targetId: enemies[i]
+            t: ActionType.WEAPON_DAMAGE,
+            e: activeHero.secondaryWeapon.id,
+            c: activeHero.id,
+            tr: enemies[i]
           });
         }
       }
@@ -1831,9 +2438,9 @@ export class BattleService {
         continue;
       }
       actions.push({
-        type: ActionType.MOVE,
-        positionX: moves[i].x,
-        positionY: moves[i].y
+        t: ActionType.MOVE,
+        x: moves[i].x,
+        y: moves[i].y
       });
     }
 
@@ -1842,7 +2449,7 @@ export class BattleService {
       activeHero.energy === 0 ||
       (team.crystals > 0 && team.heroes.filter((h) => !h.isDead).length > 1)
     ) {
-      actions.push({ type: ActionType.TURN_END });
+      actions.push({ t: ActionType.TURN_END });
     }
 
     return actions;

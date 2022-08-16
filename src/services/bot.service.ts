@@ -54,31 +54,31 @@ export class BotService {
     if (!action) {
       return battle;
     }
-    switch (action.type) {
+    switch (action.t) {
       case ActionType.MOVE:
       case ActionType.PET_MOVE:
         // action.casterId means that this is a PET_MOVE
         return this.battleService.moveChar(
           battle,
-          { x: action.positionX, y: action.positionY },
+          { x: action.x, y: action.y },
           isSimulation,
-          action.casterId ? action.casterId : undefined
+          action.c ? action.c : undefined
         );
       case ActionType.WEAPON_DAMAGE:
-        return this.battleService.useWeapon(battle, action.targetId, action.equipId, isSimulation);
+        return this.battleService.useWeapon(battle, action.tr, action.e, isSimulation);
       case ActionType.ABILITY:
       case ActionType.PET_ABILITY:
         const heroes = this.battleService.getHeroesInBattle(battle);
         const activeHero: IHero = this.heroService.getHeroById(battle.queue[0], heroes);
         let activeChar: IChar = activeHero;
         const target: IChar =
-          activeChar.id === action.targetId ? activeChar : this.heroService.getCharById(action.targetId, heroes);
-        let ability: IAbility = this.heroService.getHeroAbilityById(activeHero, action.abilityId);
+          activeChar.id === action.tr ? activeChar : this.heroService.getCharById(action.tr, heroes);
+        let ability: IAbility = this.heroService.getHeroAbilityById(activeHero, action.a);
 
         // Maybe it is a pet ability
         if (!ability) {
           for (let i = 0; i < activeHero.pets.length; i++) {
-            if (activeHero.pets[i].ability.id === action.abilityId) {
+            if (activeHero.pets[i].ability.id === action.a) {
               ability = activeHero.pets[i].ability;
               activeChar = activeHero.pets[i];
             }
@@ -91,7 +91,7 @@ export class BotService {
           ability,
           activeChar,
           target,
-          action.positionX === undefined ? undefined : { x: action.positionX, y: action.positionY },
+          action.x === undefined ? undefined : { x: action.x, y: action.y },
           isSimulation
         );
         return this.battleService.afterCastAbility(
@@ -100,13 +100,13 @@ export class BotService {
           heroes,
           ability,
           target,
-          action.positionX === undefined ? undefined : { x: action.positionX, y: action.positionY },
+          action.x === undefined ? undefined : { x: action.x, y: action.y },
           isSimulation
         );
       case ActionType.UPGRADE_EQUIP:
-        return this.battleService.upgradeEquip(battle, action.equipId, isSimulation);
+        return this.battleService.upgradeEquip(battle, action.e, isSimulation);
       case ActionType.LEARN_ABILITY:
-        return this.battleService.learnAbility(battle, action.abilityId, isSimulation);
+        return this.battleService.learnAbility(battle, action.a, isSimulation);
       case ActionType.TURN_END:
         return this.battleService.endTurn(battle, isSimulation);
     }
@@ -204,10 +204,9 @@ export class BotService {
       for (let i = 0; i < stats.children.length; i++) {
         let actionStr = 'Action ' + i + '\tsims: ' + stats.children[i].sims + '\twins: ' + stats.children[i].wins;
         for (const key in stats.children[i].action) {
-          if (key === 'positionX') {
-            actionStr +=
-              '\tposition: (' + stats.children[i].action.positionX + ',' + stats.children[i].action.positionY + ')';
-          } else if (key !== 'positionY') {
+          if (key === 'x') {
+            actionStr += '\tposition: (' + stats.children[i].action.x + ',' + stats.children[i].action.y + ')';
+          } else if (key !== 'y') {
             actionStr += '\t' + key + ': ' + JSON.stringify(stats.children[i].action[key]);
           }
         }
@@ -252,18 +251,22 @@ export class BotService {
     }
 
     if (Const.memoryInfo) {
-      const used = process.memoryUsage();
-      console.log(
-        'Memory: rss: ' +
-          Math.round((used.rss / 1024 / 1024) * 100) / 100 +
-          ' MB, heapTotal: ' +
-          Math.round((used.heapTotal / 1024 / 1024) * 100) / 100 +
-          ' MB, heapUsed: ' +
-          Math.round((used.heapUsed / 1024 / 1024) * 100) / 100 +
-          ' MB'
-      );
+      this.showMemoryUsage();
     }
     return actionFromChain;
+  }
+
+  showMemoryUsage() {
+    const used = process.memoryUsage();
+    console.log(
+      'Memory: rss: ' +
+        Math.round((used.rss / 1024 / 1024) * 100) / 100 +
+        ' MB, heapTotal: ' +
+        Math.round((used.heapTotal / 1024 / 1024) * 100) / 100 +
+        ' MB, heapUsed: ' +
+        Math.round((used.heapUsed / 1024 / 1024) * 100) / 100 +
+        ' MB'
+    );
   }
 
   startSimulation(rootNode: BotNode, state: IBattle, isExternalServer: boolean): ISimulationResult {
@@ -274,10 +277,10 @@ export class BotService {
       const activeHero = this.heroService.getHeroById(state.queue[0], heroes);
       state.log = [
         {
-          type: LogMessageType.TURN_START,
+          t: LogMessageType.TURN_START,
           id: activeHero.id,
-          positionX: activeHero.position.x,
-          positionY: activeHero.position.y
+          x: activeHero.position.x,
+          y: activeHero.position.y
         }
       ];
     }
@@ -297,20 +300,26 @@ export class BotService {
       !(isExternalServer && nodes.size >= Const.maxNumberOfNodesForExternalServer) &&
       !(nodes.size >= Const.maxNumberOfNodesForInternalServer)
     ) {
-      if (Const.simulationTimeInfo) {
-        startTime = Date.now();
-      }
-      let node = this.select(nodes, state, currentTeamId);
-      let winner = node.state.scenario.checkForWin(node.state.teams);
+      try {
+        if (Const.simulationTimeInfo) {
+          startTime = Date.now();
+        }
+        let node = this.select(nodes, state, currentTeamId);
+        let winner = node.state.scenario.checkForWin(node.state.teams);
 
-      if (node.isLeaf() === false && winner === null && node.state.queue.length > 0) {
-        node = this.expand(nodes, node);
-        winner = this.simulate(node, currentTeamId);
-      }
-      this.backpropagate(node, winner, currentTeamId);
+        if (node.isLeaf() === false && winner === null && node.state.queue.length > 0) {
+          node = this.expand(nodes, node);
+          winner = this.simulate(node, currentTeamId);
+        }
+        this.backpropagate(node, winner, currentTeamId);
 
-      if (Const.simulationTimeInfo) {
-        simulationTime.push(Date.now() - startTime);
+        if (Const.simulationTimeInfo) {
+          simulationTime.push(Date.now() - startTime);
+        }
+      } catch (e) {
+        console.log(e);
+        this.showMemoryUsage();
+        break;
       }
     }
 
@@ -327,18 +336,10 @@ export class BotService {
   }
 
   simplifyBotNode(node: BotNode): ISimplifiedBotNode {
-    const children: ISimplifiedBotNode['children'] = [];
-    for (const child of node.children) {
-      if (child[1].node) {
-        children.push([child[0], { action: child[1].action, node: this.simplifyBotNode(child[1].node) }]);
-      }
-    }
     return {
-      action: node.action,
       sims: node.sims,
       wins: node.wins,
-      depth: node.depth,
-      children
+      depth: node.depth
     };
   }
 
@@ -467,16 +468,16 @@ export class BotService {
     const previousMoves: IPosition[] = [];
     const activeHeroId = state.log[state.log.length - 1].id
       ? state.log[state.log.length - 1].id
-      : state.log[state.log.length - 1].casterId;
+      : state.log[state.log.length - 1].c;
 
     for (let i = state.log.length - 2; i > -1; i--) {
-      if (state.log[i].type === LogMessageType.TURN_START) {
-        previousMoves.push({ x: state.log[i].positionX, y: state.log[i].positionY });
+      if (state.log[i].t === LogMessageType.TURN_START) {
+        previousMoves.push({ x: state.log[i].x, y: state.log[i].y });
         break;
       }
       if (state.log[i].id === activeHeroId) {
-        if (state.log[i].type === LogMessageType.MOVE) {
-          previousMoves.push({ x: state.log[i].positionX, y: state.log[i].positionY });
+        if (state.log[i].t === LogMessageType.MOVE) {
+          previousMoves.push({ x: state.log[i].x, y: state.log[i].y });
         }
       } else {
         break;
@@ -558,8 +559,8 @@ export class BotService {
     const actionChain = [bestNode.action];
     while (
       bestNode &&
-      bestNode.action.type !== ActionType.TURN_END &&
-      !bestNode.state.log.find((l) => l.type === LogMessageType.WIN)
+      bestNode.action.t !== ActionType.TURN_END &&
+      !bestNode.state.log.find((l) => l.t === LogMessageType.WIN)
     ) {
       bestNode = this.bestNode(nodes, bestNode.state);
       if (bestNode) {

@@ -18,7 +18,7 @@ export class ReportService {
     let battleLogData = 'SEP=,\nsetup,count,turn,hero,action,position,weapon/ability,target,value\n';
     let turn = 1;
     for (let i = 0; i < battle.log.length; i++) {
-      switch (battle.log[i].type) {
+      switch (battle.log[i].t) {
         case LogMessageType.MOVE:
           battleLogData +=
             setupIndex +
@@ -29,9 +29,9 @@ export class ReportService {
             ',' +
             battle.log[i].id +
             ',MOVE,' +
-            battle.log[i].positionX +
+            battle.log[i].x +
             ' ' +
-            battle.log[i].positionY +
+            battle.log[i].y +
             '\n';
           break;
         case LogMessageType.TURN_END:
@@ -46,13 +46,13 @@ export class ReportService {
             ',' +
             turn +
             ',' +
-            battle.log[i].casterId +
+            battle.log[i].c +
             ',WEAPON_DAMAGE,,' +
-            battle.log[i].equipId +
+            battle.log[i].e +
             ',' +
-            battle.log[i].targetId +
+            battle.log[i].tr +
             ',' +
-            battle.log[i].value +
+            battle.log[i].v +
             '\n';
           break;
         case LogMessageType.ABILITY_DAMAGE:
@@ -63,13 +63,13 @@ export class ReportService {
             ',' +
             turn +
             ',' +
-            battle.log[i].casterId +
+            battle.log[i].c +
             ',ABILITY_DAMAGE,,' +
-            battle.log[i].abilityId +
+            battle.log[i].a +
             ',' +
-            battle.log[i].targetId +
+            battle.log[i].tr +
             ',' +
-            battle.log[i].value +
+            battle.log[i].v +
             '\n';
           break;
         case LogMessageType.ABILITY_HEAL:
@@ -80,13 +80,13 @@ export class ReportService {
             ',' +
             turn +
             ',' +
-            battle.log[i].casterId +
+            battle.log[i].c +
             ',ABILITY_HEAL,,' +
-            battle.log[i].abilityId +
+            battle.log[i].a +
             ',' +
-            battle.log[i].targetId +
+            battle.log[i].tr +
             ',' +
-            battle.log[i].value +
+            battle.log[i].v +
             '\n';
           break;
         case LogMessageType.ABILITY_CAST:
@@ -97,11 +97,11 @@ export class ReportService {
             ',' +
             turn +
             ',' +
-            battle.log[i].casterId +
+            battle.log[i].c +
             ',ABILITY_CAST,,' +
-            battle.log[i].abilityId +
+            battle.log[i].a +
             ',' +
-            battle.log[i].targetId +
+            battle.log[i].tr +
             '\n';
           break;
         case LogMessageType.EFFECT_DAMAGE:
@@ -112,51 +112,33 @@ export class ReportService {
             ',' +
             turn +
             ',' +
-            battle.log[i].casterId +
+            battle.log[i].c +
             ',AEFFECT_DAMAGE,,' +
-            battle.log[i].abilityId +
+            battle.log[i].a +
             ',' +
-            battle.log[i].targetId +
+            battle.log[i].tr +
             ',' +
-            battle.log[i].value +
+            battle.log[i].v +
             '\n';
           break;
         case LogMessageType.UPGRADE_EQUIP:
           battleLogData +=
-            setupIndex +
-            ',' +
-            i +
-            ',' +
-            turn +
-            ',' +
-            battle.log[i].id +
-            ',UPGRADE_EQUIP,,' +
-            battle.log[i].equipId +
-            '\n';
+            setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',UPGRADE_EQUIP,,' + battle.log[i].e + '\n';
           break;
         case LogMessageType.LEARN_ABILITY:
           battleLogData +=
-            setupIndex +
-            ',' +
-            i +
-            ',' +
-            turn +
-            ',' +
-            battle.log[i].id +
-            ',LEARN_ABILITY,,' +
-            battle.log[i].abilityId +
-            '\n';
+            setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',LEARN_ABILITY,,' + battle.log[i].a + '\n';
           break;
         case LogMessageType.TAKE_CRYSTAL:
           battleLogData += setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',TAKE_CRYSTAL\n';
           break;
         case LogMessageType.TAKE_MANA:
           battleLogData +=
-            setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',TAKE_MANA,,,' + battle.log[i].value + '\n';
+            setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',TAKE_MANA,,,' + battle.log[i].v + '\n';
           break;
         case LogMessageType.TAKE_ENERGY:
           battleLogData +=
-            setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',TAKE_ENERGY,,,' + battle.log[i].value + '\n';
+            setupIndex + ',' + i + ',' + turn + ',' + battle.log[i].id + ',TAKE_ENERGY,,,' + battle.log[i].v + '\n';
           break;
         case LogMessageType.PET_SUMMON:
           battleLogData +=
@@ -168,9 +150,9 @@ export class ReportService {
             ',' +
             battle.log[i].id +
             ',PET_SUMMON,' +
-            battle.log[i].positionX +
+            battle.log[i].x +
             ' ' +
-            battle.log[i].positionY +
+            battle.log[i].y +
             '\n';
           break;
         case LogMessageType.PET_MOVE:
@@ -183,9 +165,9 @@ export class ReportService {
             ',' +
             battle.log[i].id +
             ',PET_MOVE,' +
-            battle.log[i].positionX +
+            battle.log[i].x +
             ' ' +
-            battle.log[i].positionY +
+            battle.log[i].y +
             '\n';
           break;
         case LogMessageType.TURN_SKIP:
@@ -286,13 +268,9 @@ export class ReportService {
         ',' +
         (loserTeam.heroes[1].abilities[3] ? loserTeam.heroes[1].abilities[3].id : '') +
         ',' +
-        battle.log.filter((message: ILogMessage) => message.type === LogMessageType.TAKE_CRYSTAL).length +
+        battle.log.filter((message: ILogMessage) => message.t === LogMessageType.TAKE_CRYSTAL).length +
         ',' +
-        (battle.log.filter((message: ILogMessage) => message.type === LogMessageType.TURN_END).length + 1) +
-        ',' +
-        (Const.botThinkTime / 1000).toFixed(0) +
-        ',' +
-        Const.explorationParameter +
+        (battle.log.filter((message: ILogMessage) => message.t === LogMessageType.TURN_END).length + 1) +
         '\n';
     } else if (battle.scenario.id === '1') {
       const loserTeam = battle.teams[0].id === winner.id ? battle.teams[1] : battle.teams[0];
@@ -366,13 +344,9 @@ export class ReportService {
         ',' +
         (loserTeam.heroes[1].abilities[3] ? loserTeam.heroes[1].abilities[3].id : '') +
         ',' +
-        battle.log.filter((message: ILogMessage) => message.type === LogMessageType.TAKE_CRYSTAL).length +
+        battle.log.filter((message: ILogMessage) => message.t === LogMessageType.TAKE_CRYSTAL).length +
         ',' +
-        (battle.log.filter((message: ILogMessage) => message.type === LogMessageType.TURN_END).length + 1) +
-        ',' +
-        (Const.botThinkTime / 1000).toFixed(0) +
-        ',' +
-        Const.explorationParameter +
+        (battle.log.filter((message: ILogMessage) => message.t === LogMessageType.TURN_END).length + 1) +
         '\n';
     } else if (battle.scenario.id === '2') {
       const loserTeam = battle.teams[0].id === winner.id ? battle.teams[1] : battle.teams[0];
@@ -414,13 +388,9 @@ export class ReportService {
         ',' +
         (loserTeam.heroes[0].abilities[3] ? loserTeam.heroes[0].abilities[3].id : '') +
         ',' +
-        battle.log.filter((message: ILogMessage) => message.type === LogMessageType.TAKE_CRYSTAL).length +
+        battle.log.filter((message: ILogMessage) => message.t === LogMessageType.TAKE_CRYSTAL).length +
         ',' +
-        (battle.log.filter((message: ILogMessage) => message.type === LogMessageType.TURN_END).length + 1) +
-        ',' +
-        (Const.botThinkTime / 1000).toFixed(0) +
-        ',' +
-        Const.explorationParameter +
+        (battle.log.filter((message: ILogMessage) => message.t === LogMessageType.TURN_END).length + 1) +
         '\n';
     } else if (battle.scenario.id === '3') {
       const loserTeams = [];
@@ -430,6 +400,147 @@ export class ReportService {
           loserTeams.push(battle.teams[i]);
         }
       }
+      statisticsData +=
+        battle.id +
+        ',' +
+        setupIndex +
+        ',' +
+        winner.heroes[0].id +
+        ',' +
+        winner.heroes[0].primaryWeapon.level +
+        ',' +
+        (winner.heroes[0].secondaryWeapon ? winner.heroes[0].secondaryWeapon.level : '') +
+        ',' +
+        winner.heroes[0].chestpiece.level +
+        ',' +
+        (winner.heroes[0].abilities[0] ? winner.heroes[0].abilities[0].id : '') +
+        ',' +
+        (winner.heroes[0].abilities[1] ? winner.heroes[0].abilities[1].id : '') +
+        ',' +
+        (winner.heroes[0].abilities[2] ? winner.heroes[0].abilities[2].id : '') +
+        ',' +
+        (winner.heroes[0].abilities[3] ? winner.heroes[0].abilities[3].id : '') +
+        ',' +
+        loserTeams[0].heroes[0].id +
+        ',' +
+        loserTeams[0].heroes[0].primaryWeapon.level +
+        ',' +
+        (loserTeams[0].heroes[0].secondaryWeapon ? loserTeams[0].heroes[0].secondaryWeapon.level : '') +
+        ',' +
+        loserTeams[0].heroes[0].chestpiece.level +
+        ',' +
+        (loserTeams[0].heroes[0].abilities[0] ? loserTeams[0].heroes[0].abilities[0].id : '') +
+        ',' +
+        (loserTeams[0].heroes[0].abilities[1] ? loserTeams[0].heroes[0].abilities[1].id : '') +
+        ',' +
+        (loserTeams[0].heroes[0].abilities[2] ? loserTeams[0].heroes[0].abilities[2].id : '') +
+        ',' +
+        (loserTeams[0].heroes[0].abilities[3] ? loserTeams[0].heroes[0].abilities[3].id : '') +
+        ',' +
+        loserTeams[1].heroes[0].id +
+        ',' +
+        loserTeams[1].heroes[0].primaryWeapon.level +
+        ',' +
+        (loserTeams[1].heroes[0].secondaryWeapon ? loserTeams[1].heroes[0].secondaryWeapon.level : '') +
+        ',' +
+        loserTeams[1].heroes[0].chestpiece.level +
+        ',' +
+        (loserTeams[1].heroes[0].abilities[0] ? loserTeams[1].heroes[0].abilities[0].id : '') +
+        ',' +
+        (loserTeams[1].heroes[0].abilities[1] ? loserTeams[1].heroes[0].abilities[1].id : '') +
+        ',' +
+        (loserTeams[1].heroes[0].abilities[2] ? loserTeams[1].heroes[0].abilities[2].id : '') +
+        ',' +
+        (loserTeams[1].heroes[0].abilities[3] ? loserTeams[1].heroes[0].abilities[3].id : '') +
+        ',' +
+        battle.log.filter((message: ILogMessage) => message.t === LogMessageType.TAKE_CRYSTAL).length +
+        ',' +
+        (battle.log.filter((message: ILogMessage) => message.t === LogMessageType.TURN_END).length + 1) +
+        '\n';
+    } else if (battle.scenario.id === '4') {
+      const loserTeams = [];
+      for (let i = 0; i < battle.teams.length; i++) {
+        if (battle.teams[i].id !== winner.id) {
+          battle.teams[i].heroes = this.sortHeroes(battle.teams[i]);
+          loserTeams.push(battle.teams[i]);
+        }
+      }
+      statisticsData +=
+        battle.id +
+        ',' +
+        setupIndex +
+        ',' +
+        winner.heroes[0].id +
+        ',' +
+        winner.heroes[0].primaryWeapon.level +
+        ',' +
+        (winner.heroes[0].secondaryWeapon ? winner.heroes[0].secondaryWeapon.level : '') +
+        ',' +
+        winner.heroes[0].chestpiece.level +
+        ',' +
+        (winner.heroes[0].abilities[0] ? winner.heroes[0].abilities[0].id : '') +
+        ',' +
+        (winner.heroes[0].abilities[1] ? winner.heroes[0].abilities[1].id : '') +
+        ',' +
+        (winner.heroes[0].abilities[2] ? winner.heroes[0].abilities[2].id : '') +
+        ',' +
+        (winner.heroes[0].abilities[3] ? winner.heroes[0].abilities[3].id : '') +
+        ',' +
+        loserTeams[0].heroes[0].id +
+        ',' +
+        loserTeams[0].heroes[0].primaryWeapon.level +
+        ',' +
+        (loserTeams[0].heroes[0].secondaryWeapon ? loserTeams[0].heroes[0].secondaryWeapon.level : '') +
+        ',' +
+        loserTeams[0].heroes[0].chestpiece.level +
+        ',' +
+        (loserTeams[0].heroes[0].abilities[0] ? loserTeams[0].heroes[0].abilities[0].id : '') +
+        ',' +
+        (loserTeams[0].heroes[0].abilities[1] ? loserTeams[0].heroes[0].abilities[1].id : '') +
+        ',' +
+        (loserTeams[0].heroes[0].abilities[2] ? loserTeams[0].heroes[0].abilities[2].id : '') +
+        ',' +
+        (loserTeams[0].heroes[0].abilities[3] ? loserTeams[0].heroes[0].abilities[3].id : '') +
+        ',' +
+        loserTeams[1].heroes[0].id +
+        ',' +
+        loserTeams[1].heroes[0].primaryWeapon.level +
+        ',' +
+        (loserTeams[1].heroes[0].secondaryWeapon ? loserTeams[1].heroes[0].secondaryWeapon.level : '') +
+        ',' +
+        loserTeams[1].heroes[0].chestpiece.level +
+        ',' +
+        (loserTeams[1].heroes[0].abilities[0] ? loserTeams[1].heroes[0].abilities[0].id : '') +
+        ',' +
+        (loserTeams[1].heroes[0].abilities[1] ? loserTeams[1].heroes[0].abilities[1].id : '') +
+        ',' +
+        (loserTeams[1].heroes[0].abilities[2] ? loserTeams[1].heroes[0].abilities[2].id : '') +
+        ',' +
+        (loserTeams[1].heroes[0].abilities[3] ? loserTeams[1].heroes[0].abilities[3].id : '') +
+        ',' +
+        loserTeams[2].heroes[0].id +
+        ',' +
+        loserTeams[2].heroes[0].primaryWeapon.level +
+        ',' +
+        (loserTeams[2].heroes[0].secondaryWeapon ? loserTeams[2].heroes[0].secondaryWeapon.level : '') +
+        ',' +
+        loserTeams[2].heroes[0].chestpiece.level +
+        ',' +
+        (loserTeams[2].heroes[0].abilities[0] ? loserTeams[2].heroes[0].abilities[0].id : '') +
+        ',' +
+        (loserTeams[2].heroes[0].abilities[1] ? loserTeams[2].heroes[0].abilities[1].id : '') +
+        ',' +
+        (loserTeams[2].heroes[0].abilities[2] ? loserTeams[2].heroes[0].abilities[2].id : '') +
+        ',' +
+        (loserTeams[2].heroes[0].abilities[3] ? loserTeams[2].heroes[0].abilities[3].id : '') +
+        ',' +
+        battle.log.filter((message: ILogMessage) => message.t === LogMessageType.TAKE_CRYSTAL).length +
+        ',' +
+        (battle.log.filter((message: ILogMessage) => message.t === LogMessageType.TURN_END).length + 1) +
+        '\n';
+    } else if (battle.scenario.id === '5') {
+      const loserTeam = battle.teams[0].id === winner.id ? battle.teams[1] : battle.teams[0];
+      loserTeam.heroes = this.sortHeroes(loserTeam);
       statisticsData +=
         battle.id +
         ',' +
@@ -467,45 +578,41 @@ export class ReportService {
         ',' +
         (winner.heroes[1].abilities[3] ? winner.heroes[1].abilities[3].id : '') +
         ',' +
-        loserTeams[0].heroes[0].id +
+        loserTeam.heroes[0].id +
         ',' +
-        loserTeams[0].heroes[0].primaryWeapon.level +
+        loserTeam.heroes[0].primaryWeapon.level +
         ',' +
-        (loserTeams[0].heroes[0].secondaryWeapon ? loserTeams[0].heroes[0].secondaryWeapon.level : '') +
+        (loserTeam.heroes[0].secondaryWeapon ? loserTeam.heroes[0].secondaryWeapon.level : '') +
         ',' +
-        loserTeams[0].heroes[0].chestpiece.level +
+        loserTeam.heroes[0].chestpiece.level +
         ',' +
-        (loserTeams[0].heroes[0].abilities[0] ? loserTeams[0].heroes[0].abilities[0].id : '') +
+        (loserTeam.heroes[0].abilities[0] ? loserTeam.heroes[0].abilities[0].id : '') +
         ',' +
-        (loserTeams[0].heroes[0].abilities[1] ? loserTeams[0].heroes[0].abilities[1].id : '') +
+        (loserTeam.heroes[0].abilities[1] ? loserTeam.heroes[0].abilities[1].id : '') +
         ',' +
-        (loserTeams[0].heroes[0].abilities[2] ? loserTeams[0].heroes[0].abilities[2].id : '') +
+        (loserTeam.heroes[0].abilities[2] ? loserTeam.heroes[0].abilities[2].id : '') +
         ',' +
-        (loserTeams[0].heroes[0].abilities[3] ? loserTeams[0].heroes[0].abilities[3].id : '') +
+        (loserTeam.heroes[0].abilities[3] ? loserTeam.heroes[0].abilities[3].id : '') +
         ',' +
-        loserTeams[1].heroes[0].id +
+        loserTeam.heroes[1].id +
         ',' +
-        loserTeams[1].heroes[0].primaryWeapon.level +
+        loserTeam.heroes[1].primaryWeapon.level +
         ',' +
-        (loserTeams[1].heroes[0].secondaryWeapon ? loserTeams[1].heroes[0].secondaryWeapon.level : '') +
+        (loserTeam.heroes[1].secondaryWeapon ? loserTeam.heroes[1].secondaryWeapon.level : '') +
         ',' +
-        loserTeams[1].heroes[0].chestpiece.level +
+        loserTeam.heroes[1].chestpiece.level +
         ',' +
-        (loserTeams[1].heroes[0].abilities[0] ? loserTeams[1].heroes[0].abilities[0].id : '') +
+        (loserTeam.heroes[1].abilities[0] ? loserTeam.heroes[1].abilities[0].id : '') +
         ',' +
-        (loserTeams[1].heroes[0].abilities[1] ? loserTeams[1].heroes[0].abilities[1].id : '') +
+        (loserTeam.heroes[1].abilities[1] ? loserTeam.heroes[1].abilities[1].id : '') +
         ',' +
-        (loserTeams[1].heroes[0].abilities[2] ? loserTeams[1].heroes[0].abilities[2].id : '') +
+        (loserTeam.heroes[1].abilities[2] ? loserTeam.heroes[1].abilities[2].id : '') +
         ',' +
-        (loserTeams[1].heroes[0].abilities[3] ? loserTeams[1].heroes[0].abilities[3].id : '') +
+        (loserTeam.heroes[1].abilities[3] ? loserTeam.heroes[1].abilities[3].id : '') +
         ',' +
-        battle.log.filter((message: ILogMessage) => message.type === LogMessageType.TAKE_CRYSTAL).length +
+        battle.log.filter((message: ILogMessage) => message.t === LogMessageType.TAKE_CRYSTAL).length +
         ',' +
-        (battle.log.filter((message: ILogMessage) => message.type === LogMessageType.TURN_END).length + 1) +
-        ',' +
-        (Const.botThinkTime / 1000).toFixed(0) +
-        ',' +
-        Const.explorationParameter +
+        (battle.log.filter((message: ILogMessage) => message.t === LogMessageType.TURN_END).length + 1) +
         '\n';
     }
 
@@ -514,19 +621,27 @@ export class ReportService {
       switch (battle.scenario.id) {
         case '0':
           headers +=
-            'winner1,winner1-pw,winner1-sw,winner1-cp,winner1-ability1,winner1-ability2,winner1-ability3,winner1-ability4,winner2,winner2-pw,winner2-sw,winner2-cp,winner2-ability1,winner2-ability2,winner2-ability3,winner2-ability4,loser1,loser1-pw,loser1-sw,loser1-cp,loser1-ability1,loser1-ability2,loser1-ability3,loser1-ability4,loser2,loser2-pw,loser2-sw,loser2-cp,loser2-ability1,loser2-ability2,loser2-ability3,loser2-ability4,crystals,turns,think-time,expl-p\n';
+            'winner1,winner1-pw,winner1-sw,winner1-cp,winner1-ability1,winner1-ability2,winner1-ability3,winner1-ability4,winner2,winner2-pw,winner2-sw,winner2-cp,winner2-ability1,winner2-ability2,winner2-ability3,winner2-ability4,loser1,loser1-pw,loser1-sw,loser1-cp,loser1-ability1,loser1-ability2,loser1-ability3,loser1-ability4,loser2,loser2-pw,loser2-sw,loser2-cp,loser2-ability1,loser2-ability2,loser2-ability3,loser2-ability4,crystals,turns\n';
           break;
         case '1':
           headers +=
-            'winner1,winner1-pw,winner1-sw,winner1-cp,winner1-ability1,winner1-ability2,winner1-ability3,winner1-ability4,winner2,winner2-pw,winner2-sw,winner2-cp,winner2-ability1,winner2-ability2,winner2-ability3,winner2-ability4,loser1,loser1-pw,loser1-sw,loser1-cp,loser1-ability1,loser1-ability2,loser1-ability3,loser1-ability4,loser2,loser2-pw,loser2-sw,loser2-cp,loser2-ability1,loser2-ability2,loser2-ability3,loser2-ability4,crystals,turns,think-time,expl-p\n';
+            'winner1,winner1-pw,winner1-sw,winner1-cp,winner1-ability1,winner1-ability2,winner1-ability3,winner1-ability4,winner2,winner2-pw,winner2-sw,winner2-cp,winner2-ability1,winner2-ability2,winner2-ability3,winner2-ability4,loser1,loser1-pw,loser1-sw,loser1-cp,loser1-ability1,loser1-ability2,loser1-ability3,loser1-ability4,loser2,loser2-pw,loser2-sw,loser2-cp,loser2-ability1,loser2-ability2,loser2-ability3,loser2-ability4,crystals,turns\n';
           break;
         case '2':
           headers +=
-            'winner1,winner1-pw,winner1-sw,winner1-cp,winner1-ability1,winner1-ability2,winner1-ability3,winner1-ability4,loser1,loser1-pw,loser1-sw,loser1-cp,loser1-ability1,loser1-ability2,loser1-ability3,loser1-ability4,crystals,turns,think-time,expl-p\n';
+            'winner1,winner1-pw,winner1-sw,winner1-cp,winner1-ability1,winner1-ability2,winner1-ability3,winner1-ability4,loser1,loser1-pw,loser1-sw,loser1-cp,loser1-ability1,loser1-ability2,loser1-ability3,loser1-ability4,crystals,turns\n';
           break;
         case '3':
           headers +=
-            'winner1,winner1-pw,winner1-sw,winner1-cp,winner1-ability1,winner1-ability2,winner1-ability3,winner1-ability4,loser1,loser1-pw,loser1-sw,loser1-cp,loser1-ability1,loser1-ability2,loser1-ability3,loser1-ability4,loser2,loser2-pw,loser2-sw,loser2-cp,loser2-ability1,loser2-ability2,loser2-ability3,loser2-ability4,crystals,turns,think-time,expl-p\n';
+            'winner1,winner1-pw,winner1-sw,winner1-cp,winner1-ability1,winner1-ability2,winner1-ability3,winner1-ability4,loser1,loser1-pw,loser1-sw,loser1-cp,loser1-ability1,loser1-ability2,loser1-ability3,loser1-ability4,loser2,loser2-pw,loser2-sw,loser2-cp,loser2-ability1,loser2-ability2,loser2-ability3,loser2-ability4,crystals,turns\n';
+          break;
+        case '4':
+          headers +=
+            'winner1,winner1-pw,winner1-sw,winner1-cp,winner1-ability1,winner1-ability2,winner1-ability3,winner1-ability4,loser1,loser1-pw,loser1-sw,loser1-cp,loser1-ability1,loser1-ability2,loser1-ability3,loser1-ability4,loser2,loser2-pw,loser2-sw,loser2-cp,loser2-ability1,loser2-ability2,loser2-ability3,loser2-ability4,loser3,loser3-pw,loser3-sw,loser3-cp,loser3-ability1,loser3-ability2,loser3-ability3,loser3-ability4,crystals,turns\n';
+          break;
+        case '5':
+          headers +=
+            'winner1,winner1-pw,winner1-sw,winner1-cp,winner1-ability1,winner1-ability2,winner1-ability3,winner1-ability4,winner2,winner2-pw,winner2-sw,winner2-cp,winner2-ability1,winner2-ability2,winner2-ability3,winner2-ability4,loser1,loser1-pw,loser1-sw,loser1-cp,loser1-ability1,loser1-ability2,loser1-ability3,loser1-ability4,loser2,loser2-pw,loser2-sw,loser2-cp,loser2-ability1,loser2-ability2,loser2-ability3,loser2-ability4,crystals,turns\n';
           break;
       }
       fs.writeFileSync(targetFile, headers + statisticsData);
@@ -563,7 +678,7 @@ export class ReportService {
   expandChildren(parentNode: BotNode) {
     const childrenNodeArray = Array.from(parentNode.children.values());
     const childrenArray = [];
-    const isParentNodeWin = parentNode.state.log.find((l) => l.type === LogMessageType.WIN);
+    const isParentNodeWin = parentNode.state.log.find((l) => l.t === LogMessageType.WIN);
     if (isParentNodeWin) {
       childrenArray.push({
         name: 'battle end',
@@ -587,10 +702,10 @@ export class ReportService {
     let name = '';
     let activeCharId = parentNode.state.queue[0];
     if (parentNode.action) {
-      switch (parentNode.action.type) {
+      switch (parentNode.action.t) {
         case ActionType.MOVE:
         case ActionType.PET_MOVE:
-          name = activeCharId + ' move to ' + parentNode.action.positionX + ',' + parentNode.action.positionY;
+          name = activeCharId + ' move to ' + parentNode.action.x + ',' + parentNode.action.y;
           break;
         case ActionType.WEAPON_DAMAGE:
           const weaponDamage = parentNode.state.log
@@ -598,20 +713,20 @@ export class ReportService {
             .reverse()
             .find(
               (l) =>
-                l.casterId === parentNode.action.casterId &&
-                l.targetId === parentNode.action.targetId &&
-                l.equipId === parentNode.action.equipId &&
-                l.type === LogMessageType.WEAPON_DAMAGE
-            ).value;
-          activeCharId = parentNode.action.casterId;
+                l.c === parentNode.action.c &&
+                l.tr === parentNode.action.tr &&
+                l.e === parentNode.action.e &&
+                l.t === LogMessageType.WEAPON_DAMAGE
+            ).v;
+          activeCharId = parentNode.action.c;
           name =
-            parentNode.action.casterId +
+            parentNode.action.c +
             ' deals ' +
             weaponDamage +
             ' damage to ' +
-            parentNode.action.targetId +
+            parentNode.action.tr +
             ' with ' +
-            parentNode.action.equipId;
+            parentNode.action.e;
           break;
         case ActionType.ABILITY:
         case ActionType.PET_ABILITY:
@@ -620,45 +735,40 @@ export class ReportService {
             .reverse()
             .find(
               (l) =>
-                l.casterId === parentNode.action.casterId &&
-                l.targetId === parentNode.action.targetId &&
-                l.abilityId === parentNode.action.abilityId &&
-                (l.type === LogMessageType.ABILITY_DAMAGE || l.type === LogMessageType.ABILITY_HEAL)
+                l.c === parentNode.action.c &&
+                l.tr === parentNode.action.tr &&
+                l.a === parentNode.action.a &&
+                (l.t === LogMessageType.ABILITY_DAMAGE || l.t === LogMessageType.ABILITY_HEAL)
             );
-          activeCharId = parentNode.action.casterId;
+          activeCharId = parentNode.action.c;
           name =
-            parentNode.action.casterId +
+            parentNode.action.c +
             ' cast ' +
-            parentNode.action.abilityId +
+            parentNode.action.a +
             ' on ' +
-            (parentNode.action.targetId
-              ? parentNode.action.targetId
-              : '(' + parentNode.action.positionX + ',' + parentNode.action.positionY + ')') +
-            (abilityWithDamageMessage ? ' (damage/heal: ' + abilityWithDamageMessage.value + ')' : '');
+            (parentNode.action.tr
+              ? parentNode.action.tr
+              : '(' + parentNode.action.x + ',' + parentNode.action.y + ')') +
+            (abilityWithDamageMessage ? ' (damage/heal: ' + abilityWithDamageMessage.v + ')' : '');
           break;
         case ActionType.UPGRADE_EQUIP:
-          name = activeCharId + ' upgrade equip: ' + parentNode.action.equipId;
+          name = activeCharId + ' upgrade equip: ' + parentNode.action.e;
           break;
         case ActionType.LEARN_ABILITY:
-          name = activeCharId + ' learn ability: ' + parentNode.action.abilityId;
+          name = activeCharId + ' learn ability: ' + parentNode.action.a;
           break;
         case ActionType.TURN_END:
           const endTurnActiveCharId = parentNode.state.log
             .slice()
             .reverse()
-            .find((l) => l.type === LogMessageType.TURN_END).id;
+            .find((l) => l.t === LogMessageType.TURN_END).id;
           activeCharId = endTurnActiveCharId;
           name = endTurnActiveCharId + ' end turn';
           break;
       }
     } else {
       activeCharId = parentNode.state.log[0].id;
-      name =
-        parentNode.state.log[0].id +
-        ' starts at ' +
-        parentNode.state.log[0].positionX +
-        ',' +
-        parentNode.state.log[0].positionY;
+      name = parentNode.state.log[0].id + ' starts at ' + parentNode.state.log[0].x + ',' + parentNode.state.log[0].y;
     }
 
     return {
@@ -666,7 +776,7 @@ export class ReportService {
       hero: activeCharId,
       sims: parentNode.sims,
       wins: parentNode.wins,
-      type: parentNode.action ? parentNode.action.type : 0,
+      type: parentNode.action ? parentNode.action.t : 0,
       children: childrenArray
     };
   }

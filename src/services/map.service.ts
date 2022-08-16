@@ -204,6 +204,19 @@ export class MapService {
     if (!this.checkTileForObstacle(newPosition, tiles, heroes)) {
       char.position.x = newPosition.x;
       char.position.y = newPosition.y;
+    } else {
+      // Diagonal tile is busy, but target is visible for ability,
+      // so we move to alternative tile
+      if (newPosition.x === char.position.x) {
+        newPosition.x = targetPosition.x;
+      } else if (newPosition.y === char.position.y) {
+        newPosition.y = targetPosition.y;
+      }
+
+      if (!this.checkTileForObstacle(newPosition, tiles, heroes)) {
+        char.position.x = newPosition.x;
+        char.position.y = newPosition.y;
+      }
     }
   }
 }

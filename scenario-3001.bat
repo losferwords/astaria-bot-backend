@@ -1,2 +1,3 @@
 set PORT=3001
-npm run start
+set NODE_OPTIONS="--max-old-space-size=8192"
+npm run start:prod

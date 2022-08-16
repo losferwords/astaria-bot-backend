@@ -4,11 +4,11 @@ import { IBattle } from '../../interfaces/IBattle';
 import { IScenario } from '../../interfaces/IScenario';
 import { ITeam } from '../../interfaces/ITeam';
 
-const teamPositions: IPosition[][] = [[{ x: 0, y: 4 }], [{ x: 8, y: 4 }], [{ x: 4, y: 0 }]];
+const teamPositions: IPosition[][] = [[{ x: 0, y: 4 }], [{ x: 8, y: 4 }], [{ x: 4, y: 0 }], [{ x: 4, y: 8 }]];
 
-export class ArenaOfAcheos1x1x1 implements IScenario {
-  static id = '3';
-  static teamSize = [3, 1];
+export class ArenaOfAcheos1x1x1x1 implements IScenario {
+  static id = '4';
+  static teamSize = [4, 1];
   id;
   teamSize;
   tileSize = 40;
@@ -115,8 +115,8 @@ export class ArenaOfAcheos1x1x1 implements IScenario {
   ];
 
   constructor() {
-    this.id = ArenaOfAcheos1x1x1.id;
-    this.teamSize = ArenaOfAcheos1x1x1.teamSize;
+    this.id = ArenaOfAcheos1x1x1x1.id;
+    this.teamSize = ArenaOfAcheos1x1x1x1.teamSize;
   }
 
   setHeroPositions(teams: ITeam[]) {
@@ -149,14 +149,16 @@ export class ArenaOfAcheos1x1x1 implements IScenario {
         }
       }
     }
-    if (teamsDeaths[0] === 0 && teamsDeaths[1] === 1 && teamsDeaths[2] === 1) {
+    if (teamsDeaths[0] === 0 && teamsDeaths[1] === 1 && teamsDeaths[2] === 1 && teamsDeaths[3] === 1) {
       return teams[0];
-    } else if (teamsDeaths[0] === 1 && teamsDeaths[1] === 0 && teamsDeaths[2] === 1) {
+    } else if (teamsDeaths[0] === 1 && teamsDeaths[1] === 0 && teamsDeaths[2] === 1 && teamsDeaths[3] === 1) {
       return teams[1];
-    } else if (teamsDeaths[0] === 1 && teamsDeaths[1] === 1 && teamsDeaths[2] === 0) {
+    } else if (teamsDeaths[0] === 1 && teamsDeaths[1] === 1 && teamsDeaths[2] === 0 && teamsDeaths[3] === 1) {
       return teams[2];
-    } else if (teamsDeaths[0] === 1 && teamsDeaths[1] === 1 && teamsDeaths[2] === 1) {
-      return teams[Math.floor(Math.random() * 3)];
+    } else if (teamsDeaths[0] === 1 && teamsDeaths[1] === 1 && teamsDeaths[2] === 1 && teamsDeaths[3] === 0) {
+      return teams[3];
+    } else if (teamsDeaths[0] === 1 && teamsDeaths[1] === 1 && teamsDeaths[2] === 1 && teamsDeaths[3] === 1) {
+      return teams[Math.floor(Math.random() * 4)];
     }
     return null;
   }

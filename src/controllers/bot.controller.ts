@@ -6,6 +6,8 @@ import { BotNode } from 'src/models/BotNode';
 import { ArchaeanTemple } from 'src/models/scenarios/archaean-temple';
 import { ArenaOfAcheos1x1 } from 'src/models/scenarios/arena-of-acheos-1x1';
 import { ArenaOfAcheos1x1x1 } from 'src/models/scenarios/arena-of-acheos-1x1x1';
+import { ArenaOfAcheos1x1x1x1 } from 'src/models/scenarios/arena-of-acheos-1x1x1x1';
+import { ArenaOfAcheos2x2 } from 'src/models/scenarios/arena-of-acheos-2x2';
 import { ChthonRuins } from 'src/models/scenarios/chthon-ruins';
 import { BotService } from 'src/services/bot.service';
 
@@ -34,10 +36,29 @@ export class BotController {
       case '3':
         startSimulationDto.state.scenario = new ArenaOfAcheos1x1x1();
         break;
+      case '4':
+        startSimulationDto.state.scenario = new ArenaOfAcheos1x1x1x1();
+        break;
+      case '5':
+        startSimulationDto.state.scenario = new ArenaOfAcheos2x2();
+        break;
     }
     const { nodes, simulationTime } = this.botService.startSimulation(rootNode, startSimulationDto.state, true);
+    const simplifiedNodes = this.botService.simplifySimulationResults(nodes);
+    let canBeSent = false;
+    while (!canBeSent) {
+      try {
+        JSON.stringify(simplifiedNodes);
+        canBeSent = true;
+      } catch (e) {
+        const originalLength = simplifiedNodes.length;
+        simplifiedNodes.splice(originalLength > 5000 ? -5000 : 0);
+        console.log(`splice external nodes from ${originalLength} to ${simplifiedNodes.length}`);
+      }
+    }
+
     return {
-      nodes: this.botService.simplifySimulationResults(nodes),
+      nodes: simplifiedNodes,
       simulationTime
     };
   }

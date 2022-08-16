@@ -5,5 +5,4 @@ export interface ISimplifiedBotNode {
   sims: number;
   wins: number;
   depth: number;
-  children: [string, { action: IAction; node?: ISimplifiedBotNode }][];
 }

@@ -145,10 +145,10 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      targetId: target.id,
-      abilityId: ability.id
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: target.id,
+      a: ability.id
     });
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -192,10 +192,10 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      targetId: target.id,
-      abilityId: ability.id
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: target.id,
+      a: ability.id
     });
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -240,10 +240,10 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      targetId: target.id,
-      abilityId: ability.id
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: target.id,
+      a: ability.id
     });
 
     for (let i = target.effects.length - 1; i > -1; i--) {
@@ -278,11 +278,11 @@ export class AbilityService {
     }
 
     battle.log.push({
-      type: LogMessageType.ABILITY_HEAL,
-      casterId: caster.id,
-      targetId: target.id,
-      abilityId: ability.id,
-      value: '4'
+      t: LogMessageType.ABILITY_HEAL,
+      c: caster.id,
+      tr: target.id,
+      a: ability.id,
+      v: '4'
     });
 
     return battle;
@@ -355,10 +355,10 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      targetId: target.id,
-      abilityId: ability.id
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: target.id,
+      a: ability.id
     });
 
     const effect: IEffect = this.addEffect(battle, heroes, caster, ability.id, caster.id, isSimulation);
@@ -414,10 +414,10 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      targetId: target.id,
-      abilityId: ability.id
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: target.id,
+      a: ability.id
     });
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -467,10 +467,10 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      targetId: target.id,
-      abilityId: ability.id
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: target.id,
+      a: ability.id
     });
 
     for (let i = target.effects.length - 1; i > -1; i--) {
@@ -622,25 +622,25 @@ export class AbilityService {
         caster.health = caster.maxHealth;
       }
       battle.log.push({
-        type: LogMessageType.ABILITY_HEAL,
-        casterId: caster.id,
-        targetId: caster.id,
-        abilityId: ability.id,
-        value: '4'
+        t: LogMessageType.ABILITY_HEAL,
+        c: caster.id,
+        tr: caster.id,
+        a: ability.id,
+        v: '4'
       });
 
       this.heroService.takeMana(caster as IHero, 4);
       battle.log.push({
         id: caster.id,
-        type: LogMessageType.TAKE_MANA,
-        value: '4'
+        t: LogMessageType.TAKE_MANA,
+        v: '4'
       });
 
       this.heroService.takeEnergy(caster as IHero, 4);
       battle.log.push({
         id: caster.id,
-        type: LogMessageType.TAKE_ENERGY,
-        value: '4'
+        t: LogMessageType.TAKE_ENERGY,
+        v: '4'
       });
     } else {
       ability.left = 0;
@@ -661,10 +661,10 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      targetId: target.id,
-      abilityId: ability.id
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: target.id,
+      a: ability.id
     });
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -682,18 +682,30 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
-    const targetAllies = this.battleService.findAllies(battle, target.id, 2, false, true, false, false);
-    for (let i = 0; i < targetAllies.length; i++) {
-      const targetAlliesChar = this.heroService.getCharById(targetAllies[i], heroes);
-      this.battleService.charTakesDamage({
-        battle,
-        caster,
-        heroes,
-        target: targetAlliesChar,
-        magicDamage: 4,
-        abilityId: ability.id,
-        isSimulation
-      });
+    const aoeEnemies = this.battleService.findEnemies(
+      battle,
+      caster.id,
+      2,
+      true,
+      ability.id,
+      false,
+      false,
+      target.position
+    );
+
+    for (let i = 0; i < aoeEnemies.length; i++) {
+      if (aoeEnemies[i] !== target.id) {
+        const aoeEnemiesChar = this.heroService.getCharById(aoeEnemies[i], heroes);
+        this.battleService.charTakesDamage({
+          battle,
+          caster,
+          heroes,
+          target: aoeEnemiesChar,
+          magicDamage: 4,
+          abilityId: ability.id,
+          isSimulation
+        });
+      }
     }
 
     this.battleService.charTakesDamage({
@@ -772,10 +784,10 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      targetId: target.id,
-      abilityId: ability.id
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: target.id,
+      a: ability.id
     });
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -819,9 +831,9 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.PET_SUMMON,
-      casterId: caster.id,
-      abilityId: 'wolf'
+      t: LogMessageType.PET_SUMMON,
+      c: caster.id,
+      a: 'wolf'
     });
 
     const newPet = new Pet('wolf', position);
@@ -879,11 +891,11 @@ export class AbilityService {
     }
 
     battle.log.push({
-      type: LogMessageType.ABILITY_HEAL,
-      casterId: caster.id,
-      targetId: target.id,
-      abilityId: ability.id,
-      value: '2'
+      t: LogMessageType.ABILITY_HEAL,
+      c: caster.id,
+      tr: target.id,
+      a: ability.id,
+      v: '2'
     });
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -927,10 +939,10 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      targetId: target.id,
-      abilityId: ability.id
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: target.id,
+      a: ability.id
     });
 
     if (target.isPet) {
@@ -991,9 +1003,9 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.PET_SUMMON,
-      casterId: caster.id,
-      abilityId: 'dryad'
+      t: LogMessageType.PET_SUMMON,
+      c: caster.id,
+      a: 'dryad'
     });
 
     const newPet = new Pet('dryad', position);
@@ -1061,19 +1073,19 @@ export class AbilityService {
     }
 
     battle.log.push({
-      type: LogMessageType.ABILITY_HEAL,
-      casterId: caster.id,
-      targetId: target.id,
-      abilityId: ability.id,
-      value: '5'
+      t: LogMessageType.ABILITY_HEAL,
+      c: caster.id,
+      tr: target.id,
+      a: ability.id,
+      v: '5'
     });
 
     battle.log.push({
-      type: LogMessageType.ABILITY_HEAL,
-      casterId: caster.id,
-      targetId: caster.id,
-      abilityId: ability.id,
-      value: '5'
+      t: LogMessageType.ABILITY_HEAL,
+      c: caster.id,
+      tr: caster.id,
+      a: ability.id,
+      v: '5'
     });
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -1213,10 +1225,10 @@ export class AbilityService {
     this.battleService.applyMapEffects(battle, heroes, false, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      targetId: target.id,
-      abilityId: ability.id
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: target.id,
+      a: ability.id
     });
 
     return battle;
@@ -1289,19 +1301,19 @@ export class AbilityService {
     }
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      abilityId: ability.id,
-      positionX: position.x,
-      positionY: position.y
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      a: ability.id,
+      x: position.x,
+      y: position.y
     });
 
     battle.log.push({
-      type: LogMessageType.ABILITY_HEAL,
-      casterId: caster.id,
-      targetId: caster.id,
-      abilityId: ability.id,
-      value: '2'
+      t: LogMessageType.ABILITY_HEAL,
+      c: caster.id,
+      tr: caster.id,
+      a: ability.id,
+      v: '2'
     });
 
     caster.position.x = position.x;
@@ -1353,11 +1365,11 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      abilityId: ability.id,
-      positionX: position.x,
-      positionY: position.y
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      a: ability.id,
+      x: position.x,
+      y: position.y
     });
 
     const effect: IEffect = this.addEffect(battle, heroes, caster, ability.id, caster.id, isSimulation);
@@ -1392,16 +1404,16 @@ export class AbilityService {
     this.heroService.takeMana(caster, 4);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      abilityId: ability.id,
-      targetId: target.id
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      a: ability.id,
+      tr: target.id
     });
 
     battle.log.push({
       id: caster.id,
-      type: LogMessageType.TAKE_MANA,
-      value: '4'
+      t: LogMessageType.TAKE_MANA,
+      v: '4'
     });
 
     this.battleService.applyMapEffects(battle, heroes, false, isSimulation);
@@ -1478,10 +1490,10 @@ export class AbilityService {
     if (casterTeam.id === targetTeam.id) {
       this.heroService.takeEnergy(caster, 4);
       battle.log.push({
-        type: LogMessageType.ABILITY_CAST,
-        casterId: caster.id,
-        abilityId: ability.id,
-        targetId: target.id
+        t: LogMessageType.ABILITY_CAST,
+        c: caster.id,
+        a: ability.id,
+        tr: target.id
       });
     } else {
       this.battleService.charTakesDamage({
@@ -1541,11 +1553,11 @@ export class AbilityService {
     }
 
     battle.log.push({
-      type: LogMessageType.ABILITY_HEAL,
-      casterId: caster.id,
-      targetId: target.id,
-      abilityId: ability.id,
-      value: '6'
+      t: LogMessageType.ABILITY_HEAL,
+      c: caster.id,
+      tr: target.id,
+      a: ability.id,
+      v: '6'
     });
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -1614,10 +1626,10 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      targetId: target.id,
-      abilityId: ability.id
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: target.id,
+      a: ability.id
     });
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -1635,18 +1647,30 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
-    const targetAllies = this.battleService.findAllies(battle, target.id, 1, false, true, false, false);
-    for (let i = 0; i < targetAllies.length; i++) {
-      const targetAlliesChar = this.heroService.getCharById(targetAllies[i], heroes);
-      this.battleService.charTakesDamage({
-        battle,
-        caster,
-        heroes,
-        target: targetAlliesChar,
-        magicDamage: 1,
-        abilityId: ability.id,
-        isSimulation
-      });
+    const aoeEnemies = this.battleService.findEnemies(
+      battle,
+      caster.id,
+      1,
+      true,
+      ability.id,
+      false,
+      false,
+      target.position
+    );
+
+    for (let i = 0; i < aoeEnemies.length; i++) {
+      if (aoeEnemies[i] !== target.id) {
+        const aoeEnemiesChar = this.heroService.getCharById(aoeEnemies[i], heroes);
+        this.battleService.charTakesDamage({
+          battle,
+          caster,
+          heroes,
+          target: aoeEnemiesChar,
+          magicDamage: 1,
+          abilityId: ability.id,
+          isSimulation
+        });
+      }
     }
 
     this.battleService.charTakesDamage({
@@ -1674,10 +1698,10 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      targetId: caster.id,
-      abilityId: ability.id
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: caster.id,
+      a: ability.id
     });
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -1696,9 +1720,9 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.PET_SUMMON,
-      casterId: caster.id,
-      abilityId: 'dragon-spirit'
+      t: LogMessageType.PET_SUMMON,
+      c: caster.id,
+      a: 'dragon-spirit'
     });
 
     const newPet = new Pet('dragon-spirit', position);
@@ -1726,18 +1750,30 @@ export class AbilityService {
       abilityDamage += 3;
     }
 
-    const targetAllies = this.battleService.findAllies(battle, target.id, 1, false, true, false, false);
-    for (let i = 0; i < targetAllies.length; i++) {
-      const targetAlliesChar = this.heroService.getCharById(targetAllies[i], heroes);
-      this.battleService.charTakesDamage({
-        battle,
-        caster,
-        heroes,
-        target: targetAlliesChar,
-        magicDamage: abilityDamage,
-        abilityId: ability.id,
-        isSimulation
-      });
+    const aoeEnemies = this.battleService.findEnemies(
+      battle,
+      caster.id,
+      1,
+      true,
+      ability.id,
+      false,
+      false,
+      target.position
+    );
+
+    for (let i = 0; i < aoeEnemies.length; i++) {
+      if (aoeEnemies[i] !== target.id) {
+        const aoeEnemiesChar = this.heroService.getCharById(aoeEnemies[i], heroes);
+        this.battleService.charTakesDamage({
+          battle,
+          caster,
+          heroes,
+          target: aoeEnemiesChar,
+          magicDamage: abilityDamage,
+          abilityId: ability.id,
+          isSimulation
+        });
+      }
     }
 
     this.battleService.charTakesDamage({
@@ -1765,11 +1801,11 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      abilityId: ability.id,
-      positionX: position.x,
-      positionY: position.y
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      a: ability.id,
+      x: position.x,
+      y: position.y
     });
 
     const effect: IEffect = this.addEffect(battle, heroes, caster, ability.id, caster.id, isSimulation);
@@ -1872,10 +1908,10 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      targetId: caster.id,
-      abilityId: ability.id
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: caster.id,
+      a: ability.id
     });
 
     caster.primaryWeapon.isUsed = false;
@@ -1894,11 +1930,11 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      abilityId: ability.id,
-      positionX: position.x,
-      positionY: position.y
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      a: ability.id,
+      x: position.x,
+      y: position.y
     });
 
     caster.position.x = position.x;
@@ -1976,10 +2012,10 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      targetId: caster.id,
-      abilityId: ability.id
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: caster.id,
+      a: ability.id
     });
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -2055,9 +2091,9 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.PET_SUMMON,
-      casterId: caster.id,
-      abilityId: 'phantom'
+      t: LogMessageType.PET_SUMMON,
+      c: caster.id,
+      a: 'phantom'
     });
 
     const newPet = new Pet('phantom', position);
@@ -2162,11 +2198,11 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      abilityId: ability.id,
-      positionX: position.x,
-      positionY: position.y
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      a: ability.id,
+      x: position.x,
+      y: position.y
     });
 
     caster.position.x = position.x;
@@ -2185,11 +2221,11 @@ export class AbilityService {
         }
 
         battle.log.push({
-          type: LogMessageType.ABILITY_HEAL,
-          casterId: caster.id,
-          targetId: allyChar.id,
-          abilityId: ability.id,
-          value: '2'
+          t: LogMessageType.ABILITY_HEAL,
+          c: caster.id,
+          tr: allyChar.id,
+          a: ability.id,
+          v: '2'
         });
       }
     }
@@ -2219,11 +2255,11 @@ export class AbilityService {
       }
 
       battle.log.push({
-        type: LogMessageType.ABILITY_HEAL,
-        casterId: caster.id,
-        targetId: target.id,
-        abilityId: ability.id,
-        value: '2'
+        t: LogMessageType.ABILITY_HEAL,
+        c: caster.id,
+        tr: target.id,
+        a: ability.id,
+        v: '2'
       });
     } else {
       this.battleService.charTakesDamage({
@@ -2269,11 +2305,11 @@ export class AbilityService {
       }
 
       battle.log.push({
-        type: LogMessageType.ABILITY_HEAL,
-        casterId: caster.id,
-        targetId: caster.id,
-        abilityId: ability.id,
-        value: healthDamage + ''
+        t: LogMessageType.ABILITY_HEAL,
+        c: caster.id,
+        tr: caster.id,
+        a: ability.id,
+        v: healthDamage + ''
       });
     }
 
@@ -2292,10 +2328,10 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      targetId: target.id,
-      abilityId: ability.id
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: target.id,
+      a: ability.id
     });
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -2314,10 +2350,10 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      targetId: target.id,
-      abilityId: ability.id
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: target.id,
+      a: ability.id
     });
 
     const casterTeam = this.heroService.getTeamByHeroId(caster.id, battle.teams);
@@ -2356,11 +2392,11 @@ export class AbilityService {
       }
 
       battle.log.push({
-        type: LogMessageType.ABILITY_HEAL,
-        casterId: caster.id,
-        targetId: caster.id,
-        abilityId: ability.id,
-        value: 3 * effectsRemoved + ''
+        t: LogMessageType.ABILITY_HEAL,
+        c: caster.id,
+        tr: caster.id,
+        a: ability.id,
+        v: 3 * effectsRemoved + ''
       });
     }
 
@@ -2409,10 +2445,10 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      targetId: target.id,
-      abilityId: ability.id
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: target.id,
+      a: ability.id
     });
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -2441,11 +2477,11 @@ export class AbilityService {
         }
 
         battle.log.push({
-          type: LogMessageType.ABILITY_HEAL,
-          casterId: caster.id,
-          targetId: allyChar.id,
-          abilityId: ability.id,
-          value: caster.intellect + ''
+          t: LogMessageType.ABILITY_HEAL,
+          c: caster.id,
+          tr: allyChar.id,
+          a: ability.id,
+          v: caster.intellect + ''
         });
       }
     }
@@ -2514,10 +2550,10 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      targetId: target.id,
-      abilityId: ability.id
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: target.id,
+      a: ability.id
     });
 
     this.heroService.takeEnergy(caster, 4);
@@ -2562,10 +2598,10 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      targetId: target.id,
-      abilityId: ability.id
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: target.id,
+      a: ability.id
     });
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -2643,19 +2679,14 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      abilityId: ability.id,
-      positionX: position.x,
-      positionY: position.y
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      a: ability.id,
+      x: position.x,
+      y: position.y
     });
 
     const effect: IEffect = this.addEffect(battle, heroes, caster, ability.id, caster.id, isSimulation);
-    if (!effect) {
-      console.log(JSON.stringify(battle.log));
-      console.log(JSON.stringify(caster));
-      return battle;
-    }
     effect.position = {
       x: position.x,
       y: position.y
@@ -2701,10 +2732,10 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      targetId: target.id,
-      abilityId: ability.id
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: target.id,
+      a: ability.id
     });
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -2723,10 +2754,10 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      targetId: caster.id,
-      abilityId: ability.id
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: caster.id,
+      a: ability.id
     });
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -2745,10 +2776,10 @@ export class AbilityService {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
-      type: LogMessageType.ABILITY_CAST,
-      casterId: caster.id,
-      abilityId: ability.id,
-      targetId: target.id
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      a: ability.id,
+      tr: target.id
     });
 
     caster.energy = caster.maxEnergy;

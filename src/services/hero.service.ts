@@ -328,25 +328,25 @@ export class HeroService {
         activeHero.primaryWeapon = heroData.primaryWeapons[activeHero.primaryWeapon.level];
         activeHero.primaryWeapon.isUsed = primaryWeaponIsUsed;
         battle.log.push({
-          type: LogMessageType.UPGRADE_EQUIP,
+          t: LogMessageType.UPGRADE_EQUIP,
           id: activeHero.id,
-          equipId: activeHero.primaryWeapon.id
+          e: activeHero.primaryWeapon.id
         });
       } else if (activeHero.secondaryWeapon?.id === equipId && activeHero.secondaryWeapon?.level < 3) {
         const secondaryWeaponIsUsed = activeHero.secondaryWeapon.isUsed;
         activeHero.secondaryWeapon = heroData.secondaryWeapons[activeHero.secondaryWeapon.level];
         activeHero.secondaryWeapon.isUsed = secondaryWeaponIsUsed;
         battle.log.push({
-          type: LogMessageType.UPGRADE_EQUIP,
+          t: LogMessageType.UPGRADE_EQUIP,
           id: activeHero.id,
-          equipId: activeHero.secondaryWeapon.id
+          e: activeHero.secondaryWeapon.id
         });
       } else if (activeHero.chestpiece.id === equipId && activeHero.chestpiece.level < 3) {
         activeHero.chestpiece = heroData.chestpieces[activeHero.chestpiece.level];
         battle.log.push({
-          type: LogMessageType.UPGRADE_EQUIP,
+          t: LogMessageType.UPGRADE_EQUIP,
           id: activeHero.id,
-          equipId: activeHero.chestpiece.id
+          e: activeHero.chestpiece.id
         });
       } else {
         return battle;
@@ -371,9 +371,9 @@ export class HeroService {
 
       activeHero.abilities.push(heroData.abilities.find((a) => a.id === abilityId));
       battle.log.push({
-        type: LogMessageType.LEARN_ABILITY,
+        t: LogMessageType.LEARN_ABILITY,
         id: activeHero.id,
-        abilityId: abilityId
+        a: abilityId
       });
 
       if (activeHero.abilities.length > 1) {

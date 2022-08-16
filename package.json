@@ -11,7 +11,7 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main --expose-gc --max-old-space-size=8192"
+    "start:prod": "node --expose-gc dist/main"
   },
   "dependencies": {
     "@nestjs/axios": "^0.0.8",
