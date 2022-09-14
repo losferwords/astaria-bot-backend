@@ -155,7 +155,7 @@ export class BattleController {
         : this.heroService.getCharById(castAbilityDto.targetId, heroes);
     let ability: IAbility = this.heroService.getHeroAbilityById(activeHero, castAbilityDto.abilityId);
 
-    //Maybe it is a pet ability
+    // Maybe it is a pet ability
     if (!ability) {
       for (let i = 0; i < activeHero.pets.length; i++) {
         if (activeHero.pets[i].ability.id === castAbilityDto.abilityId) {
@@ -173,15 +173,16 @@ export class BattleController {
       castAbilityDto.position,
       false
     );
-    return this.battleService.afterCastAbility(
-      newBattle,
-      activeChar,
-      heroes,
-      ability,
-      target,
-      castAbilityDto.position,
-      false
-    );
+    // return this.battleService.afterCastAbility(
+    //   newBattle,
+    //   activeChar,
+    //   heroes,
+    //   ability,
+    //   target,
+    //   castAbilityDto.position,
+    //   false
+    // );
+    return newBattle;
   }
 
   @Post('/upgrade-equip')

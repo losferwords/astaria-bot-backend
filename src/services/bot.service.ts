@@ -94,15 +94,16 @@ export class BotService {
           action.x === undefined ? undefined : { x: action.x, y: action.y },
           isSimulation
         );
-        return this.battleService.afterCastAbility(
-          newBattle,
-          activeChar,
-          heroes,
-          ability,
-          target,
-          action.x === undefined ? undefined : { x: action.x, y: action.y },
-          isSimulation
-        );
+        // return this.battleService.afterCastAbility(
+        //   newBattle,
+        //   activeChar,
+        //   heroes,
+        //   ability,
+        //   target,
+        //   action.x === undefined ? undefined : { x: action.x, y: action.y },
+        //   isSimulation
+        // );
+        return newBattle;
       case ActionType.UPGRADE_EQUIP:
         return this.battleService.upgradeEquip(battle, action.e, isSimulation);
       case ActionType.LEARN_ABILITY:

@@ -674,7 +674,7 @@ export class BattleService {
                     caster: sandStormCaster,
                     heroes,
                     target: sandStormEnemies[j],
-                    directDamage: 2,
+                    directDamage: 1,
                     effectId: effect.id,
                     isSimulation
                   });
@@ -716,7 +716,6 @@ export class BattleService {
 
     for (let i = hero.effects.length - 1; i > -1; i--) {
       if (!hero.effects[i]) {
-        console.log(hero.id, hero.effects, i);
         continue;
       }
       if (hero.effects[i].left > 0 && hero.effects[i].left < 100) {
@@ -800,18 +799,6 @@ export class BattleService {
       hero.energy = hero.maxEnergy;
     }
 
-    if (hero.health + hero.regeneration < hero.maxHealth) {
-      hero.health += hero.regeneration;
-    } else {
-      hero.health = hero.maxHealth;
-    }
-
-    if (hero.mana + hero.mind < hero.maxMana) {
-      hero.mana += hero.mind;
-    } else {
-      hero.mana = hero.maxMana;
-    }
-
     for (let i = 0; i < hero.abilities.length; i++) {
       if (hero.abilities[i].left > 0) {
         hero.abilities[i].left--;
@@ -824,6 +811,18 @@ export class BattleService {
     }
 
     this.applyMapEffects(battle, heroes, true, isSimulation);
+
+    if (hero.health + hero.regeneration < hero.maxHealth) {
+      hero.health += hero.regeneration;
+    } else {
+      hero.health = hero.maxHealth;
+    }
+
+    if (hero.mana + hero.mind < hero.maxMana) {
+      hero.mana += hero.mind;
+    } else {
+      hero.mana = hero.maxMana;
+    }
   }
 
   endTurn(battle: IBattle, isSimulation: boolean): IBattle {
@@ -1060,20 +1059,20 @@ export class BattleService {
     return battle;
   }
 
-  afterCastAbility(
-    newBattle: IBattle,
-    activeChar: IChar,
-    heroes: IHero[],
-    ability: IAbility,
-    target: IChar,
-    position: IPosition,
-    isSimulation: boolean
-  ): IBattle {
-    if (!ability.isPassive) {
-      this.checkPassiveAbilityTrigger('22-counterattack', newBattle, activeChar, heroes, target, 0, isSimulation);
-    }
-    return newBattle;
-  }
+  // afterCastAbility(
+  //   newBattle: IBattle,
+  //   activeChar: IChar,
+  //   heroes: IHero[],
+  //   ability: IAbility,
+  //   target: IChar,
+  //   position: IPosition,
+  //   isSimulation: boolean
+  // ): IBattle {
+  //   if (!ability.isPassive) {
+  //     this.checkPassiveAbilityTrigger('22-counterattack', newBattle, activeChar, heroes, target, 0, isSimulation);
+  //   }
+  //   return newBattle;
+  // }
 
   battleEnd(battle: IBattle, winner: ITeam) {
     let winnerHeroes = '';
@@ -1246,7 +1245,7 @@ export class BattleService {
           return true;
         } else {
           const physDamageToHealth =
-            (caster as IHero).secondaryWeapon.level + 4 + (caster as IHero).strength - (target as IHero).armor;
+            (caster as IHero).secondaryWeapon.level + 3 + (caster as IHero).strength - (target as IHero).armor;
           return physDamageToHealth > 0 || !target.isImmuneToDebuffs;
         }
 
@@ -1285,8 +1284,8 @@ export class BattleService {
           return true;
         } else {
           const physDamageToHealth =
-            (caster as IHero).primaryWeapon.physDamage + 1 + (caster as IHero).strength - (target as IHero).armor;
-          const magicDamageToHealth = 2 + (caster as IHero).intellect - (target as IHero).will;
+            (caster as IHero).primaryWeapon.physDamage + (caster as IHero).strength - (target as IHero).armor;
+          const magicDamageToHealth = 1 + (caster as IHero).intellect - (target as IHero).will;
           return physDamageToHealth > 0 || magicDamageToHealth > 0;
         }
       case '33-lightning-strike':
@@ -1409,7 +1408,7 @@ export class BattleService {
         if (target.isPet) {
           return true;
         } else {
-          let abilityDamage = 6;
+          let abilityDamage = 7;
 
           if (this.heroService.getCharEffectById(caster, '33-power-of-the-pack')) {
             abilityDamage += 3;
@@ -1468,7 +1467,7 @@ export class BattleService {
         if (target.isPet) {
           return true;
         } else {
-          const magicDamageToHealth = 2 + (caster as IHero).intellect - (target as IHero).will;
+          const magicDamageToHealth = 4 + (caster as IHero).intellect - (target as IHero).will;
           return magicDamageToHealth > 0 || !target.isImmuneToDebuffs;
         }
 
@@ -1499,7 +1498,7 @@ export class BattleService {
         if (target.isPet) {
           return true;
         } else {
-          const magicDamageToHealth = 3 + (caster as IHero).intellect - (target as IHero).will;
+          const magicDamageToHealth = 2 + (caster as IHero).intellect - (target as IHero).will;
           return magicDamageToHealth > 0 || !target.isImmuneToDebuffs;
         }
       case '31-dragon-tail':
@@ -1553,7 +1552,7 @@ export class BattleService {
         if (target.isPet) {
           return true;
         } else {
-          let abilityDamage = 5;
+          let abilityDamage = 6;
 
           if (this.heroService.getCharEffectById(caster, '33-power-of-the-pack')) {
             abilityDamage += 3;
@@ -1761,8 +1760,9 @@ export class BattleService {
         }
       case '13-fit-of-energy':
         return (
-          (caster as IHero).energy <= (caster as IHero).maxEnergy - 4 ||
-          (caster as IHero).mana <= (caster as IHero).maxMana - 3
+          (caster as IHero).energy <= (caster as IHero).maxEnergy - 2 ||
+          (caster as IHero).mana <= (caster as IHero).maxMana - 2 ||
+          (caster as IHero).health <= (caster as IHero).maxHealth - 2
         );
       case '21-precise-strike':
         target = this.heroService.getCharById(targetId, heroes);
@@ -1915,6 +1915,11 @@ export class BattleService {
     if (healthDamage === 0) {
       return 0;
     }
+
+    if (target.health - healthDamage < 1) {
+      healthDamage = target.health; // to avoid possible side effects after damage taken
+    }
+
     target.health -= healthDamage;
 
     if (target.health < 1) {
@@ -2016,7 +2021,7 @@ export class BattleService {
     }
 
     if (activeHero.id === 'druid' && this.heroService.getHeroAbilityById(activeHero, '32-war-tree')) {
-      physDamage = physDamage + 2;
+      physDamage = physDamage + 1;
       magicDamage = magicDamage + 2;
     }
 
@@ -2058,7 +2063,7 @@ export class BattleService {
                   heroes,
                   target: activeChar,
                   abilityId: passiveAbility,
-                  physDamage: paragon.primaryWeapon.physDamage,
+                  physDamage: paragon.primaryWeapon.physDamage + 1,
                   isSimulation
                 });
               }
@@ -2090,7 +2095,7 @@ export class BattleService {
                 heroes,
                 target: enemyChar,
                 abilityId: passiveAbility,
-                magicDamage: 2,
+                magicDamage: 3,
                 isSimulation
               });
             }

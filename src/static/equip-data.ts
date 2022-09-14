@@ -47,9 +47,8 @@ export class EquipData {
         id: 'shield-2',
         level: 2,
         cost: 1,
-        armor: 1,
+        armor: 2,
         will: 1,
-        mind: 1,
         isPassive: true
       },
       {
@@ -57,8 +56,8 @@ export class EquipData {
         level: 3,
         cost: 1,
         armor: 2,
-        will: 2,
-        mind: 1,
+        will: 1,
+        regeneration: 1,
         isPassive: true
       }
     ],
@@ -75,8 +74,9 @@ export class EquipData {
         level: 2,
         cost: 1,
         strength: 1,
-        armor: 3,
+        armor: 2,
         will: 2,
+        mind: 1,
         isPassive: true
       },
       {
@@ -85,8 +85,8 @@ export class EquipData {
         cost: 1,
         strength: 1,
         armor: 4,
-        will: 2,
-        regeneration: 1,
+        will: 3,
+        mind: 1,
         isPassive: true
       }
     ]
@@ -166,7 +166,7 @@ export class EquipData {
         id: 'staff-1',
         level: 1,
         range: 1,
-        energyCost: 3,
+        energyCost: 2,
         physDamage: 2,
         strength: 1,
         intellect: 1,
@@ -178,7 +178,7 @@ export class EquipData {
         level: 2,
         range: 1,
         cost: 1,
-        energyCost: 3,
+        energyCost: 2,
         physDamage: 3,
         strength: 2,
         intellect: 2,
@@ -191,7 +191,7 @@ export class EquipData {
         level: 3,
         range: 1,
         cost: 1,
-        energyCost: 3,
+        energyCost: 2,
         physDamage: 4,
         strength: 2,
         intellect: 3,
@@ -456,7 +456,7 @@ export class EquipData {
         id: 'hammer-1',
         level: 1,
         range: 1,
-        energyCost: 4,
+        energyCost: 3,
         physDamage: 3,
         strength: 1,
         isPassive: false,
@@ -467,7 +467,7 @@ export class EquipData {
         level: 2,
         range: 1,
         cost: 1,
-        energyCost: 4,
+        energyCost: 3,
         physDamage: 4,
         strength: 2,
         intellect: 2,
@@ -479,7 +479,7 @@ export class EquipData {
         level: 3,
         range: 1,
         cost: 1,
-        energyCost: 4,
+        energyCost: 3,
         physDamage: 5,
         strength: 3,
         intellect: 3,
