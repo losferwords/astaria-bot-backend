@@ -52,7 +52,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ) {
-    if (caster.id === 'avatar' && this.heroService.getCharEffectById(caster, '32-elements-control')) {
+    if (this.heroService.getCharEffectById(caster, '32-elements-control')) {
       for (let i = caster.effects.length - 1; i >= 0; i--) {
         if (caster.effects[i].id === '32-elements-control') {
           caster.effects.splice(i, 1);
