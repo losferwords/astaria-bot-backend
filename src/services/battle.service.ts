@@ -1363,7 +1363,7 @@ export class BattleService {
           return true;
         } else {
           const physDamageToHealth =
-            (caster as IHero).primaryWeapon.physDamage + (caster as IHero).strength - (target as IHero).armor;
+            (caster as IHero).primaryWeapon.physDamage + 1 + (caster as IHero).strength - (target as IHero).armor;
           return physDamageToHealth > 0 || !target.isImmuneToDebuffs;
         }
       case '21-entangling-roots':
@@ -1382,7 +1382,7 @@ export class BattleService {
         if (target.isPet) {
           return true;
         } else {
-          let abilityDamage = 4;
+          let abilityDamage = 5;
 
           if (this.heroService.getCharEffectById(caster, '33-power-of-the-pack')) {
             abilityDamage += 3;
@@ -1479,7 +1479,7 @@ export class BattleService {
           return true;
         } else {
           const physDamageToHealth =
-            (caster as IHero).primaryWeapon.physDamage + 3 + (caster as IHero).strength - (target as IHero).armor;
+            (caster as IHero).primaryWeapon.physDamage + 2 + (caster as IHero).strength - (target as IHero).armor;
           const magicDamageToHealth = 2 + (caster as IHero).intellect - (target as IHero).will;
           return physDamageToHealth > 0 || magicDamageToHealth > 0;
         }
@@ -1823,7 +1823,7 @@ export class BattleService {
         if (target.isPet) {
           return true;
         } else {
-          const magicDamageToHealth = 4 + (caster as IHero).intellect - (target as IHero).will;
+          const magicDamageToHealth = 3 + (caster as IHero).intellect - (target as IHero).will;
           return magicDamageToHealth > 0 || !target.isImmuneToDebuffs;
         }
       case '43-sands-of-time':
@@ -2095,7 +2095,7 @@ export class BattleService {
                 heroes,
                 target: enemyChar,
                 abilityId: passiveAbility,
-                magicDamage: 3,
+                magicDamage: 2,
                 isSimulation
               });
             }

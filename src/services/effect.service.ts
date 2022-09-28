@@ -182,7 +182,7 @@ export class EffectService {
   // Avatar
   '22-cauterization'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
-      (target as IHero).will = (target as IHero).will + 2;
+      (target as IHero).will = (target as IHero).will + 1;
     }
   }
 
@@ -195,9 +195,9 @@ export class EffectService {
   }
 
   '32-elements-control'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
-    (target as IHero).armor = (target as IHero).armor + 3;
-    (target as IHero).will = (target as IHero).will + 3;
-    (target as IHero).mind = (target as IHero).mind + 3;
+    (target as IHero).armor = (target as IHero).armor + 2;
+    (target as IHero).will = (target as IHero).will + 2;
+    (target as IHero).mind = (target as IHero).mind + 2;
   }
 
   '41-harmony'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
@@ -233,10 +233,10 @@ export class EffectService {
   // Lightbringer
   '21-aura-of-might'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
-      let extraStat = 1;
+      let extraStat = 2;
       const caster: IHero = this.heroService.getHeroById(effect.casterId, heroes);
       if (this.heroService.getCharEffectById(caster, '42-divine-radiance')) {
-        extraStat = 3;
+        extraStat = 4;
       }
       (target as IHero).strength = (target as IHero).strength + extraStat;
       (target as IHero).intellect = (target as IHero).intellect + extraStat;
@@ -245,10 +245,10 @@ export class EffectService {
 
   '22-aura-of-fortitude'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
-      let extraStat = 1;
+      let extraStat = 2;
       const caster: IHero = this.heroService.getHeroById(effect.casterId, heroes);
       if (this.heroService.getCharEffectById(caster, '42-divine-radiance')) {
-        extraStat = 3;
+        extraStat = 4;
       }
       (target as IHero).armor = (target as IHero).armor + extraStat;
       (target as IHero).will = (target as IHero).will + extraStat;
@@ -259,7 +259,7 @@ export class EffectService {
     let extraStat = 1;
     const caster: IHero = this.heroService.getHeroById(effect.casterId, heroes);
     if (this.heroService.getCharEffectById(caster, '42-divine-radiance')) {
-      extraStat = 3;
+      extraStat = 2;
     }
     if (!target.isPet) {
       (target as IHero).mind = (target as IHero).mind + extraStat;
@@ -291,6 +291,5 @@ export class EffectService {
   '42-sand-form'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     (target as IHero).isInvisible = true;
     (target as IHero).regeneration = (target as IHero).regeneration + 1;
-    (target as IHero).mind = (target as IHero).mind + 1;
   }
 }

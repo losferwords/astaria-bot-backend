@@ -198,7 +198,6 @@ export class HeroService {
       (hero.chestpiece.armor ? hero.chestpiece.armor : 0);
     if (hero.id === 'avatar' && this.getHeroAbilityById(hero, '21-flame-claws')) {
       hero.armor += 1;
-      hero.will += 1;
     }
 
     hero.will =
