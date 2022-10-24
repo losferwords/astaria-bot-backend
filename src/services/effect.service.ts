@@ -256,15 +256,17 @@ export class EffectService {
   }
 
   '23-aura-of-light'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
-    let extraStat = 1;
+    let extraRegeneration = 1;
+    let extraMind = 2;
     const caster: IHero = this.heroService.getHeroById(effect.casterId, heroes);
     if (this.heroService.getCharEffectById(caster, '42-divine-radiance')) {
-      extraStat = 2;
+      extraRegeneration = 2;
+      extraMind = 4;
     }
     if (!target.isPet) {
-      (target as IHero).mind = (target as IHero).mind + extraStat;
+      (target as IHero).mind = (target as IHero).mind + extraMind;
     }
-    target.regeneration = target.regeneration + extraStat;
+    target.regeneration = target.regeneration + extraRegeneration;
   }
 
   '41-hammer-of-wrath'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {

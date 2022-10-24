@@ -1777,7 +1777,6 @@ export class BattleService {
           const physDamageToHealth =
             (caster as IHero).primaryWeapon.physDamage +
             (caster as IHero).secondaryWeapon.physDamage +
-            1 +
             (caster as IHero).strength -
             targetArmor;
           return physDamageToHealth > 0;
@@ -2021,7 +2020,7 @@ export class BattleService {
     }
 
     if (activeHero.id === 'druid' && this.heroService.getHeroAbilityById(activeHero, '32-war-tree')) {
-      physDamage = physDamage + 1;
+      physDamage = physDamage + 2;
       magicDamage = magicDamage + 2;
     }
 

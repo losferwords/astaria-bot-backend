@@ -1401,8 +1401,8 @@ export class AbilityService {
     caster.position.x = targetPositionX;
     caster.position.y = targetPositionY;
 
-    this.heroService.takeMana(caster, 4);
-    this.heroService.takeEnergy(caster, 4);
+    this.heroService.takeMana(caster, 5);
+    this.heroService.takeEnergy(caster, 5);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -2599,7 +2599,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.primaryWeapon.physDamage + caster.secondaryWeapon.physDamage + 1,
+      physDamage: caster.primaryWeapon.physDamage + caster.secondaryWeapon.physDamage,
       abilityId: ability.id,
       isSimulation
     });
