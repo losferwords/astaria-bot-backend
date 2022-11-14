@@ -1401,8 +1401,8 @@ export class AbilityService {
     caster.position.x = targetPositionX;
     caster.position.y = targetPositionY;
 
-    this.heroService.takeMana(caster, 5);
-    this.heroService.takeEnergy(caster, 5);
+    this.heroService.takeMana(caster, 6);
+    this.heroService.takeEnergy(caster, 6);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -1414,13 +1414,13 @@ export class AbilityService {
     battle.log.push({
       id: caster.id,
       t: LogMessageType.TAKE_MANA,
-      v: '4'
+      v: '6'
     });
 
     battle.log.push({
       id: caster.id,
       t: LogMessageType.TAKE_ENERGY,
-      v: '4'
+      v: '6'
     });
 
     this.battleService.applyMapEffects(battle, heroes, false, isSimulation);

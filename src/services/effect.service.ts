@@ -103,7 +103,7 @@ export class EffectService {
   // Druid
   '11-crown-of-thorns'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (isBeforeTurn && !target.isPet) {
-      this.heroService.spendMana(target as IHero, 2);
+      this.heroService.spendMana(target as IHero, 3);
     }
   }
 
