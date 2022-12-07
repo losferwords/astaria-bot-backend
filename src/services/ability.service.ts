@@ -738,7 +738,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      magicDamage: 2,
+      magicDamage: 3,
       abilityId: ability.id,
       isSimulation
     });
@@ -783,11 +783,18 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
+    target.health += 1;
+
+    if (target.health > target.maxHealth) {
+      target.health = target.maxHealth;
+    }
+
     battle.log.push({
-      t: LogMessageType.ABILITY_CAST,
+      t: LogMessageType.ABILITY_HEAL,
       c: caster.id,
       tr: target.id,
-      a: ability.id
+      a: ability.id,
+      v: '1'
     });
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -858,7 +865,7 @@ export class AbilityService {
     let abilityDamage = 5;
 
     if (this.heroService.getCharEffectById(caster, '33-power-of-the-pack')) {
-      abilityDamage += 3;
+      abilityDamage += 4;
     }
 
     this.battleService.charTakesDamage({
@@ -1030,7 +1037,7 @@ export class AbilityService {
     let abilityDamage = 7;
 
     if (this.heroService.getCharEffectById(caster, '33-power-of-the-pack')) {
-      abilityDamage += 3;
+      abilityDamage += 4;
     }
 
     this.battleService.charTakesDamage({
@@ -1060,13 +1067,13 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
-    target.health += 8;
+    target.health += 6;
 
     if (target.health > target.maxHealth) {
       target.health = target.maxHealth;
     }
 
-    caster.health += 8;
+    caster.health += 6;
 
     if (caster.health > caster.maxHealth) {
       caster.health = caster.maxHealth;
@@ -1077,7 +1084,7 @@ export class AbilityService {
       c: caster.id,
       tr: target.id,
       a: ability.id,
-      v: '8'
+      v: '6'
     });
 
     battle.log.push({
@@ -1085,7 +1092,7 @@ export class AbilityService {
       c: caster.id,
       tr: caster.id,
       a: ability.id,
-      v: '8'
+      v: '6'
     });
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -1334,20 +1341,11 @@ export class AbilityService {
   ): IBattle {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
-    this.battleService.charTakesDamage({
-      battle,
-      caster,
-      heroes,
-      target,
-      directDamage: 2,
-      abilityId: ability.id,
-      isSimulation
-    });
-
-    caster.health += 2;
-    if (caster.health > caster.maxHealth) {
-      caster.health = caster.maxHealth;
+    if (!target.isPet) {
+      this.heroService.spendMana(target as IHero, 3);
     }
+
+    this.heroService.takeMana(caster, 3);
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
     return battle;
@@ -1401,9 +1399,6 @@ export class AbilityService {
     caster.position.x = targetPositionX;
     caster.position.y = targetPositionY;
 
-    this.heroService.takeMana(caster, 6);
-    this.heroService.takeEnergy(caster, 6);
-
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
       c: caster.id,
@@ -1411,17 +1406,15 @@ export class AbilityService {
       tr: target.id
     });
 
-    battle.log.push({
-      id: caster.id,
-      t: LogMessageType.TAKE_MANA,
-      v: '6'
-    });
+    this.heroService.takeEnergy(caster, 3);
 
     battle.log.push({
       id: caster.id,
       t: LogMessageType.TAKE_ENERGY,
-      v: '6'
+      v: '3'
     });
+
+    caster.primaryWeapon.isUsed = false;
 
     this.battleService.applyMapEffects(battle, heroes, false, isSimulation);
     return battle;
@@ -1754,7 +1747,7 @@ export class AbilityService {
     let abilityDamage = 6;
 
     if (this.heroService.getCharEffectById(caster, '33-power-of-the-pack')) {
-      abilityDamage += 3;
+      abilityDamage += 4;
     }
 
     const aoeEnemies = this.battleService.findEnemies(
@@ -2127,7 +2120,7 @@ export class AbilityService {
     let abilityDamage = shadow.primaryWeapon.physDamage + shadow.strength;
 
     if (this.heroService.getCharEffectById(caster, '33-power-of-the-pack')) {
-      abilityDamage += 3;
+      abilityDamage += 4;
     }
 
     this.battleService.charTakesDamage({

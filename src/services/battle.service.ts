@@ -1353,7 +1353,7 @@ export class BattleService {
         if (target.isPet) {
           return true;
         } else {
-          const magicDamageToHealth = 2 + (caster as IHero).intellect - (target as IHero).will;
+          const magicDamageToHealth = 3 + (caster as IHero).intellect - (target as IHero).will;
           return magicDamageToHealth > 0 || !target.isImmuneToDebuffs;
         }
       case '12-poison-touch':
@@ -1385,7 +1385,7 @@ export class BattleService {
           let abilityDamage = 5;
 
           if (this.heroService.getCharEffectById(caster, '33-power-of-the-pack')) {
-            abilityDamage += 3;
+            abilityDamage += 4;
           }
           const physDamageToHealth = abilityDamage - (target as IHero).armor;
           return physDamageToHealth > 0;
@@ -1411,7 +1411,7 @@ export class BattleService {
           let abilityDamage = 7;
 
           if (this.heroService.getCharEffectById(caster, '33-power-of-the-pack')) {
-            abilityDamage += 3;
+            abilityDamage += 4;
           }
           const magicDamageToHealth = abilityDamage - (target as IHero).will;
           return magicDamageToHealth > 0 || (target as IHero).mana > 0;
@@ -1461,7 +1461,7 @@ export class BattleService {
         }
       case '33-mind-control':
         target = this.heroService.getCharById(targetId, heroes);
-        return !target.isStunned && !target.isImmuneToDebuffs;
+        return !target.isPet && !target.isStunned && !target.isImmuneToDebuffs;
       case '43-amnesia':
         target = this.heroService.getCharById(targetId, heroes);
         if (target.isPet) {
@@ -1555,7 +1555,7 @@ export class BattleService {
           let abilityDamage = 6;
 
           if (this.heroService.getCharEffectById(caster, '33-power-of-the-pack')) {
-            abilityDamage += 3;
+            abilityDamage += 4;
           }
 
           const aoeEnemies = this.findEnemies(battle, caster.id, 1, true, ability.id, false, false, target.position);
@@ -1648,7 +1648,7 @@ export class BattleService {
           let abilityDamage = shadow.primaryWeapon.physDamage + shadow.strength;
 
           if (this.heroService.getCharEffectById(caster, '33-power-of-the-pack')) {
-            abilityDamage += 3;
+            abilityDamage += 4;
           }
           const physDamageToHealth = abilityDamage - (target as IHero).armor;
           return physDamageToHealth > 0;

@@ -257,7 +257,7 @@ export class EffectsData {
 
   public static readonly '23-blind': IEffect = {
     id: '23-blind',
-    duration: 2,
+    duration: 1,
     isBuff: false,
     isRemovable: true
   };

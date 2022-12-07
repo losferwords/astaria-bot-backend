@@ -16,7 +16,7 @@ export class Const {
     ArenaOfAcheos1x1x1x1,
     ArenaOfAcheos2x2
   ];
-  public static moveOrder = ['avenger', 'shadow', 'avatar', 'oracle', 'paragon', 'druid', 'highlander', 'lightbringer'];
+  public static moveOrder = ['avenger', 'oracle', 'shadow', 'avatar', 'paragon', 'druid', 'highlander', 'lightbringer'];
   public static maxPrimaryAttributes = 10;
   public static maxSecondaryAttributes = 4;
   public static rayTracePrecision = 8;

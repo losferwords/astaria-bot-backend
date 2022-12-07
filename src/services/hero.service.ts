@@ -196,6 +196,12 @@ export class HeroService {
       (hero.primaryWeapon.armor ? hero.primaryWeapon.armor : 0) +
       (hero.secondaryWeapon?.armor ? hero.secondaryWeapon.armor : 0) +
       (hero.chestpiece.armor ? hero.chestpiece.armor : 0);
+    if (hero.id === 'druid' && this.getHeroAbilityById(hero, '32-war-tree')) {
+      hero.armor += 1;
+    }
+    if (hero.id === 'oracle' && this.getHeroAbilityById(hero, '12-reflection')) {
+      hero.armor += 1;
+    }
     if (hero.id === 'avatar' && this.getHeroAbilityById(hero, '21-flame-claws')) {
       hero.armor += 1;
     }

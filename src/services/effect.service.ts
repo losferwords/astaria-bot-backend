@@ -140,7 +140,7 @@ export class EffectService {
       (target as IHero).will = (target as IHero).will + 3;
       (target as IHero).mind = (target as IHero).mind + 3;
     } else {
-      target.regeneration = target.regeneration + 3;
+      target.regeneration = target.regeneration + 4;
     }
   }
 
@@ -157,6 +157,12 @@ export class EffectService {
         (target as IHero).intellect = caster.intellect;
       } else {
         caster.intellect = (target as IHero).intellect;
+      }
+
+      if (caster.regeneration > target.regeneration) {
+        target.regeneration = caster.regeneration;
+      } else {
+        caster.regeneration = target.regeneration;
       }
     }
   }
