@@ -1102,6 +1102,7 @@ export class BattleService {
     switch (abilityId) {
       case '13-lightning-rod':
       case '32-war-tree':
+      case '12-reflection':
       case '21-flame-claws':
         activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
         this.heroService.resetHeroState(activeHero);
