@@ -2108,6 +2108,9 @@ export class BattleService {
   getAvailableActions(battle: IBattle, previousMoves: IPosition[]): IAction[] {
     const heroes = this.getHeroesInBattle(battle);
     const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
+    if (!activeHero) {
+      return [{ t: ActionType.TURN_END }];
+    }
     const team = this.heroService.getTeamByHeroId(activeHero.id, battle.teams);
     const actions: IAction[] = [];
 
