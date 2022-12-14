@@ -357,6 +357,11 @@ export class BattleService {
         }
         this.effectService.apply(battle, heroes, effect, char, isBeforeTurn);
         break;
+      case '33-mind-control':
+        if (isSimulation) {
+          this.effectService.apply(battle, heroes, effect, char, isBeforeTurn);
+        }
+        break;
       case '13-fireball':
         if (isBeforeTurn) {
           this.charTakesDamage({
@@ -1468,7 +1473,7 @@ export class BattleService {
         if (target.isPet) {
           return true;
         } else {
-          const magicDamageToHealth = 4 + (caster as IHero).intellect - (target as IHero).will;
+          const magicDamageToHealth = 3 + (caster as IHero).intellect - (target as IHero).will;
           return magicDamageToHealth > 0 || !target.isImmuneToDebuffs;
         }
 
@@ -2095,7 +2100,7 @@ export class BattleService {
                 heroes,
                 target: enemyChar,
                 abilityId: passiveAbility,
-                magicDamage: 2,
+                magicDamage: 1,
                 isSimulation
               });
             }
@@ -2131,6 +2136,9 @@ export class BattleService {
       const heroAbilityLevel = activeHero.abilities.length;
       for (let i = 3 * heroAbilityLevel; i < 3 * heroAbilityLevel + 3; i++) {
         if (heroData.abilities[i]) {
+          if (heroData.abilities[i].targetType === AbilityTargetType.ALLY_NOT_ME && team.heroes.length < 2) {
+            continue;
+          }
           actions.push({
             t: ActionType.LEARN_ABILITY,
             a: heroData.abilities[i].id
@@ -2455,7 +2463,8 @@ export class BattleService {
     if (
       actions.length === 0 ||
       activeHero.energy === 0 ||
-      (team.crystals > 0 && team.heroes.filter((h) => !h.isDead).length > 1)
+      (team.crystals > 0 && team.heroes.filter((h) => !h.isDead).length > 1) ||
+      activeHero.effects.find((e) => e.id === '33-mind-control')
     ) {
       actions.push({ t: ActionType.TURN_END });
     }

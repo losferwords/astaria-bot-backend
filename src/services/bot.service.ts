@@ -537,11 +537,23 @@ export class BotService {
 
     // Highest sims
     let maxSims = 0;
+    let minSims = 10000000;
+
+    const heroes = this.battleService.getHeroesInBattle(state);
+    const activeHero = this.heroService.getHeroById(state.queue[0], heroes);
+
     for (const action of allActions) {
       const childNode = node.childNode(action);
-      if (childNode && childNode.sims > maxSims) {
-        bestNode = childNode;
-        maxSims = childNode.sims;
+      if (activeHero.effects.find((e) => e.id === '33-mind-control')) {
+        if (childNode && childNode.sims < minSims) {
+          bestNode = childNode;
+          minSims = childNode.sims;
+        }
+      } else {
+        if (childNode && childNode.sims > maxSims) {
+          bestNode = childNode;
+          maxSims = childNode.sims;
+        }
       }
     }
 

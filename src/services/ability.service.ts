@@ -1436,7 +1436,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      magicDamage: 4,
+      magicDamage: 3,
       abilityId: ability.id,
       isSimulation
     });
