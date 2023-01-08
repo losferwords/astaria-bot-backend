@@ -85,7 +85,7 @@ export class BotService {
           }
         }
 
-        const newBattle = this.abilityService.castAbility(
+        this.abilityService.castAbility(
           battle,
           heroes,
           ability,
@@ -103,7 +103,7 @@ export class BotService {
         //   action.x === undefined ? undefined : { x: action.x, y: action.y },
         //   isSimulation
         // );
-        return newBattle;
+        return battle;
       case ActionType.UPGRADE_EQUIP:
         return this.battleService.upgradeEquip(battle, action.e, isSimulation);
       case ActionType.LEARN_ABILITY:
