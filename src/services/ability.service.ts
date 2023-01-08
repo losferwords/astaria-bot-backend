@@ -890,7 +890,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      magicDamage: 3,
+      magicDamage: 4,
       abilityId: ability.id,
       isSimulation
     });
@@ -1290,11 +1290,15 @@ export class AbilityService {
   ): void {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
-    if (!target.isPet) {
-      this.heroService.spendMana(target as IHero, 3);
-    }
-
-    this.heroService.takeMana(caster, 3);
+    this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      magicDamage: 2,
+      abilityId: ability.id,
+      isSimulation
+    });
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
   }
@@ -1353,7 +1357,20 @@ export class AbilityService {
       tr: target.id
     });
 
-    this.heroService.takeEnergy(caster, 3);
+    this.heroService.takeEnergy(caster, 2);
+
+    caster.health += 2;
+    if (caster.health > caster.maxHealth) {
+      caster.health = caster.maxHealth;
+    }
+
+    battle.log.push({
+      t: LogMessageType.ABILITY_HEAL,
+      c: caster.id,
+      tr: caster.id,
+      a: ability.id,
+      v: '2'
+    });
 
     battle.log.push({
       id: caster.id,
@@ -2288,7 +2305,7 @@ export class AbilityService {
     this.battleService.applyCharEffects(battle, heroes, target, false, isSimulation);
 
     if (effectsRemoved > 0 && caster.health < caster.maxHealth) {
-      caster.health += 2 * effectsRemoved;
+      caster.health += 3 * effectsRemoved;
 
       if (caster.health > caster.maxHealth) {
         caster.health = caster.maxHealth;
@@ -2299,7 +2316,7 @@ export class AbilityService {
         c: caster.id,
         tr: caster.id,
         a: ability.id,
-        v: 2 * effectsRemoved + ''
+        v: 3 * effectsRemoved + ''
       });
     }
   }
