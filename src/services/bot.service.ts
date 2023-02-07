@@ -140,7 +140,7 @@ export class BotService {
     for (let i = 1; i < Const.numberOfServers; i++) {
       simulations.push(
         lastValueFrom(
-          this.httpService.post(`http://localhost:300${i}/start-simulation`, {
+          this.httpService.post(`http://localhost:300${i + 1}/start-simulation`, {
             startSimulationData: {
               unexpandedActions,
               state
