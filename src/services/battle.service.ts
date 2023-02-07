@@ -1094,7 +1094,7 @@ export class BattleService {
     const heroes = this.getHeroesInBattle(battle);
     const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
 
-    battle = this.heroService.upgradeEquip(battle, heroes, equipId);
+    this.heroService.upgradeEquip(battle, heroes, equipId);
     this.applyCharEffects(battle, heroes, activeHero, false, isSimulation);
     this.applyMapEffects(battle, heroes, false, isSimulation);
     return battle;
@@ -1103,7 +1103,7 @@ export class BattleService {
   learnAbility(battle: IBattle, abilityId: string, isSimulation: boolean): IBattle {
     let activeHero: IHero;
     const heroes = this.getHeroesInBattle(battle);
-    battle = this.heroService.learnAbility(battle, heroes, abilityId);
+    this.heroService.learnAbility(battle, heroes, abilityId);
     switch (abilityId) {
       case '13-lightning-rod':
       case '32-war-tree':
@@ -1402,7 +1402,7 @@ export class BattleService {
         if (target.isPet) {
           return true;
         } else {
-          const magicDamageToHealth = 3 + (caster as IHero).intellect - (target as IHero).will;
+          const magicDamageToHealth = 4 + (caster as IHero).intellect - (target as IHero).will;
           return magicDamageToHealth > 0 || !target.isImmuneToDebuffs;
         }
       case '41-wrath-of-nature':
@@ -1467,7 +1467,12 @@ export class BattleService {
         }
       case '33-mind-control':
         target = this.heroService.getCharById(targetId, heroes);
-        return !target.isPet && !target.isStunned && !target.isImmuneToDebuffs;
+        if (target.isPet) {
+          return true;
+        } else {
+          const magicDamageToHealth = 2 + (caster as IHero).intellect - (target as IHero).will;
+          return magicDamageToHealth > 0 || !target.isImmuneToDebuffs;
+        }
       case '43-amnesia':
         target = this.heroService.getCharById(targetId, heroes);
         if (target.isPet) {

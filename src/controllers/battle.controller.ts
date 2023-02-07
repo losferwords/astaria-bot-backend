@@ -164,15 +164,7 @@ export class BattleController {
         }
       }
     }
-    const newBattle = this.abilityService.castAbility(
-      battle,
-      heroes,
-      ability,
-      activeChar,
-      target,
-      castAbilityDto.position,
-      false
-    );
+    this.abilityService.castAbility(battle, heroes, ability, activeChar, target, castAbilityDto.position, false);
     // return this.battleService.afterCastAbility(
     //   newBattle,
     //   activeChar,
@@ -182,7 +174,7 @@ export class BattleController {
     //   castAbilityDto.position,
     //   false
     // );
-    return newBattle;
+    return battle;
   }
 
   @Post('/upgrade-equip')

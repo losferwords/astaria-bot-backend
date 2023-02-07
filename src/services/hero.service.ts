@@ -311,7 +311,7 @@ export class HeroService {
     }
   }
 
-  moveChar(battle: IBattle, activeChar: IChar, position: IPosition, isPet: boolean): IBattle {
+  moveChar(battle: IBattle, activeChar: IChar, position: IPosition, isPet: boolean): void {
     activeChar.position.x = position.x;
     activeChar.position.y = position.y;
     if (!isPet) {
@@ -319,10 +319,9 @@ export class HeroService {
     } else {
       (activeChar as IPet).isMoved = true;
     }
-    return battle;
   }
 
-  upgradeEquip(battle: IBattle, heroes: IHero[], equipId: string): IBattle {
+  upgradeEquip(battle: IBattle, heroes: IHero[], equipId: string): void {
     let activeHero = this.getHeroById(battle.queue[0], heroes);
     const team = this.getTeamByHeroId(activeHero.id, battle.teams);
     if (team.crystals > 0 || activeHero.crystals > 0) {
@@ -354,7 +353,7 @@ export class HeroService {
           e: activeHero.chestpiece.id
         });
       } else {
-        return battle;
+        return;
       }
 
       activeHero = this.calcHero(activeHero);
@@ -365,10 +364,9 @@ export class HeroService {
         activeHero.crystals -= 1;
       }
     }
-    return battle;
   }
 
-  learnAbility(battle: IBattle, heroes: IHero[], abilityId: string): IBattle {
+  learnAbility(battle: IBattle, heroes: IHero[], abilityId: string): void {
     const activeHero = this.getHeroById(battle.queue[0], heroes);
     const team = this.getTeamByHeroId(activeHero.id, battle.teams);
     if (activeHero.abilities.length === 0 || team.crystals > 0 || activeHero.crystals > 0) {
@@ -389,6 +387,5 @@ export class HeroService {
         }
       }
     }
-    return battle;
   }
 }
