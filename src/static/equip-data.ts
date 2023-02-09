@@ -550,7 +550,7 @@ export class EquipData {
         cost: 1,
         energyCost: 3,
         physDamage: 4,
-        strength: 2,
+        strength: 1,
         armor: 1,
         isPassive: false,
         isUsed: false
@@ -586,7 +586,6 @@ export class EquipData {
         energyCost: 2,
         physDamage: 3,
         intellect: 2,
-        will: 1,
         mind: 1,
         isPassive: false,
         isUsed: false

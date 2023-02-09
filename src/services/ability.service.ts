@@ -1252,7 +1252,7 @@ export class AbilityService {
   ): void {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
-    caster.health += 3;
+    caster.health += 2;
     if (caster.health > caster.maxHealth) {
       caster.health = caster.maxHealth;
     }
@@ -1270,7 +1270,7 @@ export class AbilityService {
       c: caster.id,
       tr: caster.id,
       a: ability.id,
-      v: '3'
+      v: '2'
     });
 
     caster.position.x = position.x;
