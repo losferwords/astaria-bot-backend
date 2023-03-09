@@ -1357,9 +1357,9 @@ export class AbilityService {
       tr: target.id
     });
 
-    this.heroService.takeEnergy(caster, 2);
+    this.heroService.takeEnergy(caster, 1);
 
-    caster.health += 2;
+    caster.health += 1;
     if (caster.health > caster.maxHealth) {
       caster.health = caster.maxHealth;
     }
@@ -1369,13 +1369,13 @@ export class AbilityService {
       c: caster.id,
       tr: caster.id,
       a: ability.id,
-      v: '2'
+      v: '1'
     });
 
     battle.log.push({
       id: caster.id,
       t: LogMessageType.TAKE_ENERGY,
-      v: '3'
+      v: '1'
     });
 
     caster.primaryWeapon.isUsed = false;

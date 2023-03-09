@@ -28,7 +28,7 @@ export class Const {
   public static maxChainLength = 500;
   public static obviousMoveMinSims = 10000;
   public static obviousMoveRatio = 0.95;
-  public static numberOfServers = 2;
+  public static numberOfServers = 1;
   public static maxNumberOfNodesForInternalServer = 200000;
   public static maxNumberOfNodesForExternalServer = 100000;
   public static reportSortingArray = [

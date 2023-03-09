@@ -136,9 +136,9 @@ export class EffectService {
 
   '33-power-of-the-pack'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
-      (target as IHero).armor = (target as IHero).armor + 3;
-      (target as IHero).will = (target as IHero).will + 3;
-      (target as IHero).mind = (target as IHero).mind + 3;
+      (target as IHero).armor = (target as IHero).armor + 4;
+      (target as IHero).will = (target as IHero).will + 4;
+      (target as IHero).mind = (target as IHero).mind + 4;
     } else {
       target.regeneration = target.regeneration + 4;
     }
