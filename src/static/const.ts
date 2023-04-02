@@ -8,6 +8,7 @@ import { ArenaOfAcheos2x2 } from 'src/models/scenarios/arena-of-acheos-2x2';
 export class Const {
   public static startCrystals = 0;
   public static moveEnergyCost = 3;
+  public static moveEnergyCostDiagonalExtra = 0;
   public static scenarios = [
     ChthonRuins,
     ArchaeanTemple,

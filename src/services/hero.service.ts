@@ -188,9 +188,6 @@ export class HeroService {
       (hero.primaryWeapon.intellect ? hero.primaryWeapon.intellect : 0) +
       (hero.secondaryWeapon?.intellect ? hero.secondaryWeapon.intellect : 0) +
       (hero.chestpiece.intellect ? hero.chestpiece.intellect : 0);
-    if (hero.id === 'highlander' && this.getHeroAbilityById(hero, '13-lightning-rod')) {
-      hero.intellect += 1;
-    }
 
     hero.armor =
       (hero.primaryWeapon.armor ? hero.primaryWeapon.armor : 0) +
@@ -311,11 +308,15 @@ export class HeroService {
     }
   }
 
-  moveChar(battle: IBattle, activeChar: IChar, position: IPosition, isPet: boolean): void {
+  moveChar(activeChar: IChar, position: IPosition, isPet: boolean): void {
+    const extraEnergy =
+      activeChar.position.x - position.x !== 0 && activeChar.position.y - position.y !== 0
+        ? Const.moveEnergyCostDiagonalExtra
+        : 0;
     activeChar.position.x = position.x;
     activeChar.position.y = position.y;
     if (!isPet) {
-      (activeChar as IHero).energy -= (activeChar as IHero).moveEnergyCost;
+      (activeChar as IHero).energy -= (activeChar as IHero).moveEnergyCost + extraEnergy;
     } else {
       (activeChar as IPet).isMoved = true;
     }

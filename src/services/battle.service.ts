@@ -252,7 +252,7 @@ export class BattleService {
       activeChar = activeHero.pets.find((p) => p.id === petId);
     }
     if (this.heroService.canMove(activeChar, !!petId)) {
-      this.heroService.moveChar(battle, activeChar, targetPosition, !!petId);
+      this.heroService.moveChar(activeChar, targetPosition, !!petId);
       battle.log.push({
         t: LogMessageType.MOVE,
         x: targetPosition.x,

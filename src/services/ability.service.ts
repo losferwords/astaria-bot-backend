@@ -1378,8 +1378,6 @@ export class AbilityService {
       v: '1'
     });
 
-    caster.primaryWeapon.isUsed = false;
-
     this.battleService.applyMapEffects(battle, heroes, false, isSimulation);
   }
 
@@ -1425,7 +1423,7 @@ export class AbilityService {
       heroes,
       target,
       physDamage: caster.primaryWeapon.physDamage + 2,
-      magicDamage: 2,
+      magicDamage: 1,
       abilityId: ability.id,
       isSimulation
     });
@@ -2214,7 +2212,7 @@ export class AbilityService {
       caster,
       heroes,
       target,
-      physDamage: caster.primaryWeapon.physDamage + 1,
+      physDamage: caster.primaryWeapon.physDamage,
       magicDamage: 1,
       abilityId: ability.id,
       isSimulation

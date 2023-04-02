@@ -26,9 +26,9 @@ export class HeroesData {
 
   public static readonly druid: IHeroData = {
     id: 'druid',
-    maxEnergy: 10,
+    maxEnergy: 12,
     maxHealth: 16,
-    maxMana: 20,
+    maxMana: 16,
     primaryWeapons: EquipData.druid.primaryWeapons,
     chestpieces: EquipData.druid.chestpieces,
     abilities: AbilitiesData.druid

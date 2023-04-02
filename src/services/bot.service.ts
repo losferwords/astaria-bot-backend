@@ -57,7 +57,7 @@ export class BotService {
     switch (action.t) {
       case ActionType.MOVE:
       case ActionType.PET_MOVE:
-        // action.casterId means that this is a PET_MOVE
+        // action.c means that this is a PET_MOVE
         return this.battleService.moveChar(
           battle,
           { x: action.x, y: action.y },
