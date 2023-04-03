@@ -847,6 +847,24 @@ export class BattleService {
 
     this.beforeTurn(battle, heroes, activeHero, isSimulation);
     battle.scenario.beforeTurn(battle);
+    if (
+      battle.scenario.id === '2' ||
+      battle.scenario.id === '3' ||
+      battle.scenario.id === '4' ||
+      battle.scenario.id === '5'
+    ) {
+      if (activeHero.crystals > Const.maxCrystalsBeforeOverload) {
+        this.charTakesDamage({
+          battle,
+          caster: activeHero,
+          heroes,
+          target: activeHero,
+          directDamage: activeHero.crystals - Const.maxCrystalsBeforeOverload,
+          isOverload: true,
+          isSimulation
+        });
+      }
+    }
 
     if (battle.queue[0] && battle.queue.length > 1) {
       const newActiveHero = this.heroService.getHeroById(battle.queue[0], heroes);
@@ -1859,6 +1877,7 @@ export class BattleService {
     weaponId,
     abilityId,
     effectId,
+    isOverload,
     isSimulation
   }: ICharTakesDamageArgs): number {
     let healthDamage = 0;
@@ -1911,6 +1930,8 @@ export class BattleService {
         ? LogMessageType.WEAPON_DAMAGE
         : abilityId
         ? LogMessageType.ABILITY_DAMAGE
+        : isOverload
+        ? LogMessageType.OVERLOAD_DAMAGE
         : LogMessageType.EFFECT_DAMAGE
     };
 

@@ -113,7 +113,24 @@ export class ReportService {
             turn +
             ',' +
             battle.log[i].c +
-            ',AEFFECT_DAMAGE,,' +
+            ',EFFECT_DAMAGE,,' +
+            battle.log[i].a +
+            ',' +
+            battle.log[i].tr +
+            ',' +
+            battle.log[i].v +
+            '\n';
+          break;
+        case LogMessageType.OVERLOAD_DAMAGE:
+          battleLogData +=
+            setupIndex +
+            ',' +
+            i +
+            ',' +
+            turn +
+            ',' +
+            battle.log[i].c +
+            ',OVERLOAD_DAMAGE,,' +
             battle.log[i].a +
             ',' +
             battle.log[i].tr +

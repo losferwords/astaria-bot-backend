@@ -13,5 +13,6 @@ export interface ICharTakesDamageArgs {
   weaponId?: string;
   abilityId?: string;
   effectId?: string;
+  isOverload?: boolean;
   isSimulation: boolean;
 }
