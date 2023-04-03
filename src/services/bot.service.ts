@@ -46,6 +46,10 @@ export class BotService {
 
   async botAction(): Promise<IBattle> {
     const battle = this.battleService.battle;
+    if (!battle) {
+      console.log('No battle');
+      return;
+    }
     const chosenAction = await this.chooseAction(battle);
     return this.doAction(battle, chosenAction, false);
   }
