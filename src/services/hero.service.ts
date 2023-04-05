@@ -309,14 +309,10 @@ export class HeroService {
   }
 
   moveChar(activeChar: IChar, position: IPosition, isPet: boolean): void {
-    const extraEnergy =
-      activeChar.position.x - position.x !== 0 && activeChar.position.y - position.y !== 0
-        ? Const.moveEnergyCostDiagonalExtra
-        : 0;
     activeChar.position.x = position.x;
     activeChar.position.y = position.y;
     if (!isPet) {
-      (activeChar as IHero).energy -= (activeChar as IHero).moveEnergyCost + extraEnergy;
+      (activeChar as IHero).energy -= (activeChar as IHero).moveEnergyCost;
     } else {
       (activeChar as IPet).isMoved = true;
     }
