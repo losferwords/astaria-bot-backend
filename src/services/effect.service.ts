@@ -108,12 +108,6 @@ export class EffectService {
   }
 
   '13-wound-healing'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
-    if (!target.isPet) {
-      (target as IHero).armor = (target as IHero).armor + 1;
-    }
-    if (!target.isPet) {
-      (target as IHero).will = (target as IHero).will + 1;
-    }
     target.regeneration = target.regeneration + 2;
     if (!target.isPet) {
       (target as IHero).mind = (target as IHero).mind + 2;

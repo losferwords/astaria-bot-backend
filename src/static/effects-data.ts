@@ -191,7 +191,7 @@ export class EffectsData {
 
   public static readonly '43-amnesia': IEffect = {
     id: '43-amnesia',
-    duration: 2,
+    duration: 1,
     isBuff: false,
     isRemovable: true
   };

@@ -2138,7 +2138,7 @@ export class AbilityService {
     for (let i = 0; i < allies.length; i++) {
       const allyChar = this.heroService.getCharById(allies[i], heroes);
       if (allyChar.health < allyChar.maxHealth) {
-        allyChar.health += 3;
+        allyChar.health += 2;
 
         if (allyChar.health > allyChar.maxHealth) {
           allyChar.health = allyChar.maxHealth;
@@ -2149,7 +2149,7 @@ export class AbilityService {
           c: caster.id,
           tr: allyChar.id,
           a: ability.id,
-          v: '3'
+          v: '2'
         });
       }
     }
@@ -2685,16 +2685,23 @@ export class AbilityService {
   ): void {
     this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
 
-    battle.log.push({
-      t: LogMessageType.ABILITY_CAST,
-      c: caster.id,
-      a: ability.id,
-      tr: target.id
-    });
-
     caster.energy = caster.maxEnergy;
     caster.mana = caster.maxMana;
     caster.primaryWeapon.isUsed = false;
     caster.secondaryWeapon.isUsed = false;
+
+    caster.health += 1;
+
+    if (caster.health > caster.maxHealth) {
+      caster.health = caster.maxHealth;
+    }
+
+    battle.log.push({
+      t: LogMessageType.ABILITY_HEAL,
+      c: caster.id,
+      tr: caster.id,
+      a: ability.id,
+      v: '1'
+    });
   }
 }
