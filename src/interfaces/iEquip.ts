@@ -12,6 +12,7 @@ export interface IEquip {
   energyCost?: number;
   physDamage?: number;
   magicDamage?: number;
+  directDamage?: number;
   isPassive: boolean;
   isUsed?: boolean;
 }

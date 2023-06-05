@@ -13,22 +13,18 @@ import { IHero } from 'src/interfaces/IHero';
 import { IHeroData } from 'src/interfaces/IHeroData';
 import { IPosition } from 'src/interfaces/IPosition';
 import { AbilityService } from 'src/services/ability.service';
-import { HeroService } from 'src/services/hero.service';
-import { MapService } from 'src/services/map.service';
 import { BattleService } from '../services/battle.service';
+import CharHelper from 'src/helpers/char.helper';
+import MapHelper from 'src/helpers/map.helper';
+import BattleHelper from 'src/helpers/battle.helper';
 
 @Controller()
 export class BattleController {
-  constructor(
-    private battleService: BattleService,
-    private mapService: MapService,
-    private heroService: HeroService,
-    private abilityService: AbilityService
-  ) {}
+  constructor(private battleService: BattleService, private abilityService: AbilityService) {}
 
   @Get('/scenarios')
   scenarios(): IScenarioSetupDto[] {
-    return this.battleService.getScenarios();
+    return BattleHelper.getScenarios();
   }
 
   @Post('/start-battle')
@@ -38,13 +34,13 @@ export class BattleController {
 
   @Get('/hero-data')
   heroData(@Query('heroId') heroId: string): IHeroData {
-    return this.heroService.getHeroData(heroId);
+    return CharHelper.getHeroData(heroId);
   }
 
   @Get('/move-points')
   movePoints(@Query('petId') petId: string): IPosition[] {
     if (this.battleService.battle) {
-      return this.battleService.getMovePoints(this.battleService.battle, petId);
+      return BattleHelper.getMovePoints(this.battleService.battle, petId);
     } else {
       return [];
     }
@@ -68,7 +64,7 @@ export class BattleController {
     @Query('abilityId') abilityId: string,
     @Query('ignoreRaytrace') ignoreRaytrace: string
   ): string[] {
-    return this.battleService.findEnemies(
+    return BattleHelper.findEnemies(
       this.battleService.battle,
       sourceCharId,
       +radius,
@@ -87,7 +83,7 @@ export class BattleController {
     @Query('includeSelf') includeSelf: string,
     @Query('ignoreRaytrace') ignoreRaytrace: string
   ): string[] {
-    return this.battleService.findAllies(
+    return BattleHelper.findAllies(
       this.battleService.battle,
       sourceCharId,
       +radius,
@@ -106,7 +102,7 @@ export class BattleController {
     @Query('includeSelf') includeSelf: string,
     @Query('ignoreRaytrace') ignoreRaytrace: string
   ): string[] {
-    return this.battleService.findHeroes(
+    return BattleHelper.findHeroes(
       this.battleService.battle,
       sourceCharId,
       +radius,
@@ -124,11 +120,11 @@ export class BattleController {
     @Query('ignoreObstacles') ignoreObstacles: string
   ): IPosition[] {
     const battle = this.battleService.battle;
-    const heroes = this.battleService.getHeroesInBattle(battle);
-    const activeHero = this.heroService.getHeroById(battle.queue[0], heroes);
-    const ability: IAbility = this.heroService.getHeroAbilityById(activeHero, abilityId);
+    const heroes = BattleHelper.getHeroesInBattle(battle);
+    const activeHero = CharHelper.getHeroById(battle.queue[0], heroes);
+    const ability: IAbility = CharHelper.getHeroAbilityById(activeHero, abilityId);
 
-    return this.mapService.getMovePoints(
+    return MapHelper.getMovePoints(
       activeHero.position,
       activeHero.isBlind ? 1 : ability.range,
       battle.scenario.tiles,
@@ -146,14 +142,12 @@ export class BattleController {
   @Post('/cast-ability')
   castAbility(@Body() castAbilityDto: CastAbilityDto): IBattle {
     const battle = this.battleService.battle;
-    const heroes = this.battleService.getHeroesInBattle(battle);
-    const activeHero: IHero = this.heroService.getHeroById(battle.queue[0], heroes);
+    const heroes = BattleHelper.getHeroesInBattle(battle);
+    const activeHero: IHero = CharHelper.getHeroById(battle.queue[0], heroes);
     let activeChar: IChar = activeHero;
     const target: IChar =
-      activeChar.id === castAbilityDto.targetId
-        ? activeChar
-        : this.heroService.getCharById(castAbilityDto.targetId, heroes);
-    let ability: IAbility = this.heroService.getHeroAbilityById(activeHero, castAbilityDto.abilityId);
+      activeChar.id === castAbilityDto.targetId ? activeChar : CharHelper.getCharById(castAbilityDto.targetId, heroes);
+    let ability: IAbility = CharHelper.getHeroAbilityById(activeHero, castAbilityDto.abilityId);
 
     // Maybe it is a pet ability
     if (!ability) {

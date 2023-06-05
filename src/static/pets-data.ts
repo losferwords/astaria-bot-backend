@@ -2,7 +2,7 @@ import { AbilityTargetType } from 'src/enums/ability-target-type.enum';
 import { IPetData } from 'src/interfaces/IPetData';
 
 export class PetsData {
-  public static readonly 'wolf': IPetData = {
+  static readonly 'wolf': IPetData = {
     id: 'wolf',
     maxHealth: 6,
     ability: {
@@ -20,7 +20,7 @@ export class PetsData {
     }
   };
 
-  public static readonly 'dryad': IPetData = {
+  static readonly 'dryad': IPetData = {
     id: 'dryad',
     maxHealth: 8,
     ability: {
@@ -38,7 +38,7 @@ export class PetsData {
     }
   };
 
-  public static readonly 'dragon-spirit': IPetData = {
+  static readonly 'dragon-spirit': IPetData = {
     id: 'dragon-spirit',
     maxHealth: 8,
     ability: {
@@ -56,7 +56,7 @@ export class PetsData {
     }
   };
 
-  public static readonly 'phantom': IPetData = {
+  static readonly 'phantom': IPetData = {
     id: 'phantom',
     maxHealth: 8,
     ability: {

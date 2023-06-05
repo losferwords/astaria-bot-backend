@@ -2,7 +2,7 @@ import { AbilityTargetType } from 'src/enums/ability-target-type.enum';
 import { IAbility } from 'src/interfaces/IAbility';
 
 export class AbilitiesData {
-  public static readonly paragon: IAbility[] = [
+  static readonly paragon: IAbility[] = [
     {
       id: '11-sunder-armor',
       level: 1,
@@ -165,7 +165,7 @@ export class AbilitiesData {
     }
   ];
 
-  public static readonly highlander: IAbility[] = [
+  static readonly highlander: IAbility[] = [
     {
       id: '11-heavy-strike',
       level: 1,
@@ -326,7 +326,7 @@ export class AbilitiesData {
     }
   ];
 
-  public static readonly druid: IAbility[] = [
+  static readonly druid: IAbility[] = [
     {
       id: '11-crown-of-thorns',
       level: 1,
@@ -490,7 +490,7 @@ export class AbilitiesData {
     }
   ];
 
-  public static readonly oracle: IAbility[] = [
+  static readonly oracle: IAbility[] = [
     {
       id: '11-kinetic-impact',
       level: 1,
@@ -654,7 +654,7 @@ export class AbilitiesData {
     }
   ];
 
-  public static readonly avatar: IAbility[] = [
+  static readonly avatar: IAbility[] = [
     {
       id: '11-furious-strike',
       level: 1,
@@ -816,7 +816,7 @@ export class AbilitiesData {
     }
   ];
 
-  public static readonly shadow: IAbility[] = [
+  static readonly shadow: IAbility[] = [
     {
       id: '11-aimed-shot',
       level: 1,
@@ -975,7 +975,7 @@ export class AbilitiesData {
     }
   ];
 
-  public static readonly lightbringer: IAbility[] = [
+  static readonly lightbringer: IAbility[] = [
     {
       id: '11-sun-strike',
       level: 1,
@@ -1138,7 +1138,7 @@ export class AbilitiesData {
     }
   ];
 
-  public static readonly avenger: IAbility[] = [
+  static readonly avenger: IAbility[] = [
     {
       id: '11-double-strike',
       level: 1,
@@ -1296,6 +1296,166 @@ export class AbilitiesData {
       isSpell: true,
       left: 0,
       targetType: AbilityTargetType.SELF
+    }
+  ];
+
+  static readonly navarch: IAbility[] = [
+    {
+      id: '11-duelist',
+      level: 1,
+      range: 0,
+      cd: 0,
+      energyCost: 0,
+      manaCost: 0,
+      isPassive: true,
+      needWeapon: false,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.SELF
+    },
+    {
+      id: '12-swift-reflexes',
+      level: 1,
+      range: 0,
+      cd: 3,
+      energyCost: 2,
+      manaCost: 3,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.SELF
+    },
+    {
+      id: '13-reload',
+      level: 1,
+      range: 0,
+      cd: 1,
+      energyCost: 0,
+      manaCost: 3,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.SELF
+    },
+    {
+      id: '21-boarding',
+      level: 2,
+      range: 3,
+      cd: 2,
+      energyCost: 6,
+      manaCost: 0,
+      isPassive: false,
+      needWeapon: true,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.ENEMY
+    },
+    {
+      id: '22-smoke-cloud',
+      level: 2,
+      range: 0,
+      cd: 4,
+      energyCost: 3,
+      manaCost: 3,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.SELF
+    },
+    {
+      id: '23-enhanced-charges',
+      level: 2,
+      range: 0,
+      cd: 0,
+      energyCost: 0,
+      manaCost: 0,
+      isPassive: true,
+      needWeapon: false,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.SELF
+    },
+    {
+      id: '31-skillful-trick',
+      level: 3,
+      range: 1,
+      cd: 3,
+      energyCost: 7,
+      manaCost: 0,
+      isPassive: false,
+      needWeapon: true,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.ENEMY
+    },
+    {
+      id: '32-shellback',
+      level: 3,
+      range: 0,
+      cd: 4,
+      energyCost: 0,
+      manaCost: 0,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.SELF
+    },
+    {
+      id: '33-gunslinger',
+      level: 3,
+      range: 0,
+      cd: 0,
+      energyCost: 0,
+      manaCost: 0,
+      isPassive: true,
+      needWeapon: false,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.SELF
+    },
+    {
+      id: '41-fortune',
+      level: 4,
+      range: 0,
+      cd: 4,
+      energyCost: 4,
+      manaCost: 2,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.SELF
+    },
+    {
+      id: '42-bomb-toss',
+      level: 4,
+      range: 3,
+      cd: 3,
+      energyCost: 7,
+      manaCost: 4,
+      isPassive: false,
+      needWeapon: false,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.MAP
+    },
+    {
+      id: '43-piercing-shot',
+      level: 4,
+      range: 4,
+      cd: 4,
+      energyCost: 8,
+      manaCost: 0,
+      isPassive: false,
+      needWeapon: true,
+      isSpell: false,
+      left: 0,
+      targetType: AbilityTargetType.ENEMY,
+      ignoreRaytrace: true
     }
   ];
 }

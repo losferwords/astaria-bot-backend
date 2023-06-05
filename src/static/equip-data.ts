@@ -1,7 +1,7 @@
 import { IEquipData } from 'src/interfaces/IEquipData';
 
 export class EquipData {
-  public static readonly paragon: IEquipData = {
+  static readonly paragon: IEquipData = {
     primaryWeapons: [
       {
         id: 'spear-1',
@@ -92,7 +92,7 @@ export class EquipData {
     ]
   };
 
-  public static readonly highlander: IEquipData = {
+  static readonly highlander: IEquipData = {
     primaryWeapons: [
       {
         id: 'sword-1',
@@ -160,7 +160,7 @@ export class EquipData {
     ]
   };
 
-  public static readonly druid: IEquipData = {
+  static readonly druid: IEquipData = {
     primaryWeapons: [
       {
         id: 'staff-1',
@@ -234,7 +234,7 @@ export class EquipData {
     ]
   };
 
-  public static readonly oracle: IEquipData = {
+  static readonly oracle: IEquipData = {
     primaryWeapons: [
       {
         id: 'book-1',
@@ -304,7 +304,7 @@ export class EquipData {
     ]
   };
 
-  public static readonly avatar: IEquipData = {
+  static readonly avatar: IEquipData = {
     primaryWeapons: [
       {
         id: 'bracers-1',
@@ -379,7 +379,7 @@ export class EquipData {
     ]
   };
 
-  public static readonly shadow: IEquipData = {
+  static readonly shadow: IEquipData = {
     primaryWeapons: [
       {
         id: 'bow-1',
@@ -450,7 +450,7 @@ export class EquipData {
     ]
   };
 
-  public static readonly lightbringer: IEquipData = {
+  static readonly lightbringer: IEquipData = {
     primaryWeapons: [
       {
         id: 'hammer-1',
@@ -521,7 +521,7 @@ export class EquipData {
     ]
   };
 
-  public static readonly avenger: IEquipData = {
+  static readonly avenger: IEquipData = {
     primaryWeapons: [
       {
         id: 'sabre-1',
@@ -616,6 +616,104 @@ export class EquipData {
         strength: 2,
         intellect: 1,
         armor: 3,
+        will: 3,
+        isPassive: true
+      }
+    ]
+  };
+
+  static readonly navarch: IEquipData = {
+    primaryWeapons: [
+      {
+        id: 'kopis-1',
+        level: 1,
+        range: 1,
+        energyCost: 2,
+        physDamage: 1,
+        isPassive: false,
+        isUsed: false
+      },
+      {
+        id: 'kopis-2',
+        level: 2,
+        range: 1,
+        cost: 1,
+        energyCost: 2,
+        physDamage: 2,
+        strength: 1,
+        isPassive: false,
+        isUsed: false
+      },
+      {
+        id: 'kopis-3',
+        level: 3,
+        range: 1,
+        cost: 1,
+        energyCost: 2,
+        physDamage: 3,
+        strength: 2,
+        isPassive: false,
+        isUsed: false
+      }
+    ],
+    secondaryWeapons: [
+      {
+        id: 'gun-1',
+        level: 1,
+        range: 3,
+        energyCost: 3,
+        directDamage: 1,
+        isPassive: false,
+        isUsed: false
+      },
+      {
+        id: 'gun-2',
+        level: 2,
+        range: 3,
+        cost: 1,
+        energyCost: 3,
+        directDamage: 1,
+        will: 1,
+        mind: 1,
+        isPassive: false,
+        isUsed: false
+      },
+      {
+        id: 'gun-3',
+        level: 3,
+        range: 3,
+        cost: 1,
+        energyCost: 2,
+        directDamage: 1,
+        will: 2,
+        mind: 1,
+        isPassive: false,
+        isUsed: false
+      }
+    ],
+    chestpieces: [
+      {
+        id: 'armor-1',
+        level: 1,
+        armor: 2,
+        will: 1,
+        isPassive: true
+      },
+      {
+        id: 'armor-2',
+        level: 2,
+        cost: 1,
+        strength: 1,
+        armor: 3,
+        will: 2,
+        isPassive: true
+      },
+      {
+        id: 'armor-3',
+        level: 3,
+        cost: 1,
+        strength: 2,
+        armor: 4,
         will: 3,
         isPassive: true
       }

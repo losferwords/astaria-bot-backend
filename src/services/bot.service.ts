@@ -6,7 +6,6 @@ import { IAction } from '../interfaces/IAction';
 import { IBattle } from '../interfaces/IBattle';
 import { BattleService } from './battle.service';
 import { ITeam } from 'src/interfaces/ITeam';
-import { HeroService } from './hero.service';
 import { IPosition } from 'src/interfaces/IPosition';
 import { LogMessageType } from 'src/enums/log-message-type.enum';
 import { ReportService } from './report.service';
@@ -23,6 +22,8 @@ import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import { AxiosResponse } from 'axios';
 import { ISimplifiedBotNode } from 'src/interfaces/backend-side-only/ISimplifiedBotNode';
+import CharHelper from 'src/helpers/char.helper';
+import BattleHelper from 'src/helpers/battle.helper';
 
 interface Statistic {
   sims: number;
@@ -38,7 +39,6 @@ export class BotService {
 
   constructor(
     private battleService: BattleService,
-    private heroService: HeroService,
     private reportService: ReportService,
     private abilityService: AbilityService,
     private readonly httpService: HttpService
@@ -72,12 +72,11 @@ export class BotService {
         return this.battleService.useWeapon(battle, action.tr, action.e, isSimulation);
       case ActionType.ABILITY:
       case ActionType.PET_ABILITY:
-        const heroes = this.battleService.getHeroesInBattle(battle);
-        const activeHero: IHero = this.heroService.getHeroById(battle.queue[0], heroes);
+        const heroes = BattleHelper.getHeroesInBattle(battle);
+        const activeHero: IHero = CharHelper.getHeroById(battle.queue[0], heroes);
         let activeChar: IChar = activeHero;
-        const target: IChar =
-          activeChar.id === action.tr ? activeChar : this.heroService.getCharById(action.tr, heroes);
-        let ability: IAbility = this.heroService.getHeroAbilityById(activeHero, action.a);
+        const target: IChar = activeChar.id === action.tr ? activeChar : CharHelper.getCharById(action.tr, heroes);
+        let ability: IAbility = CharHelper.getHeroAbilityById(activeHero, action.a);
 
         // Maybe it is a pet ability
         if (!ability) {
@@ -124,7 +123,7 @@ export class BotService {
       return firstActionFromChain;
     }
 
-    const unexpandedActions = this.battleService.getAvailableActions(state, []);
+    const unexpandedActions = BattleHelper.getAvailableActions(state, []);
     if (unexpandedActions.length === 1) {
       return unexpandedActions[0];
     }
@@ -278,8 +277,8 @@ export class BotService {
     const nodes = new Map<string, BotNode>();
 
     if (!isExternalServer) {
-      const heroes = this.battleService.getHeroesInBattle(state);
-      const activeHero = this.heroService.getHeroById(state.queue[0], heroes);
+      const heroes = BattleHelper.getHeroesInBattle(state);
+      const activeHero = CharHelper.getHeroById(state.queue[0], heroes);
       state.log = [
         {
           t: LogMessageType.TURN_START,
@@ -293,7 +292,7 @@ export class BotService {
     const stateHash = this.getStateHash(state);
 
     nodes.set(stateHash, rootNode);
-    const currentTeamId = this.heroService.getTeamByHeroId(state.queue[0], state.teams).id;
+    const currentTeamId = CharHelper.getTeamByHeroId(state.queue[0], state.teams).id;
 
     const end = Date.now() + Const.botThinkTime;
     const simulationTime: number[] = [];
@@ -354,7 +353,7 @@ export class BotService {
       const actions = node.allActions();
       let bestAction: IAction;
       let bestUCB1 = -Infinity;
-      const isAllyTurn = this.heroService.getTeamByHeroId(node.state.queue[0], node.state.teams).id === currentTeamId;
+      const isAllyTurn = CharHelper.getTeamByHeroId(node.state.queue[0], node.state.teams).id === currentTeamId;
       // For ally moves we select action by UCB1 algorithm
       // For enemy we just pick random action to check to avoid too optimistic decisions
       if (isAllyTurn) {
@@ -382,7 +381,7 @@ export class BotService {
     this.doAction(newState, randomAction, true);
 
     const previousMoves = this.getPreviousMoves(newState);
-    const childUnexpandedActions = this.battleService.getAvailableActions(newState, previousMoves);
+    const childUnexpandedActions = BattleHelper.getAvailableActions(newState, previousMoves);
     const childNode = node.expand(randomAction, newState, childUnexpandedActions);
     nodes.set(this.getStateHash(newState), childNode);
     return childNode;
@@ -396,7 +395,7 @@ export class BotService {
     while (winner === null) {
       chainLength += 1;
       const previousMoves = this.getPreviousMoves(state);
-      const actions = this.battleService.getAvailableActions(state, previousMoves);
+      const actions = BattleHelper.getAvailableActions(state, previousMoves);
       const actionIndex = actions.length === 1 ? 0 : Helper.randomInt(0, actions.length - 1);
       const randomAction = actions[actionIndex];
 
@@ -543,8 +542,8 @@ export class BotService {
     let maxSims = 0;
     let minSims = 10000000;
 
-    const heroes = this.battleService.getHeroesInBattle(state);
-    const activeHero = this.heroService.getHeroById(state.queue[0], heroes);
+    const heroes = BattleHelper.getHeroesInBattle(state);
+    const activeHero = CharHelper.getHeroById(state.queue[0], heroes);
 
     for (const action of allActions) {
       const childNode = node.childNode(action);

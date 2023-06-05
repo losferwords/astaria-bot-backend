@@ -6,10 +6,10 @@ import { ArenaOfAcheos1x1x1x1 } from 'src/models/scenarios/arena-of-acheos-1x1x1
 import { ArenaOfAcheos2x2 } from 'src/models/scenarios/arena-of-acheos-2x2';
 
 export class Const {
-  public static startCrystals = 0;
-  public static maxCrystalsBeforeOverload = 2;
-  public static moveEnergyCost = 3;
-  public static scenarios = [
+  static startCrystals = 0;
+  static maxCrystalsBeforeOverload = 2;
+  static moveEnergyCost = 3;
+  static scenarios = [
     ChthonRuins,
     ArchaeanTemple,
     ArenaOfAcheos1x1,
@@ -17,22 +17,32 @@ export class Const {
     ArenaOfAcheos1x1x1x1,
     ArenaOfAcheos2x2
   ];
-  public static moveOrder = ['avenger', 'oracle', 'shadow', 'avatar', 'paragon', 'druid', 'highlander', 'lightbringer'];
-  public static maxPrimaryAttributes = 10;
-  public static maxSecondaryAttributes = 4;
-  public static rayTracePrecision = 8;
-  public static reportsPath = './reports';
-  public static statisticsFilePath = './reports/statistics';
-  public static mctsTreeReportPath = './tree-observer/mcts-trees';
-  public static explorationParameter = 2;
-  public static botThinkTime = 120000;
-  public static maxChainLength = 500;
-  public static obviousMoveMinSims = 10000;
-  public static obviousMoveRatio = 0.95;
-  public static numberOfServers = 1;
-  public static maxNumberOfNodesForInternalServer = 200000;
-  public static maxNumberOfNodesForExternalServer = 100000;
-  public static reportSortingArray = [
+  static moveOrder = [
+    'avenger',
+    'oracle',
+    'navarch',
+    'shadow',
+    'avatar',
+    'paragon',
+    'druid',
+    'highlander',
+    'lightbringer'
+  ];
+  static maxPrimaryAttributes = 10;
+  static maxSecondaryAttributes = 4;
+  static rayTracePrecision = 8;
+  static reportsPath = './reports';
+  static statisticsFilePath = './reports/statistics';
+  static mctsTreeReportPath = './tree-observer/mcts-trees';
+  static explorationParameter = 2;
+  static botThinkTime = 120000;
+  static maxChainLength = 500;
+  static obviousMoveMinSims = 10000;
+  static obviousMoveRatio = 0.95;
+  static numberOfServers = 1;
+  static maxNumberOfNodesForInternalServer = 200000;
+  static maxNumberOfNodesForExternalServer = 100000;
+  static reportSortingArray = [
     'paragon',
     'highlander',
     'druid',
@@ -44,11 +54,11 @@ export class Const {
   ];
 
   // Logs
-  public static treeBuild = false;
-  public static simulationInfo = true;
-  public static simulationTimeInfo = false;
-  public static memoryInfo = false;
-  public static maxChainInfo = false;
-  public static bestNodesInfo = false;
-  public static obviousMoveInfo = false;
+  static treeBuild = false;
+  static simulationInfo = true;
+  static simulationTimeInfo = false;
+  static memoryInfo = false;
+  static maxChainInfo = false;
+  static bestNodesInfo = false;
+  static obviousMoveInfo = false;
 }

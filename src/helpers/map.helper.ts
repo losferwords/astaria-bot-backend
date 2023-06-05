@@ -1,4 +1,3 @@
-import { Injectable } from '@nestjs/common';
 import { TileType } from 'src/enums/tile-type.enum';
 import { IChar } from 'src/interfaces/IChar';
 import { IHero } from 'src/interfaces/IHero';
@@ -6,9 +5,8 @@ import { IPosition } from 'src/interfaces/IPosition';
 import { ITile } from 'src/interfaces/ITile';
 import { Const } from 'src/static/const';
 
-@Injectable()
-export class MapService {
-  findNearestPoints(position: IPosition, tiles: ITile[][], radius: number): IPosition[] {
+export default class MapHelper {
+  static findNearestPoints(position: IPosition, tiles: ITile[][], radius: number): IPosition[] {
     const points = [];
     for (let i = -radius; i <= radius; i++) {
       if (position.x + i >= 0 && position.x + i < tiles[0].length) {
@@ -22,7 +20,7 @@ export class MapService {
     return points;
   }
 
-  rayTrace(startCoordinates: IPosition, endCoordinates: IPosition, tiles: ITile[][], heroes: IHero[]): boolean {
+  static rayTrace(startCoordinates: IPosition, endCoordinates: IPosition, tiles: ITile[][], heroes: IHero[]): boolean {
     const coordinatesArray = [];
     const tileSize = Const.rayTracePrecision;
 
@@ -75,7 +73,12 @@ export class MapService {
     return false;
   }
 
-  checkTileForObstacle(position: IPosition, tiles: ITile[][], heroes: IHero[], ignoreObstacles?: boolean): boolean {
+  private static checkTileForObstacle(
+    position: IPosition,
+    tiles: ITile[][],
+    heroes: IHero[],
+    ignoreObstacles?: boolean
+  ): boolean {
     if (
       tiles[position.y] &&
       tiles[position.y][position.x] &&
@@ -100,7 +103,7 @@ export class MapService {
     }
   }
 
-  getMovePoints(
+  static getMovePoints(
     activeHeroPosition: IPosition,
     radius = 1,
     tiles: ITile[][],
@@ -126,7 +129,7 @@ export class MapService {
     return availablePoints;
   }
 
-  knockBack(target: IChar, charPosition: IPosition, tiles: ITile[][], heroes: IHero[]) {
+  static knockBack(target: IChar, charPosition: IPosition, tiles: ITile[][], heroes: IHero[]) {
     const direction: IPosition = { x: 0, y: 0 };
 
     if (charPosition.x < target.position.x) {
@@ -155,7 +158,7 @@ export class MapService {
     }
   }
 
-  attraction(target: IChar, charPosition: IPosition, tiles: ITile[][], heroes: IHero[]) {
+  static attraction(target: IChar, charPosition: IPosition, tiles: ITile[][], heroes: IHero[]) {
     const direction: IPosition = { x: 0, y: 0 };
 
     if (charPosition.x < target.position.x) {
@@ -184,7 +187,7 @@ export class MapService {
     }
   }
 
-  charge(targetPosition: IPosition, char: IChar, tiles: ITile[][], heroes: IHero[]) {
+  static charge(targetPosition: IPosition, char: IChar, tiles: ITile[][], heroes: IHero[]) {
     const direction: IPosition = { x: 0, y: 0 };
 
     if (char.position.x < targetPosition.x) {

@@ -1,4 +1,3 @@
-import { Injectable } from '@nestjs/common';
 import { LogMessageType } from 'src/enums/log-message-type.enum';
 import { IAbility } from 'src/interfaces/IAbility';
 import { IBattle } from 'src/interfaces/IBattle';
@@ -13,9 +12,8 @@ import { Const } from 'src/static/const';
 import { Helper } from 'src/static/helper';
 import { HeroesData } from 'src/static/heroes-data';
 
-@Injectable()
-export class HeroService {
-  spendEnergy(hero: IHero, value: number) {
+export default class CharHelper {
+  static spendEnergy(hero: IHero, value: number) {
     if (hero.energy - value > 0) {
       hero.energy -= value;
     } else {
@@ -23,7 +21,7 @@ export class HeroService {
     }
   }
 
-  spendMana(hero: IHero, value: number) {
+  static spendMana(hero: IHero, value: number) {
     if (hero.mana - value > 0) {
       hero.mana -= value;
     } else {
@@ -31,7 +29,7 @@ export class HeroService {
     }
   }
 
-  takeEnergy(hero: IHero, value: number) {
+  static takeEnergy(hero: IHero, value: number) {
     if (hero.energy + value <= hero.maxEnergy) {
       hero.energy = hero.energy + value;
     } else {
@@ -39,7 +37,7 @@ export class HeroService {
     }
   }
 
-  takeMana(hero: IHero, value: number) {
+  static takeMana(hero: IHero, value: number) {
     if (hero.mana + value <= hero.maxMana) {
       hero.mana = hero.mana + value;
     } else {
@@ -47,7 +45,7 @@ export class HeroService {
     }
   }
 
-  setRandomHeroes(teamSetup) {
+  static setRandomHeroes(teamSetup) {
     const availableHeroes = [...Const.moveOrder];
     const randomHeroes = [];
     for (let i = 0; i < teamSetup.length; i++) {
@@ -68,7 +66,7 @@ export class HeroService {
     }
   }
 
-  canMove(char: IChar, isPet?: boolean): boolean {
+  static canMove(char: IChar, isPet?: boolean): boolean {
     if (!char) {
       return false;
     }
@@ -79,7 +77,7 @@ export class HeroService {
     }
   }
 
-  canUseWeapon(hero: IHero, weapon: IEquip): boolean {
+  static canUseWeapon(hero: IHero, weapon: IEquip): boolean {
     return (
       hero.energy - (weapon.energyCost + hero.extraWeaponEnergyCost) >= 0 &&
       (!hero.isDisarmed || hero.isImmuneToDisarm) &&
@@ -88,13 +86,13 @@ export class HeroService {
     );
   }
 
-  getHeroById(heroId: string, heroes: IHero[]): IHero {
+  static getHeroById(heroId: string, heroes: IHero[]): IHero {
     return heroes.find((hero: IHero) => {
       return hero.id === heroId;
     });
   }
 
-  getCharById(charId: string, heroes: IHero[]): IChar {
+  static getCharById(charId: string, heroes: IHero[]): IChar {
     for (let i = 0; i < heroes.length; i++) {
       if (heroes[i].id === charId) {
         return heroes[i];
@@ -108,7 +106,7 @@ export class HeroService {
     return undefined;
   }
 
-  getTeamByHeroId(heroId: string, teams: ITeam[]): ITeam {
+  static getTeamByHeroId(heroId: string, teams: ITeam[]): ITeam {
     return teams.find((team: ITeam) => {
       return team.heroes.find((hero: IHero) => {
         return hero.id === heroId;
@@ -116,7 +114,7 @@ export class HeroService {
     });
   }
 
-  getTeamByCharId(charId: string, teams: ITeam[]): ITeam {
+  static getTeamByCharId(charId: string, teams: ITeam[]): ITeam {
     return teams.find((team: ITeam) => {
       return team.heroes.find((hero: IHero) => {
         return hero.id === charId || hero.pets.find((p) => p.id === charId);
@@ -124,7 +122,7 @@ export class HeroService {
     });
   }
 
-  getHeroAbilityById(hero: IHero, abilityId: string) {
+  static getHeroAbilityById(hero: IHero, abilityId: string) {
     for (let i = 0; i < hero.abilities.length; i++) {
       if (hero.abilities[i].id === abilityId) {
         return hero.abilities[i];
@@ -132,7 +130,7 @@ export class HeroService {
     }
   }
 
-  getCharEffectById(char: IChar, effectId: string) {
+  static getCharEffectById(char: IChar, effectId: string) {
     for (let i = 0; i < char.effects.length; i++) {
       if (char.effects[i].id === effectId) {
         return char.effects[i];
@@ -140,7 +138,7 @@ export class HeroService {
     }
   }
 
-  getHeroData(heroId: string): IHeroData {
+  static getHeroData(heroId: string): IHeroData {
     const primaryWeapons: IEquip[] = [];
     for (let i = 0; i < HeroesData[heroId].primaryWeapons.length; i++) {
       primaryWeapons.push(Object.assign({}, HeroesData[heroId].primaryWeapons[i]));
@@ -178,7 +176,7 @@ export class HeroService {
     return heroData;
   }
 
-  calcHero(hero: IHero): IHero {
+  static calcHero(battle: IBattle, hero: IHero): IHero {
     hero.strength =
       (hero.primaryWeapon.strength ? hero.primaryWeapon.strength : 0) +
       (hero.secondaryWeapon?.strength ? hero.secondaryWeapon.strength : 0) +
@@ -225,10 +223,19 @@ export class HeroService {
       hero.primaryWeapon.range = 2;
     }
 
+    // if (
+    //   hero.id === 'navarch' &&
+    //   this.getHeroAbilityById(hero, '11-duelist') &&
+    //   BattleHelper.findEnemies(battle, hero.id, 1, false, '', false, false)
+    // ) {
+    //   hero.strength += 2;
+    //   hero.armor += 2;
+    // }
+
     return hero;
   }
 
-  resetHeroState(hero: IHero) {
+  static resetHeroState(hero: IHero) {
     hero.moveEnergyCost = Const.moveEnergyCost;
     hero.extraWeaponEnergyCost = 0;
     hero.isInvisible = false;
@@ -251,7 +258,7 @@ export class HeroService {
     }
   }
 
-  resetPetState(pet: IPet) {
+  static resetPetState(pet: IPet) {
     pet.regeneration = 0;
     pet.isStunned = false;
     pet.isDisarmed = false;
@@ -262,7 +269,7 @@ export class HeroService {
     pet.isImmuneToDisarm = false;
   }
 
-  normalizeCharStats(char: IChar) {
+  static normalizeCharStats(char: IChar) {
     if (!char.isPet) {
       if ((char as IHero).strength < 0) {
         (char as IHero).strength = 0;
@@ -311,7 +318,7 @@ export class HeroService {
     }
   }
 
-  moveChar(activeChar: IChar, position: IPosition, isPet: boolean): void {
+  static moveChar(activeChar: IChar, position: IPosition, isPet: boolean): void {
     activeChar.position.x = position.x;
     activeChar.position.y = position.y;
     if (!isPet) {
@@ -321,7 +328,7 @@ export class HeroService {
     }
   }
 
-  upgradeEquip(battle: IBattle, heroes: IHero[], equipId: string): void {
+  static upgradeEquip(battle: IBattle, heroes: IHero[], equipId: string): void {
     let activeHero = this.getHeroById(battle.queue[0], heroes);
     const team = this.getTeamByHeroId(activeHero.id, battle.teams);
     if (team.crystals > 0 || activeHero.crystals > 0) {
@@ -356,7 +363,7 @@ export class HeroService {
         return;
       }
 
-      activeHero = this.calcHero(activeHero);
+      activeHero = this.calcHero(battle, activeHero);
 
       if (team.crystals > 0) {
         team.crystals -= 1;
@@ -366,7 +373,7 @@ export class HeroService {
     }
   }
 
-  learnAbility(battle: IBattle, heroes: IHero[], abilityId: string): void {
+  static learnAbility(battle: IBattle, heroes: IHero[], abilityId: string): void {
     const activeHero = this.getHeroById(battle.queue[0], heroes);
     const team = this.getTeamByHeroId(activeHero.id, battle.teams);
     if (activeHero.abilities.length === 0 || team.crystals > 0 || activeHero.crystals > 0) {

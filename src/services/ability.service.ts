@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { HeroService } from './hero.service';
 import { IAbility } from 'src/interfaces/IAbility';
 import { IHero } from 'src/interfaces/IHero';
 import { IBattle } from 'src/interfaces/IBattle';
@@ -11,10 +10,12 @@ import { BattleService } from './battle.service';
 import { Pet } from 'src/models/Pet';
 import { IChar } from 'src/interfaces/IChar';
 import { IPet } from 'src/interfaces/IPet';
+import CharHelper from 'src/helpers/char.helper';
+import BattleHelper from 'src/helpers/battle.helper';
 
 @Injectable()
 export class AbilityService {
-  constructor(private heroService: HeroService, private battleService: BattleService) {}
+  constructor(private battleService: BattleService) {}
 
   addEffect(
     battle: IBattle,
@@ -43,7 +44,7 @@ export class AbilityService {
     return effect;
   }
 
-  private spendResouces(
+  private spendResources(
     battle: IBattle,
     heroes: IHero[],
     ability: IAbility,
@@ -52,19 +53,17 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ) {
-    if (this.heroService.getCharEffectById(caster, '32-elements-control')) {
+    if (CharHelper.getCharEffectById(caster, '32-elements-control')) {
       for (let i = caster.effects.length - 1; i >= 0; i--) {
         if (caster.effects[i].id === '32-elements-control') {
           caster.effects.splice(i, 1);
           break;
         }
       }
-      this.heroService.resetHeroState(caster);
-      this.heroService.calcHero(caster);
-      this.battleService.applyCharEffects(battle, heroes, caster, false, isSimulation);
+      this.battleService.recalculateChar(battle, heroes, caster, false, isSimulation);
     } else {
-      this.heroService.spendEnergy(caster, ability.energyCost);
-      this.heroService.spendMana(caster, ability.manaCost);
+      CharHelper.spendEnergy(caster, ability.energyCost);
+      CharHelper.spendMana(caster, ability.manaCost);
     }
 
     ability.left = ability.cd;
@@ -92,7 +91,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -116,7 +115,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -140,7 +139,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -161,7 +160,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -185,7 +184,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -206,7 +205,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charge(battle, heroes, target.position, caster, isSimulation);
 
@@ -230,7 +229,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -245,8 +244,8 @@ export class AbilityService {
       }
     }
 
-    this.heroService.resetHeroState(target as IHero);
-    this.heroService.calcHero(target as IHero);
+    CharHelper.resetHeroState(target as IHero);
+    CharHelper.calcHero(battle, target as IHero);
     this.battleService.applyCharEffects(battle, heroes, target, false, isSimulation);
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -261,7 +260,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     target.health += 3;
 
@@ -287,7 +286,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -311,7 +310,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -340,7 +339,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -373,7 +372,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -397,7 +396,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -418,14 +417,14 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
-    const enemies = this.battleService.findEnemies(battle, caster.id, 2, true, ability.id, false, false);
+    const enemies = BattleHelper.findEnemies(battle, caster.id, 2, true, ability.id, false, false);
     for (let i = 0; i < enemies.length; i++) {
       if (caster.isDead) {
         return;
       }
-      const enemyChar = this.heroService.getCharById(enemies[i], heroes);
+      const enemyChar = CharHelper.getCharById(enemies[i], heroes);
       this.battleService.charTakesDamage({
         battle,
         caster,
@@ -447,7 +446,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -462,8 +461,8 @@ export class AbilityService {
       }
     }
 
-    this.heroService.resetHeroState(target as IHero);
-    this.heroService.calcHero(target as IHero);
+    CharHelper.resetHeroState(target as IHero);
+    CharHelper.calcHero(battle, target as IHero);
     this.battleService.applyCharEffects(battle, heroes, target, false, isSimulation);
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
@@ -478,7 +477,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -506,7 +505,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -530,7 +529,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -555,7 +554,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -577,7 +576,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -606,14 +605,14 @@ export class AbilityService {
         v: '4'
       });
 
-      this.heroService.takeMana(caster as IHero, 4);
+      CharHelper.takeMana(caster as IHero, 4);
       battle.log.push({
         id: caster.id,
         t: LogMessageType.TAKE_MANA,
         v: '4'
       });
 
-      this.heroService.takeEnergy(caster as IHero, 4);
+      CharHelper.takeEnergy(caster as IHero, 4);
       battle.log.push({
         id: caster.id,
         t: LogMessageType.TAKE_ENERGY,
@@ -633,7 +632,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -654,22 +653,13 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
-    const aoeEnemies = this.battleService.findEnemies(
-      battle,
-      caster.id,
-      2,
-      true,
-      ability.id,
-      false,
-      false,
-      target.position
-    );
+    const aoeEnemies = BattleHelper.findEnemies(battle, caster.id, 2, true, ability.id, false, false, target.position);
 
     for (let i = 0; i < aoeEnemies.length; i++) {
       if (aoeEnemies[i] !== target.id) {
-        const aoeEnemiesChar = this.heroService.getCharById(aoeEnemies[i], heroes);
+        const aoeEnemiesChar = CharHelper.getCharById(aoeEnemies[i], heroes);
         this.battleService.charTakesDamage({
           battle,
           caster,
@@ -703,7 +693,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -727,7 +717,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -751,7 +741,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     target.health += 1;
 
@@ -779,7 +769,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -803,7 +793,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.PET_SUMMON,
@@ -831,7 +821,7 @@ export class AbilityService {
 
     let abilityDamage = 5;
 
-    if (this.heroService.getCharEffectById(caster, '33-power-of-the-pack')) {
+    if (CharHelper.getCharEffectById(caster, '33-power-of-the-pack')) {
       abilityDamage += 4;
     }
 
@@ -855,7 +845,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     target.health += 2;
 
@@ -883,7 +873,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -907,7 +897,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -937,11 +927,11 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
-    const enemies = this.battleService.findEnemies(battle, caster.id, 3, true, ability.id, false, false);
+    const enemies = BattleHelper.findEnemies(battle, caster.id, 3, true, ability.id, false, false);
     for (let i = 0; i < enemies.length; i++) {
-      const enemyChar = this.heroService.getCharById(enemies[i], heroes);
+      const enemyChar = CharHelper.getCharById(enemies[i], heroes);
       this.battleService.charTakesDamage({
         battle,
         caster,
@@ -968,7 +958,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.PET_SUMMON,
@@ -996,7 +986,7 @@ export class AbilityService {
 
     let abilityDamage = 7;
 
-    if (this.heroService.getCharEffectById(caster, '33-power-of-the-pack')) {
+    if (CharHelper.getCharEffectById(caster, '33-power-of-the-pack')) {
       abilityDamage += 4;
     }
 
@@ -1011,7 +1001,7 @@ export class AbilityService {
     });
 
     if (!target.isPet) {
-      this.heroService.spendMana(target as IHero, 2);
+      CharHelper.spendMana(target as IHero, 2);
     }
   }
 
@@ -1024,7 +1014,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     target.health += 6;
 
@@ -1067,7 +1057,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -1095,7 +1085,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -1117,7 +1107,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
     let leftCounter = 0;
 
     if (target.isPet) {
@@ -1148,7 +1138,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     let hasPostEffects = false;
     for (let i = target.effects.length - 1; i >= 0; i--) {
@@ -1164,23 +1154,14 @@ export class AbilityService {
 
     if (hasPostEffects) {
       for (let i = 0; i < heroes.length; i++) {
-        this.heroService.resetHeroState(heroes[i]);
-        this.heroService.calcHero(heroes[i]);
-        this.battleService.applyCharEffects(battle, heroes, heroes[i], false, isSimulation);
+        this.battleService.recalculateChar(battle, heroes, heroes[i], false, isSimulation);
 
         for (let j = 0; j < heroes[i].pets.length; j++) {
-          this.heroService.resetPetState(heroes[i].pets[j]);
-          this.battleService.applyCharEffects(battle, heroes, heroes[i].pets[j], false, isSimulation);
+          this.battleService.recalculateChar(battle, heroes, heroes[i].pets[j], false, isSimulation);
         }
       }
     } else {
-      if (target.isPet) {
-        this.heroService.resetPetState(target as IPet);
-      } else {
-        this.heroService.resetHeroState(target as IHero);
-        this.heroService.calcHero(target as IHero);
-      }
-      this.battleService.applyCharEffects(battle, heroes, target, false, isSimulation);
+      this.battleService.recalculateChar(battle, heroes, target, false, isSimulation);
     }
 
     this.battleService.applyMapEffects(battle, heroes, false, isSimulation);
@@ -1202,7 +1183,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -1226,7 +1207,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -1238,7 +1219,7 @@ export class AbilityService {
       isSimulation
     });
 
-    this.heroService.spendMana(caster, Math.ceil(caster.mana / 2));
+    CharHelper.spendMana(caster, Math.ceil(caster.mana / 2));
   }
 
   '32-teleportation'(
@@ -1250,7 +1231,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     caster.health += 2;
     if (caster.health > caster.maxHealth) {
@@ -1288,7 +1269,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -1312,7 +1293,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -1339,7 +1320,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     const targetPositionX = target.position.x;
     const targetPositionY = target.position.y;
@@ -1357,7 +1338,7 @@ export class AbilityService {
       tr: target.id
     });
 
-    this.heroService.takeEnergy(caster, 1);
+    CharHelper.takeEnergy(caster, 1);
 
     caster.health += 1;
     if (caster.health > caster.maxHealth) {
@@ -1390,7 +1371,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -1415,7 +1396,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -1438,15 +1419,15 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charge(battle, heroes, target.position, caster, isSimulation);
 
-    const casterTeam = this.heroService.getTeamByHeroId(caster.id, battle.teams);
-    const targetTeam = this.heroService.getTeamByCharId(target.id, battle.teams);
+    const casterTeam = CharHelper.getTeamByHeroId(caster.id, battle.teams);
+    const targetTeam = CharHelper.getTeamByCharId(target.id, battle.teams);
 
     if (casterTeam.id === targetTeam.id) {
-      this.heroService.takeEnergy(caster, 3);
+      CharHelper.takeEnergy(caster, 3);
       battle.log.push({
         t: LogMessageType.ABILITY_CAST,
         c: caster.id,
@@ -1475,7 +1456,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -1499,7 +1480,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     target.health += 6;
 
@@ -1527,7 +1508,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -1551,7 +1532,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -1575,7 +1556,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -1596,22 +1577,13 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
-    const aoeEnemies = this.battleService.findEnemies(
-      battle,
-      caster.id,
-      1,
-      true,
-      ability.id,
-      false,
-      false,
-      target.position
-    );
+    const aoeEnemies = BattleHelper.findEnemies(battle, caster.id, 1, true, ability.id, false, false, target.position);
 
     for (let i = 0; i < aoeEnemies.length; i++) {
       if (aoeEnemies[i] !== target.id) {
-        const aoeEnemiesChar = this.heroService.getCharById(aoeEnemies[i], heroes);
+        const aoeEnemiesChar = CharHelper.getCharById(aoeEnemies[i], heroes);
         this.battleService.charTakesDamage({
           battle,
           caster,
@@ -1644,7 +1616,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -1665,7 +1637,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.PET_SUMMON,
@@ -1693,24 +1665,15 @@ export class AbilityService {
 
     let abilityDamage = 6;
 
-    if (this.heroService.getCharEffectById(caster, '33-power-of-the-pack')) {
+    if (CharHelper.getCharEffectById(caster, '33-power-of-the-pack')) {
       abilityDamage += 4;
     }
 
-    const aoeEnemies = this.battleService.findEnemies(
-      battle,
-      caster.id,
-      1,
-      true,
-      ability.id,
-      false,
-      false,
-      target.position
-    );
+    const aoeEnemies = BattleHelper.findEnemies(battle, caster.id, 1, true, ability.id, false, false, target.position);
 
     for (let i = 0; i < aoeEnemies.length; i++) {
       if (aoeEnemies[i] !== target.id) {
-        const aoeEnemiesChar = this.heroService.getCharById(aoeEnemies[i], heroes);
+        const aoeEnemiesChar = CharHelper.getCharById(aoeEnemies[i], heroes);
         this.battleService.charTakesDamage({
           battle,
           caster,
@@ -1743,7 +1706,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -1771,7 +1734,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -1793,7 +1756,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -1821,7 +1784,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -1845,7 +1808,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -1866,7 +1829,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -1891,7 +1854,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -1915,14 +1878,14 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
-    const enemies = this.battleService.findEnemies(battle, caster.id, 3, true, ability.id, false, false);
+    const enemies = BattleHelper.findEnemies(battle, caster.id, 3, true, ability.id, false, false);
     for (let i = 0; i < enemies.length; i++) {
       if (caster.isDead) {
         return;
       }
-      const enemyHero = this.heroService.getCharById(enemies[i], heroes);
+      const enemyHero = CharHelper.getCharById(enemies[i], heroes);
       this.battleService.charTakesDamage({
         battle,
         caster,
@@ -1944,7 +1907,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -1965,7 +1928,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -1983,7 +1946,7 @@ export class AbilityService {
     }
 
     if (!target.isPet) {
-      this.heroService.spendMana(target as IHero, 2);
+      CharHelper.spendMana(target as IHero, 2);
     }
   }
 
@@ -1996,7 +1959,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -2018,7 +1981,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.PET_SUMMON,
@@ -2044,11 +2007,11 @@ export class AbilityService {
   ): void {
     ability.left = ability.cd;
 
-    const shadow = this.heroService.getHeroById('shadow', heroes);
+    const shadow = CharHelper.getHeroById('shadow', heroes);
 
     let abilityDamage = shadow.primaryWeapon.physDamage + shadow.strength;
 
-    if (this.heroService.getCharEffectById(caster, '33-power-of-the-pack')) {
+    if (CharHelper.getCharEffectById(caster, '33-power-of-the-pack')) {
       abilityDamage += 4;
     }
 
@@ -2072,7 +2035,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -2097,7 +2060,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -2119,7 +2082,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -2134,9 +2097,9 @@ export class AbilityService {
 
     this.battleService.afterMoveChar(battle, heroes, caster, isSimulation);
 
-    const allies = this.battleService.findAllies(battle, caster.id, 2, true, true, true, false);
+    const allies = BattleHelper.findAllies(battle, caster.id, 2, true, true, true, false);
     for (let i = 0; i < allies.length; i++) {
-      const allyChar = this.heroService.getCharById(allies[i], heroes);
+      const allyChar = CharHelper.getCharById(allies[i], heroes);
       if (allyChar.health < allyChar.maxHealth) {
         allyChar.health += 2;
 
@@ -2164,10 +2127,10 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
-    const casterTeam = this.heroService.getTeamByHeroId(caster.id, battle.teams);
-    const targetTeam = this.heroService.getTeamByCharId(target.id, battle.teams);
+    const casterTeam = CharHelper.getTeamByHeroId(caster.id, battle.teams);
+    const targetTeam = CharHelper.getTeamByCharId(target.id, battle.teams);
 
     if (casterTeam.id === targetTeam.id) {
       target.health += 2;
@@ -2205,7 +2168,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     const healthDamage = this.battleService.charTakesDamage({
       battle,
@@ -2244,7 +2207,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -2265,7 +2228,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -2274,8 +2237,8 @@ export class AbilityService {
       a: ability.id
     });
 
-    const casterTeam = this.heroService.getTeamByHeroId(caster.id, battle.teams);
-    const targetTeam = this.heroService.getTeamByCharId(target.id, battle.teams);
+    const casterTeam = CharHelper.getTeamByHeroId(caster.id, battle.teams);
+    const targetTeam = CharHelper.getTeamByCharId(target.id, battle.teams);
     let effectsRemoved = 0;
 
     for (let i = target.effects.length - 1; i > -1; i--) {
@@ -2295,10 +2258,10 @@ export class AbilityService {
     }
 
     if (!target.isPet) {
-      this.heroService.resetHeroState(target as IHero);
-      this.heroService.calcHero(target as IHero);
+      CharHelper.resetHeroState(target as IHero);
+      CharHelper.calcHero(battle, target as IHero);
     } else {
-      this.heroService.resetPetState(target as IPet);
+      CharHelper.resetPetState(target as IPet);
     }
     this.battleService.applyCharEffects(battle, heroes, target, false, isSimulation);
 
@@ -2328,7 +2291,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -2357,7 +2320,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -2378,11 +2341,11 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
-    const allies = this.battleService.findAllies(battle, caster.id, 3, true, true, true, false);
+    const allies = BattleHelper.findAllies(battle, caster.id, 3, true, true, true, false);
     for (let i = 0; i < allies.length; i++) {
-      const allyChar = this.heroService.getCharById(allies[i], heroes);
+      const allyChar = CharHelper.getCharById(allies[i], heroes);
       if (allyChar.health < allyChar.maxHealth) {
         allyChar.health += caster.intellect;
 
@@ -2411,7 +2374,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -2433,7 +2396,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -2455,7 +2418,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -2464,8 +2427,8 @@ export class AbilityService {
       a: ability.id
     });
 
-    this.heroService.takeEnergy(caster, 2);
-    this.heroService.takeMana(caster, 2);
+    CharHelper.takeEnergy(caster, 2);
+    CharHelper.takeMana(caster, 2);
 
     caster.health += 2;
 
@@ -2491,7 +2454,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -2513,7 +2476,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -2534,7 +2497,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -2558,9 +2521,9 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
-    const enemies = this.battleService.findEnemies(battle, caster.id, 1, true, ability.id, false, false);
+    const enemies = BattleHelper.findEnemies(battle, caster.id, 1, true, ability.id, false, false);
     if (enemies.length > 1) {
       ability.left = 0;
     }
@@ -2568,7 +2531,7 @@ export class AbilityService {
       if (caster.isDead) {
         return;
       }
-      const enemyChar = this.heroService.getCharById(enemies[i], heroes);
+      const enemyChar = CharHelper.getCharById(enemies[i], heroes);
       this.battleService.charTakesDamage({
         battle,
         caster,
@@ -2590,7 +2553,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -2617,7 +2580,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     this.battleService.charTakesDamage({
       battle,
@@ -2641,7 +2604,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -2662,7 +2625,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
@@ -2683,7 +2646,7 @@ export class AbilityService {
     position: IPosition,
     isSimulation: boolean
   ): void {
-    this.spendResouces(battle, heroes, ability, caster, target, position, isSimulation);
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
     caster.energy = caster.maxEnergy;
     caster.mana = caster.maxMana;
@@ -2702,6 +2665,223 @@ export class AbilityService {
       tr: caster.id,
       a: ability.id,
       v: '1'
+    });
+  }
+
+  '12-swift-reflexes'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): void {
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
+
+    battle.log.push({
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: target.id,
+      a: ability.id
+    });
+
+    this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
+  }
+
+  '13-reload'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): void {
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
+
+    battle.log.push({
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: caster.id,
+      a: ability.id
+    });
+
+    caster.secondaryWeapon.isUsed = false;
+  }
+
+  '21-boarding'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): void {
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
+
+    this.battleService.charge(battle, heroes, target.position, caster, isSimulation);
+
+    this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      physDamage: caster.primaryWeapon.physDamage,
+      directDamage: caster.secondaryWeapon.directDamage,
+      abilityId: ability.id,
+      isSimulation
+    });
+  }
+
+  '22-smoke-cloud'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): void {
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
+
+    battle.log.push({
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: caster.id,
+      a: ability.id
+    });
+
+    this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
+  }
+
+  '31-skillful-trick'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): void {
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
+
+    this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      physDamage: caster.primaryWeapon.physDamage + 3,
+      abilityId: ability.id,
+      isSimulation
+    });
+
+    this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
+  }
+
+  '32-shellback'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): void {
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
+
+    CharHelper.takeEnergy(caster, 4);
+
+    battle.log.push({
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: target.id,
+      a: ability.id
+    });
+
+    this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
+  }
+
+  '41-fortune'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): void {
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
+
+    battle.log.push({
+      t: LogMessageType.ABILITY_CAST,
+      c: caster.id,
+      tr: caster.id,
+      a: ability.id
+    });
+
+    caster.primaryWeapon.isUsed = false;
+
+    this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
+  }
+
+  '42-bomb-toss'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): void {
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
+
+    const aoeEnemies = BattleHelper.findEnemies(battle, caster.id, 1, true, ability.id, false, false, position);
+
+    for (let i = 0; i < aoeEnemies.length; i++) {
+      const aoeEnemiesChar = CharHelper.getCharById(aoeEnemies[i], heroes);
+      this.battleService.charTakesDamage({
+        battle,
+        caster,
+        heroes,
+        target: aoeEnemiesChar,
+        directDamage: 2,
+        abilityId: ability.id,
+        isSimulation
+      });
+
+      if (!aoeEnemiesChar || aoeEnemiesChar.health < 1) {
+        continue;
+      }
+      this.battleService.knockBack(battle, heroes, aoeEnemiesChar, position, isSimulation);
+    }
+  }
+
+  '43-piercing-shot'(
+    battle: IBattle,
+    heroes: IHero[],
+    ability: IAbility,
+    caster: IHero,
+    target: IChar,
+    position: IPosition,
+    isSimulation: boolean
+  ): void {
+    this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
+    let directDamage = caster.secondaryWeapon.directDamage;
+
+    if (CharHelper.getHeroAbilityById(caster, '33-gunslinger')) {
+      directDamage = directDamage + 1;
+    }
+
+    this.battleService.charTakesDamage({
+      battle,
+      caster,
+      heroes,
+      target,
+      directDamage,
+      abilityId: ability.id,
+      isSimulation
     });
   }
 }
