@@ -1074,7 +1074,7 @@ export class BattleService {
     battle: IBattle,
     caster: IChar,
     heroes: IHero[],
-    target: IChar,
+    target: IChar | undefined,
     value: number,
     weaponId: string,
     isSimulation: boolean
@@ -1082,7 +1082,7 @@ export class BattleService {
     this.checkPassiveAbilityTrigger('12-reflection', battle, caster, heroes, target, value, weaponId, isSimulation);
 
     // Удаляем Фортуну после получения урона
-    if (target.id === 'navarch' && value > 0 && CharHelper.getCharEffectById(target, '41-fortune')) {
+    if (target?.id === 'navarch' && value > 0 && CharHelper.getCharEffectById(target, '41-fortune')) {
       for (let i = target.effects.length - 1; i >= 0; i--) {
         if (target.effects[i].id === '41-fortune') {
           target.effects.splice(i, 1);
