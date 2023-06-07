@@ -176,7 +176,7 @@ export default class CharHelper {
     return heroData;
   }
 
-  static calcHero(battle: IBattle, hero: IHero): IHero {
+  static calcHero(hero: IHero) {
     hero.strength =
       (hero.primaryWeapon.strength ? hero.primaryWeapon.strength : 0) +
       (hero.secondaryWeapon?.strength ? hero.secondaryWeapon.strength : 0) +
@@ -222,17 +222,6 @@ export default class CharHelper {
     if (hero.id === 'druid' && this.getHeroAbilityById(hero, '32-war-tree')) {
       hero.primaryWeapon.range = 2;
     }
-
-    // if (
-    //   hero.id === 'navarch' &&
-    //   this.getHeroAbilityById(hero, '11-duelist') &&
-    //   BattleHelper.findEnemies(battle, hero.id, 1, false, '', false, false)
-    // ) {
-    //   hero.strength += 2;
-    //   hero.armor += 2;
-    // }
-
-    return hero;
   }
 
   static resetHeroState(hero: IHero) {
@@ -328,47 +317,47 @@ export default class CharHelper {
     }
   }
 
-  static upgradeEquip(battle: IBattle, heroes: IHero[], equipId: string): void {
-    let activeHero = this.getHeroById(battle.queue[0], heroes);
-    const team = this.getTeamByHeroId(activeHero.id, battle.teams);
-    if (team.crystals > 0 || activeHero.crystals > 0) {
-      const heroData = this.getHeroData(activeHero.id);
+  static upgradeEquip(battle: IBattle, hero: IHero, equipId: string): void {
+    const team = this.getTeamByHeroId(hero.id, battle.teams);
+    if (team.crystals > 0 || hero.crystals > 0) {
+      const heroData = this.getHeroData(hero.id);
 
-      if (activeHero.primaryWeapon.id === equipId && activeHero.primaryWeapon.level < 3) {
-        const primaryWeaponIsUsed = activeHero.primaryWeapon.isUsed;
-        activeHero.primaryWeapon = heroData.primaryWeapons[activeHero.primaryWeapon.level];
-        activeHero.primaryWeapon.isUsed = primaryWeaponIsUsed;
+      if (hero.primaryWeapon.id === equipId && hero.primaryWeapon.level < 3) {
+        const primaryWeaponIsUsed = hero.primaryWeapon.isUsed;
+        hero.primaryWeapon = heroData.primaryWeapons[hero.primaryWeapon.level];
+        hero.primaryWeapon.isUsed = primaryWeaponIsUsed;
         battle.log.push({
           t: LogMessageType.UPGRADE_EQUIP,
-          id: activeHero.id,
-          e: activeHero.primaryWeapon.id
+          id: hero.id,
+          e: hero.primaryWeapon.id
         });
-      } else if (activeHero.secondaryWeapon?.id === equipId && activeHero.secondaryWeapon?.level < 3) {
-        const secondaryWeaponIsUsed = activeHero.secondaryWeapon.isUsed;
-        activeHero.secondaryWeapon = heroData.secondaryWeapons[activeHero.secondaryWeapon.level];
-        activeHero.secondaryWeapon.isUsed = secondaryWeaponIsUsed;
+      } else if (hero.secondaryWeapon?.id === equipId && hero.secondaryWeapon?.level < 3) {
+        const secondaryWeaponIsUsed = hero.secondaryWeapon.isUsed;
+        hero.secondaryWeapon = heroData.secondaryWeapons[hero.secondaryWeapon.level];
+        hero.secondaryWeapon.isUsed = secondaryWeaponIsUsed;
         battle.log.push({
           t: LogMessageType.UPGRADE_EQUIP,
-          id: activeHero.id,
-          e: activeHero.secondaryWeapon.id
+          id: hero.id,
+          e: hero.secondaryWeapon.id
         });
-      } else if (activeHero.chestpiece.id === equipId && activeHero.chestpiece.level < 3) {
-        activeHero.chestpiece = heroData.chestpieces[activeHero.chestpiece.level];
+      } else if (hero.chestpiece.id === equipId && hero.chestpiece.level < 3) {
+        hero.chestpiece = heroData.chestpieces[hero.chestpiece.level];
         battle.log.push({
           t: LogMessageType.UPGRADE_EQUIP,
-          id: activeHero.id,
-          e: activeHero.chestpiece.id
+          id: hero.id,
+          e: hero.chestpiece.id
         });
       } else {
         return;
       }
 
-      activeHero = this.calcHero(battle, activeHero);
+      this.resetHeroState(hero);
+      this.calcHero(hero);
 
       if (team.crystals > 0) {
         team.crystals -= 1;
-      } else if (activeHero.crystals > 0) {
-        activeHero.crystals -= 1;
+      } else if (hero.crystals > 0) {
+        hero.crystals -= 1;
       }
     }
   }

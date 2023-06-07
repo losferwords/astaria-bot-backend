@@ -37,7 +37,7 @@ export class BattleService {
   recalculateChar(battle: IBattle, heroes: IHero[], char: IChar, isBeforeTurn: boolean, isSimulation: boolean) {
     if (!char.isPet) {
       CharHelper.resetHeroState(char as IHero);
-      CharHelper.calcHero(battle, char as IHero);
+      CharHelper.calcHero(char as IHero);
     } else {
       CharHelper.resetPetState(char as IPet);
     }
@@ -880,7 +880,7 @@ export class BattleService {
     const heroes = BattleHelper.getHeroesInBattle(battle);
     const activeHero = CharHelper.getHeroById(battle.queue[0], heroes);
 
-    CharHelper.upgradeEquip(battle, heroes, equipId);
+    CharHelper.upgradeEquip(battle, activeHero, equipId);
     this.applyCharEffects(battle, heroes, activeHero, false, isSimulation);
     this.applyMapEffects(battle, heroes, false, isSimulation);
     return battle;

@@ -244,9 +244,7 @@ export class AbilityService {
       }
     }
 
-    CharHelper.resetHeroState(target as IHero);
-    CharHelper.calcHero(battle, target as IHero);
-    this.battleService.applyCharEffects(battle, heroes, target, false, isSimulation);
+    this.battleService.recalculateChar(battle, heroes, target, false, isSimulation);
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
   }
@@ -461,9 +459,7 @@ export class AbilityService {
       }
     }
 
-    CharHelper.resetHeroState(target as IHero);
-    CharHelper.calcHero(battle, target as IHero);
-    this.battleService.applyCharEffects(battle, heroes, target, false, isSimulation);
+    this.battleService.recalculateChar(battle, heroes, target, false, isSimulation);
 
     this.addEffect(battle, heroes, target, ability.id, caster.id, isSimulation);
   }
@@ -2257,13 +2253,7 @@ export class AbilityService {
       }
     }
 
-    if (!target.isPet) {
-      CharHelper.resetHeroState(target as IHero);
-      CharHelper.calcHero(battle, target as IHero);
-    } else {
-      CharHelper.resetPetState(target as IPet);
-    }
-    this.battleService.applyCharEffects(battle, heroes, target, false, isSimulation);
+    this.battleService.recalculateChar(battle, heroes, target, false, isSimulation);
 
     if (effectsRemoved > 0 && caster.health < caster.maxHealth) {
       caster.health += 3 * effectsRemoved;
@@ -2791,7 +2781,7 @@ export class AbilityService {
   ): void {
     this.spendResources(battle, heroes, ability, caster, target, position, isSimulation);
 
-    CharHelper.takeEnergy(caster, 4);
+    CharHelper.takeEnergy(caster, 3);
 
     battle.log.push({
       t: LogMessageType.ABILITY_CAST,
