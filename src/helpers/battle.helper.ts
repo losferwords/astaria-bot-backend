@@ -1327,7 +1327,7 @@ export default class BattleHelper {
       actions.length === 0 ||
       activeHero.energy === 0 ||
       (team.crystals > 0 && team.heroes.filter((h) => !h.isDead).length > 1) ||
-      activeHero.effects.find((e) => e.id === '33-mind-control')
+      activeHero.effects.find((e) => e.id === '33-mind-control' || e.id === '22-smoke-cloud')
     ) {
       actions.push({ t: ActionType.TURN_END });
     }
