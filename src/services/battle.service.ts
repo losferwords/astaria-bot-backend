@@ -896,6 +896,7 @@ export class BattleService {
       case '12-reflection':
       case '21-flame-claws':
       case '11-duelist':
+      case '23-enhanced-charges':
         activeHero = CharHelper.getHeroById(battle.queue[0], heroes);
         this.recalculateChar(battle, heroes, activeHero, false, isSimulation);
         break;

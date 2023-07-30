@@ -1932,7 +1932,7 @@ export class AbilityService {
       heroes,
       target,
       physDamage: caster.primaryWeapon.physDamage + 2,
-      magicDamage: 2,
+      magicDamage: 1,
       abilityId: ability.id,
       isSimulation
     });

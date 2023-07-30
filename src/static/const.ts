@@ -50,7 +50,8 @@ export class Const {
     'avatar',
     'shadow',
     'lightbringer',
-    'avenger'
+    'avenger',
+    'navarch'
   ];
 
   // Logs

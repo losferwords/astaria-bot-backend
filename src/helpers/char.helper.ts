@@ -197,9 +197,6 @@ export default class CharHelper {
     if (hero.id === 'druid' && this.getHeroAbilityById(hero, '32-war-tree')) {
       hero.armor += 1;
     }
-    if (hero.id === 'oracle' && this.getHeroAbilityById(hero, '12-reflection')) {
-      hero.armor += 1;
-    }
     if (hero.id === 'avatar' && this.getHeroAbilityById(hero, '21-flame-claws')) {
       hero.armor += 1;
     }
@@ -221,6 +218,10 @@ export default class CharHelper {
 
     if (hero.id === 'druid' && this.getHeroAbilityById(hero, '32-war-tree')) {
       hero.primaryWeapon.range = 2;
+    }
+
+    if (hero.id === 'navarch' && this.getHeroAbilityById(hero, '23-enhanced-charges')) {
+      hero.secondaryWeapon.energyCost = 2;
     }
   }
 

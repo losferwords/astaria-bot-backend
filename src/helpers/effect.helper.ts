@@ -57,10 +57,10 @@ export default class EffectHelper {
 
   static '43-rallying'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     if (!target.isPet) {
-      (target as IHero).strength = (target as IHero).strength + 3;
-      (target as IHero).intellect = (target as IHero).intellect + 3;
-      (target as IHero).armor = (target as IHero).armor + 3;
-      (target as IHero).will = (target as IHero).will + 3;
+      (target as IHero).strength = (target as IHero).strength + 4;
+      (target as IHero).intellect = (target as IHero).intellect + 4;
+      (target as IHero).armor = (target as IHero).armor + 4;
+      (target as IHero).will = (target as IHero).will + 4;
     }
   }
 
@@ -215,9 +215,9 @@ export default class EffectHelper {
     target: IChar,
     isBeforeTurn: boolean
   ) {
-    (target as IHero).armor = (target as IHero).armor + 2;
-    (target as IHero).will = (target as IHero).will + 2;
-    (target as IHero).mind = (target as IHero).mind + 2;
+    (target as IHero).armor = (target as IHero).armor + 3;
+    (target as IHero).will = (target as IHero).will + 3;
+    (target as IHero).mind = (target as IHero).mind + 3;
   }
 
   static '41-harmony'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
@@ -362,6 +362,6 @@ export default class EffectHelper {
   }
 
   static '41-fortune'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
-    (target as IHero).strength = (target as IHero).strength + 3;
+    (target as IHero).strength = (target as IHero).strength + 4;
   }
 }
