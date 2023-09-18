@@ -183,8 +183,8 @@ export class BattleService {
       if (heroes[i].id === 'navarch' && CharHelper.getHeroAbilityById(heroes[i], '11-duelist')) {
         this.recalculateChar(battle, heroes, heroes[i], isBeforeTurn, isSimulation);
         if (BattleHelper.findEnemies(battle, heroes[i].id, 1, false, '', false, false).length === 1) {
-          heroes[i].strength = heroes[i].strength + 2;
-          heroes[i].armor = heroes[i].armor + 2;
+          heroes[i].strength = heroes[i].strength + 1;
+          heroes[i].armor = heroes[i].armor + 1;
         }
         // Проверяем симбиоз, чтобы перерасчитать его для Друида
         const symbiosisEffect = CharHelper.getCharEffectById(heroes[i], '43-symbiosis');
@@ -1129,7 +1129,7 @@ export class BattleService {
                   heroes,
                   target: activeChar,
                   abilityId: passiveAbility,
-                  physDamage: paragon.primaryWeapon.physDamage + 1,
+                  physDamage: paragon.primaryWeapon.physDamage,
                   isSimulation
                 });
               }
@@ -1161,7 +1161,7 @@ export class BattleService {
                 heroes,
                 target: enemyChar,
                 abilityId: passiveAbility,
-                magicDamage: 1,
+                magicDamage: 2,
                 isSimulation
               });
             }

@@ -83,7 +83,7 @@ export class EffectsData {
 
   static readonly '22-freedom-spirit': IEffect = {
     id: '22-freedom-spirit',
-    duration: 3,
+    duration: 2,
     isBuff: true,
     isRemovable: true
   };

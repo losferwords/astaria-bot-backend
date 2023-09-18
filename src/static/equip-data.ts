@@ -672,9 +672,8 @@ export class EquipData {
         range: 3,
         cost: 1,
         energyCost: 3,
-        directDamage: 1,
+        directDamage: 2,
         will: 1,
-        mind: 1,
         isPassive: false,
         isUsed: false
       },
@@ -684,8 +683,8 @@ export class EquipData {
         range: 3,
         cost: 1,
         energyCost: 3,
-        directDamage: 2,
-        will: 2,
+        directDamage: 3,
+        will: 1,
         mind: 1,
         isPassive: false,
         isUsed: false

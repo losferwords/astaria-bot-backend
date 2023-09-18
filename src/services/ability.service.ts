@@ -2697,6 +2697,8 @@ export class AbilityService {
       a: ability.id
     });
 
+    CharHelper.takeEnergy(caster, 2);
+
     caster.secondaryWeapon.isUsed = false;
   }
 

@@ -345,6 +345,7 @@ export default class EffectHelper {
 
   static '22-smoke-cloud'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
     (target as IHero).isInvisible = true;
+    (target as IHero).mind = (target as IHero).mind + 1;
   }
 
   static '31-skillful-trick'(battle: IBattle, heroes: IHero[], effect: IEffect, target: IChar, isBeforeTurn: boolean) {
